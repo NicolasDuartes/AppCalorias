@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diario de Nutrición - Modo Kcal/g</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #507052;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .hide-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="min-h-screen w-full flex justify-center bg-[#507052] p-0 overflow-hidden">
+
+  <!-- Viewport Frame: 390 x 917 px -->
+  <div class="relative w-[390px] h-[917px] bg-[#507052] overflow-hidden flex flex-col justify-between">
+
+    <!-- CABECERA Y BALANCE DIARIO FIJOS -->
+    <header class="w-full bg-[#507052] shrink-0 z-20 px-4 pt-5 pb-2">
+      <div class="flex items-center justify-between pb-2">
+        <h1 class="text-white text-2xl font-bold tracking-tight">Hoy</h1>
+        <div class="flex items-center gap-2">
+          <button class="w-9 h-9 rounded-full flex items-center justify-center text-white hover:bg-white/10 transition-colors" aria-label="Notificaciones">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+            </svg>
+          </button>
+          <div class="w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-900 font-semibold text-xs border border-white/20">
+            <svg class="w-5 h-5 text-emerald-800" fill="currentColor" viewBox="0 0 24 24">
+              <path clip-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" fill-rule="evenodd"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between pb-3">
+        <div>
+          <div class="flex items-center gap-1.5">
+            <h2 class="text-white text-base font-bold tracking-tight">Hoy, 24 Octubre</h2>
+            <span class="w-2 h-2 rounded-full bg-[#22C55E]"></span>
+          </div>
+          <p class="text-white/80 text-[11px] font-medium">Plan Hipertrofia &amp; Fuerza</p>
+        </div>
+        <div class="bg-[#111827]/80 p-1 rounded-full flex items-center shadow-inner border border-black/20">
+          <button id="btn-kcal" class="px-3 py-1 rounded-full bg-[#22C55E] text-[#0E141A] font-bold text-xs shadow transition-all">
+            Kcal / g
+          </button>
+          <button id="btn-porciones" onclick="navigateToPorciones()" class="px-3 py-1 rounded-full text-white/70 hover:text-white font-semibold text-xs transition-all">
+            Porciones
+          </button>
+        </div>
+      </div>
+
+      <!-- Tarjeta Fija: Balance Diario -->
+      <section class="w-full bg-[#F8FAFC] rounded-[18px] p-3.5 shadow-md border border-white/60">
+        <div class="flex items-start justify-between">
+          <div>
+            <span class="text-[10px] font-extrabold uppercase tracking-wider text-[#64748B]">Balance Diario</span>
+            <div class="flex items-baseline gap-1.5 mt-0.5">
+              <span class="text-2xl font-extrabold text-[#1E293B] tracking-tight">800</span>
+              <span class="text-xs font-semibold text-[#1E293B]">kcal restantes</span>
+            </div>
+            <p class="text-[11px] text-[#64748B]">(Meta diaria: 2300 kcal)</p>
+          </div>
+          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#DCFCE7] text-[#15803D] text-[11px] font-bold border border-[#86EFAC]/50">
+            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+              <path clip-rule="evenodd" d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12a4.49 4.49 0 01-1.549 3.397 4.491 4.491 0 01-1.307 3.497 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.49 4.49 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" fill-rule="evenodd"></path>
+            </svg>
+            94%
+          </span>
+        </div>
+
+        <div class="mt-2.5 space-y-2">
+          <!-- Kcal -->
+          <div>
+            <div class="flex items-center justify-between text-[11px] mb-0.5">
+              <span class="font-bold text-[#1E293B] flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-[#22C55E]"></span> KCAL
+              </span>
+              <span class="font-bold text-[#1E293B]">1500 / 2300</span>
+            </div>
+            <div class="w-full h-2 bg-[#E2E8F0] rounded-full overflow-hidden">
+              <div class="h-full bg-[#22C55E] rounded-full" style="width: 65%;"></div>
+            </div>
+          </div>
+          <!-- Proteínas -->
+          <div>
+            <div class="flex items-center justify-between text-[11px] mb-0.5">
+              <span class="font-bold text-[#1E293B] flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-[#EF4444]"></span> Proteínas
+              </span>
+              <span class="font-bold text-[#1E293B]">20 / 140 g</span>
+            </div>
+            <div class="w-full h-2 bg-[#E2E8F0] rounded-full overflow-hidden">
+              <div class="h-full bg-[#EF4444] rounded-full" style="width: 14%;"></div>
+            </div>
+          </div>
+          <!-- Carbohidratos -->
+          <div>
+            <div class="flex items-center justify-between text-[11px] mb-0.5">
+              <span class="font-bold text-[#1E293B] flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-[#F97316]"></span> Carbohidratos
+              </span>
+              <span class="font-bold text-[#1E293B]">200 / 360 g</span>
+            </div>
+            <div class="w-full h-2 bg-[#E2E8F0] rounded-full overflow-hidden">
+              <div class="h-full bg-[#F97316] rounded-full" style="width: 55%;"></div>
+            </div>
+          </div>
+          <!-- Grasas -->
+          <div>
+            <div class="flex items-center justify-between text-[11px] mb-0.5">
+              <span class="font-bold text-[#1E293B] flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-[#3B82F6]"></span> Grasas
+              </span>
+              <span class="font-bold text-[#1E293B]">70 / 80 g</span>
+            </div>
+            <div class="w-full h-2 bg-[#E2E8F0] rounded-full overflow-hidden">
+              <div class="h-full bg-[#3B82F6] rounded-full" style="width: 87.5%;"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </header>
+
+    <!-- LISTADO DE COMIDAS (SCROLL INTERNO HABILITADO) -->
+    <main class="w-full flex-1 min-h-0 overflow-y-auto hide-scrollbar px-4 pt-1 pb-24 space-y-3">
+      
+      <!-- DESAYUNO -->
+      <section class="w-full bg-[#F8FAFC] rounded-[18px] p-3.5 shadow-sm border border-white/60">
+        <div class="flex items-center justify-between pb-2.5">
+          <div class="flex items-center gap-2">
+            <span class="w-7 h-7 rounded-full bg-[#FEF3C7] text-[#D97706] flex items-center justify-center font-bold text-xs">☀️</span>
+            <div>
+              <h3 class="font-bold text-[#1E293B] text-sm">Desayuno</h3>
+              <span class="text-[11px] text-[#64748B]">08:30 AM</span>
+            </div>
+          </div>
+          <span class="px-2.5 py-0.5 rounded-full bg-[#E2E8F0] text-[#1E293B] font-bold text-[11px]">420 kcal</span>
+        </div>
+
+        <div class="space-y-2">
+          <div class="bg-white p-2.5 rounded-xl border border-[#E2E8F0] flex items-center justify-between shadow-xs">
+            <div>
+              <p class="font-bold text-xs text-[#1E293B]">Pan integral tostado</p>
+              <p class="text-[10px] text-[#64748B]">150g • 38C • 6P</p>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button class="w-7 h-7 rounded-full bg-[#F1F5F9] hover:bg-[#E2E8F0] flex items-center justify-center text-[#64748B] text-xs font-bold">⇄</button>
+              <button class="w-7 h-7 rounded-full bg-[#22C55E] text-white flex items-center justify-center">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="bg-white p-2.5 rounded-xl border border-[#E2E8F0] flex items-center justify-between shadow-xs">
+            <div>
+              <p class="font-bold text-xs text-[#1E293B]">Dulce de leche</p>
+              <p class="text-[10px] text-[#64748B]">30g • 18C • 2P</p>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button class="w-7 h-7 rounded-full bg-[#F1F5F9] hover:bg-[#E2E8F0] flex items-center justify-center text-[#64748B] text-xs font-bold">⇄</button>
+              <button class="w-7 h-7 rounded-full bg-[#22C55E] text-white flex items-center justify-center">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="bg-white p-2.5 rounded-xl border border-[#E2E8F0] flex items-center justify-between shadow-xs opacity-60">
+            <div>
+              <p class="font-bold text-xs text-[#94A3B8]">Banana madura</p>
+              <p class="text-[10px] text-[#94A3B8]">110g • 25C • 1P</p>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button class="w-7 h-7 rounded-full bg-[#F1F5F9] hover:bg-[#E2E8F0] flex items-center justify-center text-[#64748B] text-xs font-bold">⇄</button>
+              <button class="w-7 h-7 rounded-full bg-white border-2 border-[#CBD5E1] flex items-center justify-center"></button>
+            </div>
+          </div>
+
+          <div class="bg-white p-2.5 rounded-xl border border-[#E2E8F0] flex items-center justify-between shadow-xs opacity-60">
+            <div>
+              <p class="font-bold text-xs text-[#94A3B8]">Crema de maní natural</p>
+              <p class="text-[10px] text-[#94A3B8]">30g • 15G • 8P</p>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button class="w-7 h-7 rounded-full bg-[#F1F5F9] hover:bg-[#E2E8F0] flex items-center justify-center text-[#64748B] text-xs font-bold">⇄</button>
+              <button class="w-7 h-7 rounded-full bg-white border-2 border-[#CBD5E1] flex items-center justify-center"></button>
+            </div>
+          </div>
+        </div>
+
+        <button class="w-full mt-2.5 py-2 rounded-xl bg-[#E2E8F0]/70 hover:bg-[#E2E8F0] text-[#1E293B] font-bold text-xs flex items-center justify-center gap-1.5 transition-colors">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+          </svg>
+          Añadir alimento / porción
+        </button>
+      </section>
+
+      <!-- ALMUERZO -->
+      <section class="w-full bg-[#F8FAFC] rounded-[18px] p-3.5 shadow-sm border border-white/60">
+        <div class="flex items-center justify-between pb-2.5">
+          <div class="flex items-center gap-2">
+            <span class="w-7 h-7 rounded-full bg-[#FEE2E2] text-[#DC2626] flex items-center justify-center font-bold text-xs">🍲</span>
+            <div>
+              <h3 class="font-bold text-[#1E293B] text-sm">Almuerzo</h3>
+              <span class="text-[11px] text-[#64748B]">01:15 PM</span>
+            </div>
+          </div>
+          <span class="px-2.5 py-0.5 rounded-full bg-[#E2E8F0] text-[#1E293B] font-bold text-[11px]">680 kcal</span>
+        </div>
+
+        <div class="space-y-2">
+          <div class="bg-white p-2.5 rounded-xl border border-[#E2E8F0] flex items-center justify-between shadow-xs">
+            <div>
+              <p class="font-bold text-xs text-[#1E293B]">Pechuga de pollo</p>
+              <p class="text-[10px] text-[#64748B]">200g • 0C • 46P • 5G</p>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button class="w-7 h-7 rounded-full bg-[#F1F5F9] hover:bg-[#E2E8F0] flex items-center justify-center text-[#64748B] text-xs font-bold">⇄</button>
+              <button class="w-7 h-7 rounded-full bg-[#22C55E] text-white flex items-center justify-center">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="bg-white p-2.5 rounded-xl border border-[#E2E8F0] flex items-center justify-between shadow-xs">
+            <div>
+              <p class="font-bold text-xs text-[#1E293B]">Arroz integral cocido</p>
+              <p class="text-[10px] text-[#64748B]">180g • 45C • 5P • 2G</p>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button class="w-7 h-7 rounded-full bg-[#F1F5F9] hover:bg-[#E2E8F0] flex items-center justify-center text-[#64748B] text-xs font-bold">⇄</button>
+              <button class="w-7 h-7 rounded-full bg-[#22C55E] text-white flex items-center justify-center">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <button class="w-full mt-2.5 py-2 rounded-xl bg-[#E2E8F0]/70 hover:bg-[#E2E8F0] text-[#1E293B] font-bold text-xs flex items-center justify-center gap-1.5 transition-colors">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+          </svg>
+          Añadir alimento / porción
+        </button>
+      </section>
+
+      <!-- MERIENDA -->
+      <section class="w-full bg-[#F8FAFC] rounded-[18px] p-3.5 shadow-sm border border-white/60">
+        <div class="flex items-center justify-between pb-2.5">
+          <div class="flex items-center gap-2">
+            <span class="w-7 h-7 rounded-full bg-[#E0E7FF] text-[#4F46E5] flex items-center justify-center font-bold text-xs">☕</span>
+            <div>
+              <h3 class="font-bold text-[#1E293B] text-sm">Merienda</h3>
+              <span class="text-[11px] text-[#64748B]">05:00 PM</span>
+            </div>
+          </div>
+          <span class="px-2.5 py-0.5 rounded-full bg-[#E2E8F0] text-[#1E293B] font-bold text-[11px]">210 kcal</span>
+        </div>
+
+        <div class="space-y-2">
+          <div class="bg-white p-2.5 rounded-xl border border-[#E2E8F0] flex items-center justify-between shadow-xs">
+            <div>
+              <p class="font-bold text-xs text-[#1E293B]">Yogur griego natural</p>
+              <p class="text-[10px] text-[#64748B]">150g • 6C • 15P • 0G</p>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button class="w-7 h-7 rounded-full bg-[#F1F5F9] hover:bg-[#E2E8F0] flex items-center justify-center text-[#64748B] text-xs font-bold">⇄</button>
+              <button class="w-7 h-7 rounded-full bg-[#22C55E] text-white flex items-center justify-center">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <button class="w-full mt-2.5 py-2 rounded-xl bg-[#E2E8F0]/70 hover:bg-[#E2E8F0] text-[#1E293B] font-bold text-xs flex items-center justify-center gap-1.5 transition-colors">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+          </svg>
+          Añadir alimento / porción
+        </button>
+      </section>
+
+      <!-- CENA -->
+      <section class="w-full bg-[#F8FAFC] rounded-[18px] p-3.5 shadow-sm border border-white/60">
+        <div class="flex items-center justify-between pb-2.5">
+          <div class="flex items-center gap-2">
+            <span class="w-7 h-7 rounded-full bg-[#F3E8FF] text-[#9333EA] flex items-center justify-center font-bold text-xs">🌙</span>
+            <div>
+              <h3 class="font-bold text-[#1E293B] text-sm">Cena</h3>
+              <span class="text-[11px] text-[#64748B]">09:00 PM</span>
+            </div>
+          </div>
+          <span class="px-2.5 py-0.5 rounded-full bg-[#E2E8F0] text-[#1E293B] font-bold text-[11px]">190 kcal</span>
+        </div>
+
+        <div class="space-y-2">
+          <div class="bg-white p-2.5 rounded-xl border border-[#E2E8F0] flex items-center justify-between shadow-xs">
+            <div>
+              <p class="font-bold text-xs text-[#1E293B]">Ensalada fresca de atún y huevo</p>
+              <p class="text-[10px] text-[#64748B]">180g • 4C • 22P • 9G</p>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button class="w-7 h-7 rounded-full bg-[#F1F5F9] hover:bg-[#E2E8F0] flex items-center justify-center text-[#64748B] text-xs font-bold">⇄</button>
+              <button class="w-7 h-7 rounded-full bg-[#22C55E] text-white flex items-center justify-center">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <button class="w-full mt-2.5 py-2 rounded-xl bg-[#E2E8F0]/70 hover:bg-[#E2E8F0] text-[#1E293B] font-bold text-xs flex items-center justify-center gap-1.5 transition-colors">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+          </svg>
+          Añadir alimento / porción
+        </button>
+      </section>
+
+    </main>
+
+    <!-- MENÚ INFERIOR FIJO -->
+    <nav class="w-full h-[68px] shrink-0 bg-[#0E141A]/95 backdrop-blur-md border-t border-white/10 flex items-center justify-around px-2 z-30">
+      <button class="flex flex-col items-center justify-center flex-1 text-[#22C55E] gap-0.5">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+        </svg>
+        <span class="text-[10px] font-bold">Hoy</span>
+      </button>
+      <button class="flex flex-col items-center justify-center flex-1 text-[#94A3B8] hover:text-white transition-colors gap-0.5">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+        </svg>
+        <span class="text-[10px] font-medium">Mi Plan</span>
+      </button>
+      <button class="flex flex-col items-center justify-center flex-1 text-[#94A3B8] hover:text-white transition-colors gap-0.5">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+        </svg>
+        <span class="text-[10px] font-medium">Progreso</span>
+      </button>
+      <button class="flex flex-col items-center justify-center flex-1 text-[#94A3B8] hover:text-white transition-colors gap-0.5">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+        </svg>
+        <span class="text-[10px] font-medium">Coach</span>
+      </button>
+    </nav>
+
+    <!-- MODAL DE REEMPLAZO -->
+    <div id="swap-modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-end justify-center transition-opacity">
+      <div class="w-full max-w-[390px] bg-white rounded-t-3xl p-5 shadow-2xl space-y-4">
+        <div class="w-12 h-1.5 bg-[#CBD5E1] rounded-full mx-auto"></div>
+        <div class="flex items-center justify-between">
+          <div>
+            <h4 class="font-bold text-base text-[#1E293B]">Reemplazos Equivalentes</h4>
+            <p id="swap-modal-subtitle" class="text-xs text-[#64748B]">Para: Alimento</p>
+          </div>
+          <button onclick="closeSwapModal()" class="w-8 h-8 rounded-full bg-[#F1F5F9] text-[#64748B] font-bold text-sm flex items-center justify-center hover:bg-[#E2E8F0]">✕</button>
+        </div>
+        <div class="space-y-2 max-h-60 overflow-y-auto" id="swap-options-list">
+          <div onclick="selectReplacement(this)" class="p-3 rounded-xl border border-[#E2E8F0] hover:border-[#22C55E] bg-[#F8FAFC] cursor-pointer flex items-center justify-between transition-colors">
+            <div>
+              <p class="font-bold text-sm text-[#1E293B]">Opción A (Equivalente en macros)</p>
+              <p class="text-xs text-[#64748B]">Valores calóricos idénticos</p>
+            </div>
+            <span class="text-xs font-bold text-[#22C55E] bg-[#DCFCE7] px-2 py-1 rounded-full">Elegir</span>
+          </div>
+          <div onclick="selectReplacement(this)" class="p-3 rounded-xl border border-[#E2E8F0] hover:border-[#22C55E] bg-[#F8FAFC] cursor-pointer flex items-center justify-between transition-colors">
+            <div>
+              <p class="font-bold text-sm text-[#1E293B]">Opción B (Equivalente ligero)</p>
+              <p class="text-xs text-[#64748B]">Mayor volumen y fibra</p>
+            </div>
+            <span class="text-xs font-bold text-[#22C55E] bg-[#DCFCE7] px-2 py-1 rounded-full">Elegir</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    function navigateToPorciones() {
+      window.parent.postMessage({ type: 'NAVIGATE_TO_PORCIONES' }, '*');
+    }
+  </script>
+</body>
+</html>
