@@ -3,48 +3,49 @@
 
 Aplicación web interactiva, moderna, minimalista y eficaz para el cálculo del gasto energético diario (BMR, NEAT, METs, TDEE), distribución de macronutrientes, esquema de porciones y equivalencias de alimentos, convertida a partir de la planilla `Calculadora Nico Duartes.xlsx`.
 
----
+# AppCalorias - Diario Nutricional 🍏
 
-## 🚀 Características Principales
+Aplicación para el registro diario de comidas, cálculo de porciones y control de macronutrientes.
 
-1. **Contexto Energético & Gasto Diario (TDEE)**:
-   - **Metabolismo Basal (BMR)**: Ecuación científica Mifflin-St Jeor para Hombres y Mujeres.
-   - **Actividad Cotidiana (NEAT)**: Cálculo exacto por pasos diarios promedio (`pasos × 0.04`).
-   - **Gasto por Entrenamiento (METs)**: Estimación por intensidad MET, horas de entrenamiento y frecuencia semanal (`(MET × Peso × Horas × Días) / 7`).
-   - **Efecto Termogénico de los Alimentos (TEF)**: Suma de la termogénesis (`BMR × 10%`) para el TDEE total.
-   - **Objetivos Calóricos**: Déficit moderado (-500 kcal), Déficit leve (-300 kcal), Mantenimiento (0 kcal), Superávit leve (+300 kcal), Superávit moderado (+500 kcal) y objetivo personalizado.
+## 🚀 Cómo levantar el proyecto localmente
 
-2. **Esquema de Porciones y Macronutrientes**:
-   - Desglose de macronutrientes requerido: Proteínas (18%), Grasas (23%) y Carbohidratos (59%).
-   - Las 8 categorías oficiales de porciones:
-     - **HC** (Hidratos de carbono): 40g CH, 5g P, 1g G (~189 kcal)
-     - **F** (Fruta): 20g CH, 1g P, 0g G (~84 kcal)
-     - **D** (Dulce): 20g CH, 0g P, 0g G (~80 kcal)
-     - **P** (Proteína magra): 0g CH, 25g P, 3g G (~127 kcal)
-     - **PG** (Proteína grasa): 0g CH, 8.5g P, 10g G (~124 kcal)
-     - **M** (Legumbre / mixta): 20g CH, 8g P, 0g G (~112 kcal)
-     - **L** (Lácteos): 20g CH, 10g P, 0g G (~120 kcal)
-     - **G** (Fruta oleosa / Grasas): 0g CH, 0g P, 15g G (~135 kcal)
-   - **Verificación 1**: Comparación en tiempo real entre el esquema de porciones planificado y el requerimiento teórico con márgenes de tolerancia.
+Para poder ejecutar la aplicación y que se conecte correctamente a la base de datos, seguí estos pasos:
 
-3. **Plan Alimenticio por Comidas**:
-   - Distribución dinámica para Desayuno, Almuerzo, Merienda, Cena (con opción de agregar comidas y colaciones personalizadas).
-   - Selección de alimentos con cómputo automático de porciones, gramos y macronutrientes.
-   - **Verificación 2**: Comparación en tiempo real entre el consumo real en comidas y el requerimiento objetivo con alertas de coherencia.
+### 1. Clonar el repositorio
+Abrí una terminal y descargá el proyecto:
+\`\`\`bash
+git clone [ACA_PONE_EL_LINK_DE_TU_REPO_DE_GITHUB]
+cd AppCalorias
+\`\`\`
 
-4. **Calculadora Inteligente de Equivalencias**:
-   - Permite sustituir cualquier alimento por otro dentro del mismo grupo (o grupos afines).
-   - Calcula al instante los gramos exactos y medidas caseras equivalentes (tazas, fetas, cucharadas, unidades).
-   - Buscador en tiempo real de alimentos y medidas caseras.
+### 2. Instalar dependencias
+Asegurate de tener Node.js instalado. Luego, ejecutá:
+\`\`\`bash
+npm install
+\`\`\`
 
-5. **Diseño & Experiencia de Usuario**:
-   - Interfaz minimalista con **Dark Mode** y **Light Mode**.
-   - Barra HUD de estado fija con balances de calorías y progreso de macros.
-   - Persistencia automática en `localStorage`.
-   - Soporte para impresión y exportación en PDF.
-   - Cero dependencias externas complejas (HTML5 + CSS3 + Vanilla ES6 Modules).
+### 3. Configurar variables de entorno (¡MUY IMPORTANTE!) ⚠️
+Por seguridad, el archivo con las claves de la base de datos NO se sube a GitHub. **Tenés que crearlo a mano**:
 
----
+1. Creá un archivo en la raíz del proyecto (al mismo nivel que el `index.html`) y ponele exactamente este nombre: `.env`
+2. Entrá a nuestro proyecto en [Supabase](https://supabase.com) (aceptá la invitación que te llegó al mail si no lo hiciste).
+3. Andá a la ruedita de configuración (Project Settings) -> API.
+4. Pegá esto adentro de tu archivo `.env`, reemplazando con los valores que ves en Supabase:
+
+\`\`\`env
+VITE_SUPABASE_URL=pega_aca_la_URL_del_proyecto
+VITE_SUPABASE_ANON_KEY=pega_aca_la_clave_anon_public
+\`\`\`
+*Nota: Guardá el archivo. No te preocupes, Git está configurado para ignorarlo y no subirlo accidentalmente.*
+
+### 4. Levantar el servidor
+Una vez que tengas el `.env` guardado, ejecutá:
+\`\`\`bash
+npx vite
+\`\`\`
+Hacé clic en el enlace local (suele ser `http://localhost:5173/`) y ¡listo!
+Para apagar el servidor, presioná `Ctrl + C` en la terminal.
+
 
 ## 🛠️ Ejecución Local
 
