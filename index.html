@@ -9,10 +9,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/styles.css">
-
-    <!-- Agregamos la conexión a Supabase aquí (Código de tu compañero) -->
-    <script type="module" src="/js/supabase.js"></script>
+    <!-- Ajuste de ruta de CSS -->
+    <link rel="stylesheet" href="./css/styles.css">
 </head>
 
 <body class="w-full h-screen bg-[#3D553E] m-0 p-0 overflow-hidden flex justify-center text-slate-800">
@@ -20,14 +18,10 @@
     <div class="relative w-full md:max-w-2xl lg:max-w-3xl h-full bg-[#F8FAFC] flex flex-col shadow-2xl overflow-hidden">
 
         <!-- Cabecera decorativa ajustada -->
-        <div
-            class="w-full bg-[#507052] px-6 pt-8 pb-5 shrink-0 flex flex-col items-center justify-center rounded-b-[32px] shadow-sm z-10">
-            <div
-                class="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mb-4 backdrop-blur-sm border border-white/20">
+        <div class="w-full bg-[#507052] px-6 pt-8 pb-5 shrink-0 flex flex-col items-center justify-center rounded-b-[32px] shadow-sm z-10">
+            <div class="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mb-4 backdrop-blur-sm border border-white/20">
                 <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
-                    </path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
                 </svg>
             </div>
             <h1 class="text-white text-2xl font-extrabold tracking-tight">Crear Cuenta</h1>
@@ -38,62 +32,59 @@
         <div class="flex-1 overflow-y-auto hide-scrollbar px-6 pt-6 pb-8 flex flex-col justify-center space-y-6">
 
             <div class="space-y-3">
-                <span class="text-xs font-extrabold uppercase tracking-wider text-[#64748B] ml-1">Selecciona tu
-                    perfil</span>
+                <span class="text-xs font-extrabold uppercase tracking-wider text-[#64748B] ml-1">Selecciona tu perfil</span>
                 <div class="grid grid-cols-2 gap-3">
-                    <button id="btn-role-alumno" onclick="selectRole('alumno')"
-                        class="relative flex flex-col items-center justify-center p-4 rounded-2xl border-2 border-[#22C55E] bg-[#F0FDF4] transition-all duration-200 shadow-sm">
-                        <div class="absolute top-2 right-2 w-4 h-4 rounded-full bg-[#22C55E] flex items-center justify-center"
-                            id="check-alumno">
+                    <!-- IMPORTANTE: type="button" para que el click no intente guardar el formulario vacío -->
+                    <button type="button" id="btn-role-alumno" class="relative flex flex-col items-center justify-center p-4 rounded-2xl border-2 border-[#22C55E] bg-[#F0FDF4] transition-all duration-200 shadow-sm">
+                        <div class="absolute top-2 right-2 w-4 h-4 rounded-full bg-[#22C55E] flex items-center justify-center" id="check-alumno">
                             <div class="w-1.5 h-1.5 bg-white rounded-full"></div>
                         </div>
                         <span class="text-2xl mb-1">🏃‍♂️</span>
                         <span class="text-sm font-bold text-[#0E141A]">Alumno</span>
-                        <span class="text-[9px] font-medium text-[#64748B] text-center mt-1 leading-tight">Quiero
-                            registrar mis comidas</span>
+                        <span class="text-[9px] font-medium text-[#64748B] text-center mt-1 leading-tight">Quiero registrar mis comidas</span>
                     </button>
 
-                    <button id="btn-role-coach" onclick="selectRole('coach')"
-                        class="relative flex flex-col items-center justify-center p-4 rounded-2xl border-2 border-[#E2E8F0] bg-white hover:bg-gray-50 transition-all duration-200">
-                        <div class="absolute top-2 right-2 w-4 h-4 rounded-full border-2 border-[#CBD5E1] bg-transparent"
-                            id="check-coach"></div>
+                    <button type="button" id="btn-role-coach" class="relative flex flex-col items-center justify-center p-4 rounded-2xl border-2 border-[#E2E8F0] bg-white hover:bg-gray-50 transition-all duration-200">
+                        <div class="absolute top-2 right-2 w-4 h-4 rounded-full border-2 border-[#CBD5E1] bg-transparent" id="check-coach"></div>
                         <span class="text-2xl mb-1">📋</span>
                         <span class="text-sm font-bold text-[#0E141A]">Coach</span>
-                        <span class="text-[9px] font-medium text-[#64748B] text-center mt-1 leading-tight">Quiero
-                            gestionar a mis alumnos</span>
+                        <span class="text-[9px] font-medium text-[#64748B] text-center mt-1 leading-tight">Quiero gestionar a mis alumnos</span>
                     </button>
                 </div>
             </div>
 
-            <form id="registro-form" class="space-y-4" onsubmit="handleRegistro(event)">
+            <form id="registro-form" class="space-y-4">
                 <div class="space-y-1.5">
                     <label class="text-xs font-extrabold text-[#1E293B] ml-1">Nombre completo</label>
-                    <input type="text" required
+                    <input type="text" id="nombre" required
                         class="w-full bg-white border border-gray-200 text-sm font-medium text-gray-900 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#22C55E] focus:border-transparent shadow-sm transition-all"
                         placeholder="Ej: Juan Pérez">
                 </div>
 
                 <div class="space-y-1.5">
                     <label class="text-xs font-extrabold text-[#1E293B] ml-1">Correo electrónico</label>
-                    <input type="email" required
+                    <input type="email" id="email" required
                         class="w-full bg-white border border-gray-200 text-sm font-medium text-gray-900 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#22C55E] focus:border-transparent shadow-sm transition-all"
                         placeholder="juan@email.com">
                 </div>
 
                 <div class="space-y-1.5">
                     <label class="text-xs font-extrabold text-[#1E293B] ml-1">Contraseña</label>
-                    <input type="password" required
+                    <input type="password" id="password" required
                         class="w-full bg-white border border-gray-200 text-sm font-medium text-gray-900 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#22C55E] focus:border-transparent shadow-sm transition-all"
                         placeholder="••••••••">
                 </div>
 
+                <!-- Mensaje de feedback oculto por defecto -->
+                <p id="mensaje-estado" class="text-center text-sm font-bold hidden"></p>
+
                 <div class="pt-2">
-                    <button type="submit"
+                    <!-- IMPORTANTE: type="submit" solo para el botón final -->
+                    <button type="submit" id="btn-submit"
                         class="w-full bg-[#22C55E] hover:brightness-95 active:scale-[0.98] text-[#0E141A] font-extrabold text-sm py-3.5 rounded-xl shadow-md transition-all flex items-center justify-center gap-2">
                         Comenzar ahora
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
                         </svg>
                     </button>
                 </div>
@@ -108,15 +99,25 @@
         </div>
     </div>
 
-    <script>
+    <!-- SCRIPT TIPO MÓDULO -->
+    <script type="module">
+        // IMPORTANTE: Ruta con ./ para que Vite lo encuentre sin problemas
+        import { registrar } from './js/supabase.js';
+
         let selectedRole = 'alumno';
 
+        // Elementos del DOM
+        const btnAlumno = document.getElementById('btn-role-alumno');
+        const btnCoach = document.getElementById('btn-role-coach');
+        const checkAlumno = document.getElementById('check-alumno');
+        const checkCoach = document.getElementById('check-coach');
+        const form = document.getElementById('registro-form');
+        const mensajeEstado = document.getElementById('mensaje-estado');
+        const btnSubmit = document.getElementById('btn-submit');
+
+        // Función visual para seleccionar rol
         function selectRole(role) {
             selectedRole = role;
-            const btnAlumno = document.getElementById('btn-role-alumno');
-            const btnCoach = document.getElementById('btn-role-coach');
-            const checkAlumno = document.getElementById('check-alumno');
-            const checkCoach = document.getElementById('check-coach');
 
             if (role === 'alumno') {
                 btnAlumno.className = 'relative flex flex-col items-center justify-center p-4 rounded-2xl border-2 border-[#22C55E] bg-[#F0FDF4] transition-all duration-200 shadow-sm';
@@ -137,17 +138,47 @@
             }
         }
 
-        function handleRegistro(event) {
-            event.preventDefault();
+        // Asignamos los eventos de click a los botones de rol
+        btnAlumno.addEventListener('click', () => selectRole('alumno'));
+        btnCoach.addEventListener('click', () => selectRole('coach'));
 
-            // Rutas actualizadas para redirigir a la carpeta pages/
-            if (selectedRole === 'alumno') {
-                window.location.href = 'pages/alumno.html';
-            } else {
-                window.location.href = 'pages/coach-dashboard.html';
+        // Evento de registro REAL en base de datos
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault(); 
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const isCoach = selectedRole === 'coach';
+
+            // Feedback visual de carga
+            btnSubmit.innerHTML = 'Procesando...';
+            btnSubmit.disabled = true;
+            mensajeEstado.classList.add('hidden');
+
+            try {
+                // Llamamos a Supabase
+                await registrar(email, password, isCoach);
+                
+                // Si sale bien, avisamos y redirigimos
+                mensajeEstado.textContent = '¡Cuenta creada! Redirigiendo...';
+                mensajeEstado.className = 'text-center text-sm font-bold text-green-600 block';
+                
+                setTimeout(() => {
+                    if (isCoach) {
+                        window.location.href = './pages/coach.html';
+                    } else {
+                        window.location.href = './pages/alumno.html';
+                    }
+                }, 1000);
+
+            } catch (error) {
+                // Si falla mostramos error
+                mensajeEstado.textContent = 'Error: ' + error.message;
+                mensajeEstado.className = 'text-center text-sm font-bold text-red-600 block';
+                btnSubmit.innerHTML = 'Comenzar ahora';
+                btnSubmit.disabled = false;
             }
-        }
+        });
     </script>
 </body>
-
 </html>
