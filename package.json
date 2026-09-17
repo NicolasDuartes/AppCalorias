@@ -1,0 +1,24 @@
+{
+  "name": "appcalorias",
+  "version": "1.0.0",
+  "description": "Aplicación web interactiva, moderna, minimalista y eficaz para el cálculo del gasto energético diario (BMR, NEAT, METs, TDEE), distribución de macronutrientes, esquema de porciones y equivalencias de alimentos, convertida a partir de la planilla `Calculadora Nico Duartes.xlsx`.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NicolasDuartes/AppCalorias.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NicolasDuartes/AppCalorias/issues"
+  },
+  "homepage": "https://github.com/NicolasDuartes/AppCalorias#readme",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.116.0",
+    "vite": "^5.4.21"
+  }
+}
