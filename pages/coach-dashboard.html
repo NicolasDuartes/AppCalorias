@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Panel Coach - AppCalorias</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+
+<body class="w-full h-screen bg-[#3D553E] m-0 p-0 overflow-hidden flex justify-center text-slate-800">
+
+    <div class="relative w-full md:max-w-2xl lg:max-w-3xl h-full bg-[#507052] flex flex-col justify-between shadow-2xl overflow-hidden">
+
+        <!-- CABECERA DEL COACH -->
+        <header class="w-full shrink-0 z-20 px-4 pt-5 pb-4">
+            <div class="flex items-center justify-between pb-4">
+                <div>
+                    <h1 class="text-white text-2xl font-bold tracking-tight">Hola, Coach</h1>
+                    <p class="text-white/80 text-xs font-medium mt-0.5">Gestión de alumnos</p>
+                </div>
+                <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center border border-white/20 shadow-inner">
+                    <span class="text-lg">📋</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- CONTENEDOR PRINCIPAL -->
+        <main class="w-full flex-1 min-h-0 bg-[#F8FAFC] rounded-t-[32px] overflow-hidden flex flex-col shadow-[0_-8px_20px_rgba(0,0,0,0.15)] z-10 relative">
+            
+            <!-- ========================================== -->
+            <!-- VISTA 1: LISTA DE ALUMNOS (PERFILES)       -->
+            <!-- ========================================== -->
+            <div id="vista-lista" class="flex flex-col h-full w-full">
+                <div id="seccion-pendientes" class="w-full px-5 pt-6 pb-2 shrink-0 flex items-center justify-between hidden">
+                    <h2 class="text-base font-bold text-[#EAB308] tracking-tight">Solicitudes Pendientes</h2>
+                </div>
+                <div id="contenedor-pendientes" class="w-full px-4 space-y-3 mb-4 hidden">
+                    <!-- Tarjetas de pendientes -->
+                </div>
+
+                <div class="w-full px-5 pt-2 pb-2 shrink-0 flex items-center justify-between">
+                    <h2 class="text-base font-bold text-[#0E141A] tracking-tight">Directorio de Alumnos</h2>
+                </div>
+                
+                <!-- Aquí inyectaremos las tarjetas de alumnos con JS -->
+                <div id="contenedor-alumnos" class="flex-1 overflow-y-auto hide-scrollbar px-4 pb-6 space-y-3">
+                    <div class="text-center text-[#64748B] mt-10 text-xs font-medium font-bold">Cargando base de datos...</div>
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- VISTA 2: FORMULARIO DE MÉTRICAS            -->
+            <!-- ========================================== -->
+            <div id="vista-metricas" class="hidden absolute inset-0 bg-white z-20 flex flex-col h-full w-full overflow-y-auto hide-scrollbar p-5 pb-24">
+                <div class="flex justify-between items-start mb-4 border-b border-gray-100 pb-3 shrink-0">
+                    <div>
+                        <h3 class="font-bold text-[#1E293B]" id="titulo-alumno">Métricas</h3>
+                        <p class="text-[11px] text-[#64748B]" id="subtitulo-alumno">Edad: - | Sexo: -</p>
+                    </div>
+                    <button onclick="window.volverALista()" class="w-8 h-8 rounded-full bg-[#F1F5F9] text-[#64748B] hover:text-[#0E141A] flex items-center justify-center transition-colors">
+                        ✕
+                    </button>
+                </div>
+
+                <form id="form-metricas" class="space-y-3">
+                    <!-- ID oculto para saber a qué perfil le asignamos las métricas -->
+                    <input type="hidden" id="input-perfil-id">
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-[11px] font-bold text-[#1E293B] ml-1">Peso (kg)</label>
+                            <input type="number" step="0.1" id="input-peso" required
+                                class="w-full bg-[#F8FAFC] border border-gray-200 text-xs font-bold text-gray-900 rounded-xl px-3 py-2 focus:ring-2 focus:ring-[#22C55E]" />
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-bold text-[#1E293B] ml-1">Altura (cm)</label>
+                            <input type="number" id="input-altura" required
+                                class="w-full bg-[#F8FAFC] border border-gray-200 text-xs font-bold text-gray-900 rounded-xl px-3 py-2 focus:ring-2 focus:ring-[#22C55E]" />
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-[11px] font-bold text-[#1E293B] ml-1">Pasos diarios</label>
+                            <input type="number" id="input-pasos" required value="0"
+                                class="w-full bg-[#F8FAFC] border border-gray-200 text-xs font-bold text-gray-900 rounded-xl px-3 py-2 focus:ring-2 focus:ring-[#22C55E]" />
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-bold text-[#1E293B] ml-1">Valor MET</label>
+                            <input type="number" step="0.1" id="input-met" required value="0.0"
+                                class="w-full bg-[#F8FAFC] border border-gray-200 text-xs font-bold text-gray-900 rounded-xl px-3 py-2 focus:ring-2 focus:ring-[#22C55E]" />
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-[11px] font-bold text-[#1E293B] ml-1">Entrenos / semana</label>
+                            <input type="number" id="input-entrenos" required value="0"
+                                class="w-full bg-[#F8FAFC] border border-gray-200 text-xs font-bold text-gray-900 rounded-xl px-3 py-2 focus:ring-2 focus:ring-[#22C55E]" />
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-bold text-[#1E293B] ml-1">Horas / sesión</label>
+                            <input type="number" step="0.1" id="input-horas" required value="0.0"
+                                class="w-full bg-[#F8FAFC] border border-gray-200 text-xs font-bold text-gray-900 rounded-xl px-3 py-2 focus:ring-2 focus:ring-[#22C55E]" />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-[11px] font-bold text-[#1E293B] ml-1">Contexto Energético</label>
+                        <select id="input-contexto" required
+                            class="w-full bg-[#F8FAFC] border border-gray-200 text-xs font-bold text-gray-900 rounded-xl px-3 py-2 focus:ring-2 focus:ring-[#22C55E] capitalize">
+                            <option value="" disabled selected>Seleccionar contexto...</option>
+                            <!-- Opciones inyectadas por JS -->
+                        </select>
+                    </div>
+
+                    <button type="submit" class="w-full mt-4 py-3 rounded-xl bg-[#22C55E] text-[#0E141A] font-extrabold text-xs shadow-sm active:scale-95 transition-transform">
+                        Guardar Métricas
+                    </button>
+                </form>
+            </div>
+        </main>
+
+        <!-- MENÚ INFERIOR FIJO -->
+        <nav class="w-full h-[64px] shrink-0 bg-[#0E141A]/95 backdrop-blur-md border-t border-white/10 flex items-center justify-around px-2 z-30">
+            <button class="flex flex-col items-center justify-center flex-1 text-[#22C55E] gap-0.5">
+                <span class="text-lg">📋</span>
+                <span class="text-[10px] font-bold">Panel</span>
+            </button>
+            <button class="flex flex-col items-center justify-center flex-1 text-[#94A3B8] hover:text-white transition-colors gap-0.5">
+                <span class="text-lg">👥</span>
+                <span class="text-[10px] font-medium">Alumnos</span>
+            </button>
+            <button class="flex flex-col items-center justify-center flex-1 text-[#94A3B8] hover:text-white transition-colors gap-0.5">
+                <span class="text-lg">📑</span>
+                <span class="text-[10px] font-medium">Plantillas</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- LÓGICA JAVASCRIPT PURO                     -->
+    <!-- ========================================== -->
+    <script type="module">
+        import { supabase } from '../js/supabase.js';
+
+        // Variable global para almacenar los datos temporalmente en memoria
+        let perfilesGlobal = [];
+
+        // 1. INICIALIZACIÓN: Cargar datos al entrar a la página
+        async function cargarDatosInciales() {
+            try {
+                // A. Traer perfiles (Alumnos APROBADOS) desde la tabla
+                const { data: perfiles, error: errPerfiles } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('role', 'alumno')
+                    .eq('status', 'aprobado');
+                
+                if (errPerfiles) throw errPerfiles;
+                perfilesGlobal = perfiles || [];
+
+                // Renderizar la lista en el HTML
+                renderizarListaAlumnos();
+
+                // A.2 Traer perfiles (Alumnos PENDIENTES)
+                const { data: pendientes, error: errPendientes } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('role', 'alumno')
+                    .eq('status', 'pendiente');
+                
+                if (errPendientes) throw errPendientes;
+                renderizarListaPendientes(pendientes || []);
+
+                // B. Traer opciones de contextos (Tabla enums)
+                const { data: contextos, error: errContextos } = await supabase
+                    .from('enums')
+                    .select('id, valor')
+                    .eq('categoria', 'contexto_energetico');
+                
+                if (errContextos) throw errContextos;
+                
+                // Cargar opciones en el select del formulario
+                const selectContexto = document.getElementById('input-contexto');
+                contextos.forEach(ctx => {
+                    selectContexto.innerHTML += `<option value="${ctx.id}">${ctx.valor}</option>`;
+                });
+
+            } catch (error) {
+                console.error("Error al cargar base de datos:", error);
+                document.getElementById('contenedor-alumnos').innerHTML = `<div class="text-center text-red-500 mt-10 text-xs font-bold">Error de conexión.</div>`;
+            }
+        }
+
+        // 2. FUNCIÓN PARA DIBUJAR LA LISTA
+        function renderizarListaAlumnos() {
+            const contenedor = document.getElementById('contenedor-alumnos');
+            
+            if (perfilesGlobal.length === 0) {
+                contenedor.innerHTML = '<div class="text-center text-[#64748B] mt-10 text-xs font-medium">No hay alumnos registrados.</div>';
+                return;
+            }
+
+            // Construir el HTML concatenando texto
+            let htmlHTML = '';
+            perfilesGlobal.forEach(perfil => {
+                // NOTA: Si Juan usó "name" en vez de "nombre" en Supabase, cambia "perfil.nombre" a "perfil.name"
+                const nombreUsuario = perfil.nombre || perfil.name || 'Sin Nombre';
+                const iniciales = nombreUsuario.substring(0, 2).toUpperCase();
+                
+                htmlHTML += `
+                    <article class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm flex flex-col gap-3">
+                        <div class="flex items-start justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-[#DCFCE7] flex items-center justify-center text-[#15803D] font-bold text-sm border border-[#BBF7D0]">
+                                    ${iniciales}
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-[#1E293B] text-sm capitalize">${nombreUsuario}</h3>
+                                    <p class="text-[10px] text-[#64748B] font-medium">${perfil.email}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 gap-2 mt-1">
+                            <button onclick="window.abrirFormularioMetricas('${perfil.id}')"
+                                class="py-2.5 rounded-xl bg-[#22C55E] text-[#0E141A] font-extrabold text-[11px] shadow-sm active:scale-95 transition-transform">
+                                Cargar Métricas y Contexto
+                            </button>
+                        </div>
+                    </article>
+                `;
+            });
+            contenedor.innerHTML = htmlHTML;
+        }
+
+        // 2.B FUNCIÓN PARA DIBUJAR PENDIENTES
+        function renderizarListaPendientes(pendientes) {
+            const seccion = document.getElementById('seccion-pendientes');
+            const contenedor = document.getElementById('contenedor-pendientes');
+            
+            if (pendientes.length === 0) {
+                seccion.classList.add('hidden');
+                contenedor.classList.add('hidden');
+                return;
+            }
+
+            seccion.classList.remove('hidden');
+            contenedor.classList.remove('hidden');
+
+            let htmlHTML = '';
+            pendientes.forEach(perfil => {
+                const nombreUsuario = perfil.nombre || perfil.name || 'Sin Nombre';
+                const iniciales = nombreUsuario.substring(0, 2).toUpperCase();
+                
+                htmlHTML += `
+                    <article class="bg-yellow-50 rounded-2xl p-4 border border-yellow-200 shadow-sm flex flex-col gap-3">
+                        <div class="flex items-start justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-700 font-bold text-sm border border-yellow-300">
+                                    ${iniciales}
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-[#1E293B] text-sm capitalize">${nombreUsuario}</h3>
+                                    <p class="text-[10px] text-[#64748B] font-medium">${perfil.email}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 gap-2 mt-1">
+                            <button onclick="window.aprobarAlumno('${perfil.id}')"
+                                class="py-2.5 rounded-xl bg-yellow-400 text-[#0E141A] font-extrabold text-[11px] shadow-sm active:scale-95 transition-transform">
+                                Aprobar Alumno
+                            </button>
+                        </div>
+                    </article>
+                `;
+            });
+            contenedor.innerHTML = htmlHTML;
+        }
+
+        window.aprobarAlumno = async function(perfilId) {
+            const btn = event.currentTarget;
+            const textOriginal = btn.innerText;
+            btn.innerText = "Aprobando...";
+            btn.disabled = true;
+
+            try {
+                const { error } = await supabase.rpc('approve_alumno', {
+                    alumno_id: perfilId
+                });
+
+                if (error) throw error;
+                
+                // Recargar todo
+                await cargarDatosInciales();
+            } catch (error) {
+                console.error(error);
+                alert("Error al aprobar: " + error.message);
+                btn.innerText = textOriginal;
+                btn.disabled = false;
+            }
+        };
+
+        // 3. CAMBIAR A VISTA DE FORMULARIO
+        window.abrirFormularioMetricas = function(perfilId) {
+            const perfil = perfilesGlobal.find(p => p.id === perfilId);
+            const nombreUsuario = perfil.nombre || perfil.name || 'Alumno';
+            const edadUsuario = perfil.edad || perfil.age || '-';
+            const sexoUsuario = perfil.sexo || perfil.sex || '-';
+            
+            // Llenar etiquetas del título
+            document.getElementById('titulo-alumno').innerText = `Métricas para ${nombreUsuario}`;
+            document.getElementById('subtitulo-alumno').innerText = `Edad: ${edadUsuario} | Sexo: ${sexoUsuario}`;
+            
+            // Guardar el ID en el input oculto
+            document.getElementById('input-perfil-id').value = perfil.id;
+
+            // Ocultar lista, mostrar métricas
+            document.getElementById('vista-lista').classList.add('hidden');
+            document.getElementById('vista-metricas').classList.remove('hidden');
+        };
+
+        // 4. VOLVER A VISTA DE LISTA
+        window.volverALista = function() {
+            document.getElementById('vista-metricas').classList.add('hidden');
+            document.getElementById('vista-lista').classList.remove('hidden');
+            document.getElementById('form-metricas').reset(); // Limpiar inputs
+        };
+
+        // 5. GUARDAR DATOS DEL FORMULARIO EN LA TABLA ALUMNOS
+        document.getElementById('form-metricas').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Extraer y parsear valores del DOM
+            const payload = {
+                perfil_id: document.getElementById('input-perfil-id').value, // Sigue guardando en tabla alumnos vinculando el id
+                peso: parseFloat(document.getElementById('input-peso').value),
+                altura: parseInt(document.getElementById('input-altura').value),
+                pasos_diarios: parseInt(document.getElementById('input-pasos').value),
+                met: parseFloat(document.getElementById('input-met').value),
+                horas_entrenamiento: parseFloat(document.getElementById('input-horas').value),
+                entrenos_semana: parseInt(document.getElementById('input-entrenos').value),
+                contexto_id: parseInt(document.getElementById('input-contexto').value)
+            };
+
+            const btnText = e.submitter.innerText;
+            e.submitter.innerText = "Guardando...";
+
+            try {
+                const { error } = await supabase.from('alumnos').insert([payload]);
+                if (error) throw error;
+                
+                alert("¡Métricas guardadas correctamente en la base de datos!");
+                window.volverALista();
+            } catch (error) {
+                console.error("Error al insertar:", error);
+                alert("Error al guardar: " + error.message);
+            } finally {
+                e.submitter.innerText = btnText;
+            }
+        });
+
+        // Ejecutar la carga al iniciar
+        cargarDatosInciales();
+    </script>
+</body>
+</html>

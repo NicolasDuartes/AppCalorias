@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>AppCalorias - Diario Nutricional</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <!-- Conexión a la base de datos -->
+  <script type="module" src="/js/supabase.js"></script>
+</head>
+
+<body class="w-full h-screen bg-[#3D553E] m-0 p-0 overflow-hidden flex justify-center text-slate-800">
+
+  <div
+    class="relative w-full md:max-w-2xl lg:max-w-3xl h-full bg-[#507052] flex flex-col justify-between shadow-2xl overflow-hidden">
+
+    <header class="w-full bg-[#507052] shrink-0 z-20 px-4 pt-3 pb-2">
+      <div class="flex items-center justify-between pb-2">
+        <h1 class="text-white text-2xl font-bold tracking-tight">Hoy</h1>
+        <div class="flex items-center gap-2">
+          <button
+            class="w-9 h-9 rounded-full flex items-center justify-center text-white hover:bg-white/10 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+            </svg>
+          </button>
+          <div
+            class="w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-900 font-semibold text-xs border border-white/20">
+            <svg class="w-5 h-5 text-emerald-800" fill="currentColor" viewBox="0 0 24 24">
+              <path clip-rule="evenodd"
+                d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"
+                fill-rule="evenodd"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between pb-3">
+        <div>
+          <div class="flex items-center gap-1.5">
+            <h2 class="text-white text-base font-bold tracking-tight">Hoy, 24 Octubre</h2>
+            <span class="w-2 h-2 rounded-full bg-[#22C55E]"></span>
+          </div>
+          <p class="text-white/80 text-[11px] font-medium">Plan Hipertrofia &amp; Fuerza</p>
+        </div>
+        <div class="bg-[#111827]/80 p-1 rounded-full flex items-center shadow-inner border border-black/20">
+          <button id="btn-mode-kcal" onclick="setAppMode('kcal')"
+            class="px-3 py-1 rounded-full font-semibold text-xs transition-all text-white/70">
+            Kcal / g
+          </button>
+          <button id="btn-mode-porciones" onclick="setAppMode('porciones')"
+            class="px-3 py-1 rounded-full bg-[#22C55E] text-[#0E141A] font-bold text-xs shadow transition-all">
+            Porciones
+          </button>
+        </div>
+      </div>
+
+      <section id="balance-card"
+        class="w-full bg-[#F8FAFC] rounded-[18px] p-3.5 shadow-md border border-white/60 transition-all duration-300 ease-in-out">
+        <div class="flex items-start justify-between">
+          <div>
+            <span class="text-[10px] font-extrabold uppercase tracking-wider text-[#64748B]">Balance Diario</span>
+            <div class="flex items-baseline gap-1.5 mt-0.5">
+              <span id="balance-main-num"
+                class="text-2xl font-extrabold text-[#1E293B] tracking-tight transition-all duration-300">4</span>
+              <span id="balance-main-label" class="text-xs font-semibold text-[#1E293B]">porciones restantes</span>
+            </div>
+            <p id="balance-sub-label" class="text-[11px] text-[#64748B] transition-all duration-300">(800 kcal
+              restantes)</p>
+          </div>
+
+          <span id="balance-adherence-badge"
+            class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#DCFCE7] text-[#15803D] text-[11px] font-bold border border-[#86EFAC]/50">
+            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+              <path clip-rule="evenodd"
+                d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12a4.49 4.49 0 01-1.549 3.397 4.491 4.491 0 01-1.307 3.497 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.49 4.49 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
+                fill-rule="evenodd"></path>
+            </svg>
+            <span id="adherence-percent-text">100%</span>
+          </span>
+        </div>
+
+        <div id="balance-bars-container" class="mt-2.5 space-y-2 transition-all duration-300">
+          <div class="bar-row">
+            <div class="flex items-center justify-between text-[11px] mb-0.5">
+              <span class="font-bold text-[#1E293B] flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-[#22C55E]"></span> KCAL
+              </span>
+              <span id="bar-text-kcal" class="font-bold text-[#1E293B]">1500 / 2300</span>
+            </div>
+            <div class="w-full h-2 bg-[#E2E8F0] rounded-full overflow-hidden">
+              <div id="bar-fill-kcal" class="h-full bg-[#22C55E] rounded-full transition-all duration-300"
+                style="width: 65%;"></div>
+            </div>
+          </div>
+
+          <div class="bar-row">
+            <div class="flex items-center justify-between text-[11px] mb-0.5">
+              <span class="font-bold text-[#1E293B] flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-[#EF4444]"></span> Proteínas
+              </span>
+              <span id="bar-text-p" class="font-bold text-[#1E293B]">1 / 4 porc.</span>
+            </div>
+            <div class="w-full h-2 bg-[#E2E8F0] rounded-full overflow-hidden">
+              <div id="bar-fill-p" class="h-full bg-[#EF4444] rounded-full transition-all duration-300"
+                style="width: 25%;"></div>
+            </div>
+          </div>
+
+          <div class="bar-row">
+            <div class="flex items-center justify-between text-[11px] mb-0.5">
+              <span class="font-bold text-[#1E293B] flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-[#F97316]"></span> Carbohidratos
+              </span>
+              <span id="bar-text-hc" class="font-bold text-[#1E293B]">3 / 6 porc.</span>
+            </div>
+            <div class="w-full h-2 bg-[#E2E8F0] rounded-full overflow-hidden">
+              <div id="bar-fill-hc" class="h-full bg-[#F97316] rounded-full transition-all duration-300"
+                style="width: 50%;"></div>
+            </div>
+          </div>
+
+          <div class="bar-row">
+            <div class="flex items-center justify-between text-[11px] mb-0.5">
+              <span class="font-bold text-[#1E293B] flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-[#3B82F6]"></span> Grasas
+              </span>
+              <span id="bar-text-g" class="font-bold text-[#1E293B]">1.5 / 2 porc.</span>
+            </div>
+            <div class="w-full h-2 bg-[#E2E8F0] rounded-full overflow-hidden">
+              <div id="bar-fill-g" class="h-full bg-[#3B82F6] rounded-full transition-all duration-300"
+                style="width: 75%;"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </header>
+
+    <main id="meals-list-container"
+      class="w-full flex-1 min-h-0 overflow-y-auto hide-scrollbar px-4 pt-1 pb-6 space-y-3">
+    </main>
+
+    <nav
+      class="w-full h-[64px] shrink-0 bg-[#0E141A]/95 backdrop-blur-md border-t border-white/10 flex items-center justify-around px-2 z-30">
+      <button class="flex flex-col items-center justify-center flex-1 text-[#22C55E] gap-0.5">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+            stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+        </svg>
+        <span class="text-[10px] font-bold">Hoy</span>
+      </button>
+      <button
+        class="flex flex-col items-center justify-center flex-1 text-[#94A3B8] hover:text-white transition-colors gap-0.5">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+            stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+        </svg>
+        <span class="text-[10px] font-medium">Mi Plan</span>
+      </button>
+      <button
+        class="flex flex-col items-center justify-center flex-1 text-[#94A3B8] hover:text-white transition-colors gap-0.5">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+          </path>
+        </svg>
+        <span class="text-[10px] font-medium">Progreso</span>
+      </button>
+      <button
+        class="flex flex-col items-center justify-center flex-1 text-[#94A3B8] hover:text-white transition-colors gap-0.5">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+            stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+        </svg>
+        <span class="text-[10px] font-medium">Coach</span>
+      </button>
+    </nav>
+
+    <div id="modal-reemplazo"
+      class="hidden absolute inset-0 bg-black/60 backdrop-blur-xs z-50 flex flex-col justify-end transition-opacity">
+      <div
+        class="bg-white rounded-t-[28px] p-5 pb-6 shadow-2xl w-full max-w-2xl lg:max-w-3xl mx-auto border-t border-white/40 flex flex-col max-h-[82%]">
+        <div class="w-12 h-1.5 bg-[#CBD5E1] rounded-full mx-auto mb-3 shrink-0"></div>
+
+        <div class="flex items-start justify-between pb-3 border-b border-[#F1F5F9] shrink-0">
+          <div>
+            <div class="flex items-center gap-2">
+              <span id="reemplazo-modal-badge"
+                class="px-1.5 py-0.5 rounded bg-[#FEF3C7] text-[#D97706] font-bold text-[10px] border border-[#FDE68A]">[HC]</span>
+              <h3 id="reemplazo-modal-title" class="text-base font-bold text-[#0E141A] tracking-tight">Reemplazar
+                Alimento</h3>
+            </div>
+            <p id="reemplazo-modal-subtitle" class="text-[11px] text-[#64748B] font-medium mt-0.5">Porción fija de
+              equivalencia</p>
+          </div>
+          <button onclick="closeReemplazoModal()"
+            class="w-8 h-8 rounded-full bg-[#F1F5F9] text-[#64748B] hover:text-[#0E141A] flex items-center justify-center">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+            </svg>
+          </button>
+        </div>
+
+        <div id="reemplazo-options-list" class="overflow-y-auto py-2 space-y-2 mt-1 hide-scrollbar">
+        </div>
+
+        <div class="mt-3 pt-2 shrink-0">
+          <button onclick="confirmReemplazo()"
+            class="w-full py-3 rounded-xl bg-[#22C55E] text-[#0E141A] font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-md active:scale-[0.99] transition-all">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+            </svg>
+            Confirmar reemplazo
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="modal-add-food"
+      class="hidden absolute inset-0 bg-[#507052] z-50 flex flex-col justify-between overflow-hidden">
+      <header class="w-full bg-[#507052] shrink-0 z-20 px-4 pt-5 pb-3 flex flex-col gap-3">
+        <div class="flex items-center justify-between">
+          <button onclick="closeAddFoodModal()"
+            class="w-9 h-9 rounded-full bg-black/20 flex items-center justify-center text-white hover:bg-black/30 active:scale-95 transition-all">
+            <svg class="w-5 h-5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path d="M15 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+          </button>
+          <div class="flex flex-col items-center text-center">
+            <h1 id="add-food-title" class="text-base font-bold text-white tracking-tight">Añadir a Desayuno</h1>
+            <p class="text-[11px] text-white/80 font-medium mt-0.5">Selecciona el grupo o equivalente</p>
+          </div>
+          <button onclick="closeAddFoodModal()"
+            class="w-9 h-9 rounded-full bg-black/20 flex items-center justify-center text-white hover:bg-black/30 active:scale-95 transition-all">
+            <svg class="w-4 h-4 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+          </button>
+        </div>
+
+        <div class="relative w-full">
+          <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+            <svg class="w-4 h-4 text-gray-400 stroke-[2.2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z" stroke-linecap="round"
+                stroke-linejoin="round"></path>
+            </svg>
+          </div>
+          <input id="add-food-search" oninput="filterAddFoodSearch(this.value)"
+            class="w-full h-10 pl-10 pr-12 bg-white text-gray-800 placeholder-gray-400 text-xs rounded-xl border-none focus:outline-none focus:ring-2 focus:ring-[#22C55E] shadow-sm"
+            placeholder="Buscar por nombre de alimento..." type="text">
+        </div>
+      </header>
+
+      <main class="w-full flex-1 min-h-0 bg-white rounded-t-[28px] flex flex-col overflow-hidden shadow-2xl z-10">
+        <div class="w-full flex justify-center pt-2.5 pb-1 shrink-0">
+          <div class="w-10 h-1 rounded-full bg-gray-300"></div>
+        </div>
+
+        <section class="px-4 py-2 shrink-0">
+          <div
+            class="bg-[#F1F5F9] p-1 rounded-2xl flex items-center justify-between gap-1 shadow-inner border border-gray-200/50">
+            <button id="tab-macro-p" onclick="switchAddTab('P')"
+              class="flex-1 bg-white rounded-xl py-2 px-1.5 flex flex-col items-center justify-center shadow-xs transition-all">
+              <div class="flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-[#22C55E]"></span>
+                <span class="text-xs font-bold text-gray-900 leading-none">Proteínas</span>
+              </div>
+              <span class="text-[10px] text-gray-500 font-medium mt-1">4 subgrupos</span>
+              <div id="tab-macro-p-line" class="w-6 h-[2px] bg-[#22C55E] rounded-full mt-1"></div>
+            </button>
+            <button id="tab-macro-hc" onclick="switchAddTab('HC')"
+              class="flex-1 rounded-xl py-2 px-1.5 flex flex-col items-center justify-center transition-all">
+              <div class="flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-[#F97316]"></span>
+                <span class="text-xs font-semibold text-gray-600 leading-none">Carbohidratos</span>
+              </div>
+              <span class="text-[10px] text-gray-400 font-medium mt-1">3 subgrupos</span>
+              <div id="tab-macro-hc-line" class="w-6 h-[2px] bg-transparent mt-1"></div>
+            </button>
+            <button id="tab-macro-g" onclick="switchAddTab('G')"
+              class="flex-1 rounded-xl py-2 px-1.5 flex flex-col items-center justify-center transition-all">
+              <div class="flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-[#3B82F6]"></span>
+                <span class="text-xs font-semibold text-gray-600 leading-none">Grasas</span>
+              </div>
+              <span class="text-[10px] text-gray-400 font-medium mt-1">1 subgrupo</span>
+              <div id="tab-macro-g-line" class="w-6 h-[2px] bg-transparent mt-1"></div>
+            </button>
+          </div>
+        </section>
+
+        <div id="add-food-accordion-container"
+          class="flex-1 overflow-y-auto px-4 pt-2 pb-6 hide-scrollbar flex flex-col gap-2.5">
+        </div>
+      </main>
+
+      <footer
+        class="w-full h-[72px] shrink-0 bg-white border-t border-gray-100 px-4 flex items-center justify-between z-30 shadow-[0_-4px_16px_rgba(0,0,0,0.06)]">
+        <div class="flex items-center gap-2.5">
+          <span class="relative flex h-3 w-3">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-3 w-3 bg-[#22C55E]"></span>
+          </span>
+          <div class="flex flex-col">
+            <span id="footer-active-meal-name" class="text-xs font-bold text-gray-900 leading-tight">Comida activa:
+              Desayuno</span>
+            <span id="footer-active-meal-desc" class="text-[11px] text-gray-500 leading-tight mt-0.5">Toca + Añadir para
+              registrar</span>
+          </div>
+        </div>
+        <button onclick="closeAddFoodModal()"
+          class="bg-[#0E141A] hover:bg-[#1E293B] text-white text-xs font-bold px-4 py-2.5 rounded-xl active:scale-95 transition-all shadow-md">
+          Listo
+        </button>
+      </footer>
+    </div>
+
+  </div>
+
+  <script>
+    let currentMode = 'porciones';
+    let activeMealId = 'desayuno';
+
+    const mealsData = {
+      desayuno: {
+        title: 'Desayuno',
+        time: '08:30 AM',
+        icon: '☀️',
+        bgIcon: '#FEF3C7',
+        colorIcon: '#D97706',
+        items: [
+          { id: 'item_1', name: 'Pan integral tostado', group: 'HC', groupBadge: '[HC]', badgeBg: 'bg-[#FEF3C7]', badgeText: 'text-[#D97706]', badgeBorder: 'border-[#FDE68A]', grams: 150, portions: 1, p: 4, hc: 35, g: 1, kcal: 165, checked: true },
+          { id: 'item_2', name: 'Dulce de leche', group: 'Dulce', groupBadge: '[Dulce]', badgeBg: 'bg-[#FEE2E2]', badgeText: 'text-[#DC2626]', badgeBorder: 'border-[#FECACA]', grams: 30, portions: 0.5, p: 1, hc: 15, g: 2, kcal: 82, checked: true },
+          { id: 'item_3', name: 'Banana madura', group: 'Fruta', groupBadge: '[Fruta]', badgeBg: 'bg-[#DCFCE7]', badgeText: 'text-[#15803D]', badgeBorder: 'border-[#BBF7D0]', grams: 110, portions: 1, p: 1, hc: 23, g: 0.2, kcal: 98, checked: true },
+          { id: 'item_4', name: 'Crema de maní natural', group: 'Grasa', groupBadge: '[Grasa]', badgeBg: 'bg-[#E0E7FF]', badgeText: 'text-[#4F46E5]', badgeBorder: 'border-[#C7D2FE]', grams: 30, portions: 1, p: 8, hc: 6, g: 15, kcal: 190, checked: false }
+        ]
+      },
+      almuerzo: {
+        title: 'Almuerzo',
+        time: '01:15 PM',
+        icon: '🍲',
+        bgIcon: '#FEE2E2',
+        colorIcon: '#DC2626',
+        items: [
+          { id: 'item_5', name: 'Pechuga de pollo a la plancha', group: 'P. Magra', groupBadge: '[Proteína]', badgeBg: 'bg-[#DCFCE7]', badgeText: 'text-[#15803D]', badgeBorder: 'border-[#BBF7D0]', grams: 200, portions: 2, p: 46, hc: 0, g: 4, kcal: 230, checked: true },
+          { id: 'item_6', name: 'Arroz integral cocido', group: 'HC', groupBadge: '[HC]', badgeBg: 'bg-[#FEF3C7]', badgeText: 'text-[#D97706]', badgeBorder: 'border-[#FDE68A]', grams: 180, portions: 2.5, p: 5, hc: 52, g: 2, kcal: 246, checked: true }
+        ]
+      },
+      merienda: {
+        title: 'Merienda',
+        time: '05:00 PM',
+        icon: '☕',
+        bgIcon: '#E0E7FF',
+        colorIcon: '#4F46E5',
+        items: [
+          { id: 'item_7', name: 'Yogur griego natural', group: 'Lácteo', groupBadge: '[Lácteo]', badgeBg: 'bg-[#E0E7FF]', badgeText: 'text-[#4F46E5]', badgeBorder: 'border-[#C7D2FE]', grams: 150, portions: 1.5, p: 15, hc: 6, g: 5, kcal: 130, checked: true }
+        ]
+      },
+      cena: {
+        title: 'Cena',
+        time: '09:00 PM',
+        icon: '🌙',
+        bgIcon: '#F3E8FF',
+        colorIcon: '#9333EA',
+        items: [
+          { id: 'item_8', name: 'Ensalada fresca de atún y huevo', group: 'P. Magra', groupBadge: '[Proteína]', badgeBg: 'bg-[#DCFCE7]', badgeText: 'text-[#15803D]', badgeBorder: 'border-[#BBF7D0]', grams: 180, portions: 2, p: 26, hc: 5, g: 7, kcal: 190, checked: false }
+        ]
+      }
+    };
+
+    const replacementOptions = {
+      HC: [
+        { name: 'Pan integral', desc: '70g • 2 miñones' },
+        { name: 'Galletas de arroz', desc: '60g • 8 unidades' },
+        { name: 'Pan de molde / lactal', desc: '85g • 3 rebanadas' },
+        { name: 'Avena en copos', desc: '70g • 3/4 taza' },
+        { name: 'Copos de maíz (sin azúcar)', desc: '50g • 1 taza' }
+      ],
+      Dulce: [
+        { name: 'Dulce de leche', desc: '25g (1 cda sopera)' },
+        { name: 'Miel pura', desc: '25g (1 cda sopera)' },
+        { name: 'Mermelada común', desc: '30g (1.5 cdas soperas)' },
+        { name: 'Chocolate semi-amargo (>60%)', desc: '20g (2 cuadraditos)' }
+      ],
+      Fruta: [
+        { name: 'Banana madura', desc: '110g (1 chica)' },
+        { name: 'Manzana / Pera', desc: '170g (1 mediana)' },
+        { name: 'Cítricos (naranja/mandarina)', desc: '200g (2 medianas)' },
+        { name: 'Frutos rojos (arándanos/frutillas)', desc: '220g (1.5 tazas)' }
+      ],
+      'P. Magra': [
+        { name: 'Pechuga de pollo', desc: '110g crudo (90g cocido)' },
+        { name: 'Carne vacuna magra (peceto)', desc: '110g crudo' },
+        { name: 'Atún al natural', desc: '130g escurrido (1 lata)' },
+        { name: 'Scoop Proteína Whey', desc: '30g (1 scoop colmado)' },
+        { name: 'Claras de huevo', desc: '210g (7 unidades)' }
+      ],
+      'P. Grasa': [
+        { name: 'Huevo entero', desc: '1 unidad (60g)' },
+        { name: 'Queso semi-duro (tybo)', desc: '35g (1 feta gruesa)' },
+        { name: 'Queso untable descremado', desc: '60g (2 cdas soperas)' }
+      ],
+      Lácteo: [
+        { name: 'Yogur griego natural', desc: '150g (1 pote)' },
+        { name: 'Leche descremada', desc: '250ml (1 taza grande)' },
+        { name: 'Yogur bebible descremado', desc: '250ml (1 vaso grande)' }
+      ],
+      Grasa: [
+        { name: 'Crema de maní natural', desc: '30g (1 cda sopera colmada)' },
+        { name: 'Palta (aguacate)', desc: '75g (media unidad chica)' },
+        { name: 'Aceite de oliva / girasol', desc: '14g (1 cda sopera)' },
+        { name: 'Frutos secos (nueces/almendras)', desc: '30g (1 puñado)' }
+      ]
+    };
+
+    const addFoodCatalog = {
+      P: {
+        label: 'Subcategorías de proteína',
+        badge: '1 porc. = 25g Proteína base',
+        subgroups: [
+          {
+            id: 'magras',
+            title: 'Proteínas magras',
+            desc: '1 porc. = 25g P • 3-15g G',
+            icon: '🥩',
+            bgIcon: 'bg-rose-50',
+            groupKey: 'P. Magra',
+            items: [
+              { name: 'Carne magra (vaca/pollo)', desc: '110g crudo = 1 porc.', icon: '🥩', p: 25, hc: 0, g: 3, kcal: 130 },
+              { name: 'Scoop de proteína (Whey)', desc: '30g = 1 porc.', icon: '🥤', p: 24, hc: 2, g: 1.5, kcal: 120 },
+              { name: 'Claras de huevo', desc: '7 unidades = 1 porc.', icon: '🥚', p: 24, hc: 1, g: 0.5, kcal: 110 },
+              { name: 'Atún al natural', desc: '1 lata (130g) = 1 porc.', icon: '🐟', p: 28, hc: 0, g: 1, kcal: 120 }
+            ]
+          },
+          {
+            id: 'grasas',
+            title: 'Proteínas grasas',
+            desc: '1 porc. = 10g G • 8.5g P',
+            icon: '🍳',
+            bgIcon: 'bg-amber-50',
+            groupKey: 'P. Grasa',
+            items: [
+              { name: 'Huevo entero', desc: '1 unidad = 1 porc.', icon: '🍳', p: 7, hc: 0.5, g: 5, kcal: 75 },
+              { name: 'Queso semi-duro', desc: '40g = 1 porc.', icon: '🧀', p: 9, hc: 1, g: 10, kcal: 130 },
+              { name: 'Queso untable', desc: '60g = 1 porc.', icon: '🥣', p: 6, hc: 3, g: 4, kcal: 72 }
+            ]
+          },
+          {
+            id: 'legumbres',
+            title: 'Legumbres',
+            desc: '1 porc. = 20g HC • 8g P',
+            icon: '🫘',
+            bgIcon: 'bg-orange-50',
+            groupKey: 'HC',
+            items: [
+              { name: 'Lentejas cocidas', desc: '130g = 1 porc.', icon: '🫘', p: 9, hc: 20, g: 0.5, kcal: 120 },
+              { name: 'Garbanzos cocidos', desc: '120g = 1 porc.', icon: '🫘', p: 8, hc: 22, g: 2, kcal: 140 }
+            ]
+          },
+          {
+            id: 'lacteos',
+            title: 'Lácteos',
+            desc: '1 porc. = 20g HC • 10g P',
+            icon: '🥛',
+            bgIcon: 'bg-sky-50',
+            groupKey: 'Lácteo',
+            items: [
+              { name: 'Leche descremada', desc: '250ml = 1 porc.', icon: '🥛', p: 8, hc: 12, g: 1, kcal: 90 },
+              { name: 'Yogur griego', desc: '150g = 1 porc.', icon: '🥛', p: 15, hc: 6, g: 4, kcal: 120 }
+            ]
+          }
+        ]
+      },
+      HC: {
+        label: 'Subcategorías de carbohidratos',
+        badge: '1 porc. = 40g HC base',
+        subgroups: [
+          {
+            id: 'hc_puros',
+            title: 'Hidratos de carbono',
+            desc: '1 porc. = 40g HC • 190 kcal',
+            icon: '🌾',
+            bgIcon: 'bg-amber-50',
+            groupKey: 'HC',
+            items: [
+              { name: 'Arroz integral', desc: '60g crudo = 1 porc.', icon: '🍚', p: 4, hc: 45, g: 1.5, kcal: 210 },
+              { name: 'Fideos / Pastas', desc: '60g crudo = 1 porc.', icon: '🍝', p: 6, hc: 44, g: 1, kcal: 210 },
+              { name: 'Papa / Batata', desc: '210g = 1 porc.', icon: '🥔', p: 3, hc: 38, g: 0.2, kcal: 165 },
+              { name: 'Pan integral', desc: '70g = 1 porc.', icon: '🍞', p: 5, hc: 35, g: 1.5, kcal: 175 }
+            ]
+          },
+          {
+            id: 'frutas',
+            title: 'Frutas',
+            desc: '1 porc. = 20g HC • 90 kcal',
+            icon: '🍎',
+            bgIcon: 'bg-rose-50',
+            groupKey: 'Fruta',
+            items: [
+              { name: 'Manzana / Pera', desc: '170g = 1 porc.', icon: '🍎', p: 0.5, hc: 22, g: 0.2, kcal: 90 },
+              { name: 'Banana madura', desc: '110g = 1 porc.', icon: '🍌', p: 1, hc: 23, g: 0.2, kcal: 95 }
+            ]
+          },
+          {
+            id: 'dulces',
+            title: 'Dulces',
+            desc: '1 porc. = 20g HC simples',
+            icon: '🍯',
+            bgIcon: 'bg-orange-50',
+            groupKey: 'Dulce',
+            items: [
+              { name: 'Dulce de leche', desc: '25g = 1 porc.', icon: '🍯', p: 1.5, hc: 14, g: 2, kcal: 80 },
+              { name: 'Miel pura', desc: '25g = 1 porc.', icon: '🍯', p: 0.1, hc: 20, g: 0, kcal: 80 }
+            ]
+          }
+        ]
+      },
+      G: {
+        label: 'Subcategorías de grasas',
+        badge: '1 porc. = 15g Grasa base',
+        subgroups: [
+          {
+            id: 'grasas_oleosas',
+            title: 'Frutas oleosas / Grasas',
+            desc: '1 porc. = 15g Grasa • 135 kcal',
+            icon: '🥑',
+            bgIcon: 'bg-emerald-50',
+            groupKey: 'Grasa',
+            items: [
+              { name: 'Pasta de maní', desc: '30g = 1 porc.', icon: '🥜', p: 8, hc: 6, g: 15, kcal: 190 },
+              { name: 'Aceite de oliva', desc: '15g = 1 porc.', icon: '🫒', p: 0, hc: 0, g: 15, kcal: 135 },
+              { name: 'Palta (aguacate)', desc: '75g = 1 porc.', icon: '🥑', p: 1.5, hc: 3, g: 11, kcal: 120 },
+              { name: 'Frutos secos', desc: '30g = 1 porc.', icon: '🌰', p: 5, hc: 4, g: 16, kcal: 180 }
+            ]
+          }
+        ]
+      }
+    };
+
+    let activeAddTab = 'P';
+    let openedAccordionId = 'magras';
+    let foodPortionCounters = {};
+
+    let replacingMealId = null;
+    let replacingItemId = null;
+    let selectedReplacementName = null;
+
+    let openSwipedCard = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderMeals();
+      updateBalance();
+      setupScrollCollapsing();
+      setupSwipeToReveal();
+    });
+
+    function closeCurrentSwipedCard() {
+      if (openSwipedCard) {
+        openSwipedCard.style.transition = 'transform 0.2s ease-out';
+        openSwipedCard.style.transform = 'translateX(0px)';
+        openSwipedCard.dataset.swiped = 'false';
+        openSwipedCard = null;
+      }
+    }
+
+    function handleCardButtonClick(event, callback) {
+      const card = event.target.closest('.swipe-card');
+      if (card && card.dataset.swiped === 'true') {
+        event.stopPropagation();
+        closeCurrentSwipedCard();
+        return;
+      }
+      callback();
+    }
+
+    function deleteFoodItem(mealKey, itemId) {
+      if (!mealsData[mealKey]) return;
+      const index = mealsData[mealKey].items.findIndex(i => i.id === itemId);
+      if (index !== -1) {
+        mealsData[mealKey].items.splice(index, 1);
+        openSwipedCard = null;
+        renderMeals();
+        updateBalance();
+      }
+    }
+
+    function setupSwipeToReveal() {
+      const container = document.getElementById('meals-list-container');
+      if (!container) return;
+
+      let activeCard = null;
+      let startX = 0;
+      let startY = 0;
+      let lastDiffX = 0;
+      let isSwiping = false;
+      let isHorizontal = null;
+      let wasAlreadySwiped = false;
+      let isMouseDown = false;
+
+      // ---- TACTIL (TOUCH) ----
+      container.addEventListener('touchstart', (e) => {
+        if (e.target.closest('button')) return;
+
+        const card = e.target.closest('.swipe-card');
+        if (!card) {
+          closeCurrentSwipedCard();
+          return;
+        }
+
+        if (openSwipedCard && openSwipedCard !== card) {
+          closeCurrentSwipedCard();
+        }
+
+        activeCard = card;
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        lastDiffX = 0;
+        isSwiping = false;
+        isHorizontal = null;
+        wasAlreadySwiped = card.dataset.swiped === 'true';
+      }, { passive: true });
+
+      container.addEventListener('touchmove', (e) => {
+        if (!activeCard) return;
+
+        const currentX = e.touches[0].clientX;
+        const currentY = e.touches[0].clientY;
+        const diffX = currentX - startX;
+        const diffY = currentY - startY;
+
+        if (isHorizontal === null) {
+          if (Math.abs(diffX) > 8 || Math.abs(diffY) > 8) {
+            isHorizontal = Math.abs(diffX) > Math.abs(diffY);
+            if (!isHorizontal) {
+              activeCard = null;
+              return;
+            }
+          } else {
+            return;
+          }
+        }
+
+        if (isHorizontal) {
+          if (e.cancelable) e.preventDefault();
+          isSwiping = true;
+          lastDiffX = diffX;
+          // Invertido: Ahora targetX es positivo (movimiento hacia la derecha)
+          let targetX = (wasAlreadySwiped ? 75 : 0) + diffX;
+          if (targetX < 0) targetX = 0; // No permite deslizar a la izquierda
+          if (targetX > 90) targetX = 90; // Tope máximo a la derecha
+          activeCard.style.transition = 'none';
+          activeCard.style.transform = `translateX(${targetX}px)`;
+        }
+      }, { passive: false });
+
+      const finishSwipe = () => {
+        if (!activeCard) return;
+
+        activeCard.style.transition = 'transform 0.2s ease-out';
+
+        if (isSwiping) {
+          if (wasAlreadySwiped) {
+            // Si ya estaba abierto, y deslizamos un poco a la izquierda (negativo), cerramos
+            if (lastDiffX < -20) {
+              activeCard.style.transform = 'translateX(0px)';
+              activeCard.dataset.swiped = 'false';
+              if (openSwipedCard === activeCard) openSwipedCard = null;
+            } else {
+              activeCard.style.transform = 'translateX(75px)';
+              activeCard.dataset.swiped = 'true';
+              openSwipedCard = activeCard;
+            }
+          } else {
+            // Si estaba cerrado, umbral de 60px hacia la DERECHA para revelar
+            if (lastDiffX >= 60) {
+              activeCard.style.transform = 'translateX(75px)';
+              activeCard.dataset.swiped = 'true';
+              openSwipedCard = activeCard;
+            } else {
+              activeCard.style.transform = 'translateX(0px)';
+              activeCard.dataset.swiped = 'false';
+              if (openSwipedCard === activeCard) openSwipedCard = null;
+            }
+          }
+        } else if (wasAlreadySwiped && !isSwiping) {
+          activeCard.style.transform = 'translateX(0px)';
+          activeCard.dataset.swiped = 'false';
+          if (openSwipedCard === activeCard) openSwipedCard = null;
+        }
+
+        activeCard = null;
+        isSwiping = false;
+        isHorizontal = null;
+      };
+
+      container.addEventListener('touchend', finishSwipe);
+      container.addEventListener('touchcancel', finishSwipe);
+
+      // ---- MOUSE (DESKTOP) ----
+      container.addEventListener('mousedown', (e) => {
+        if (e.button !== 0 || e.target.closest('button')) return;
+
+        const card = e.target.closest('.swipe-card');
+        if (!card) {
+          closeCurrentSwipedCard();
+          return;
+        }
+
+        if (openSwipedCard && openSwipedCard !== card) {
+          closeCurrentSwipedCard();
+        }
+
+        isMouseDown = true;
+        activeCard = card;
+        startX = e.clientX;
+        startY = e.clientY;
+        lastDiffX = 0;
+        isSwiping = false;
+        isHorizontal = null;
+        wasAlreadySwiped = card.dataset.swiped === 'true';
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (!isMouseDown || !activeCard) return;
+
+        const diffX = e.clientX - startX;
+        const diffY = e.clientY - startY;
+
+        if (isHorizontal === null) {
+          if (Math.abs(diffX) > 8 || Math.abs(diffY) > 8) {
+            isHorizontal = Math.abs(diffX) > Math.abs(diffY);
+            if (!isHorizontal) {
+              activeCard = null;
+              isMouseDown = false;
+              return;
+            }
+          } else {
+            return;
+          }
+        }
+
+        if (isHorizontal) {
+          isSwiping = true;
+          lastDiffX = diffX;
+          let targetX = (wasAlreadySwiped ? 75 : 0) + diffX;
+          if (targetX < 0) targetX = 0;
+          if (targetX > 90) targetX = 90;
+          activeCard.style.transition = 'none';
+          activeCard.style.transform = `translateX(${targetX}px)`;
+        }
+      });
+
+      window.addEventListener('mouseup', () => {
+        if (!isMouseDown) return;
+        isMouseDown = false;
+        finishSwipe();
+      });
+
+      // Cerrar al clickear fuera
+      document.addEventListener('click', (e) => {
+        if (openSwipedCard && !e.target.closest('.swipe-container')) {
+          closeCurrentSwipedCard();
+        }
+      });
+    }
+
+    function setupScrollCollapsing() {
+      const scrollContainer = document.getElementById('meals-list-container');
+      const balanceCard = document.getElementById('balance-card');
+      const mainNum = document.getElementById('balance-main-num');
+      const subLabel = document.getElementById('balance-sub-label');
+      const barsContainer = document.getElementById('balance-bars-container');
+
+      scrollContainer.addEventListener('scroll', () => {
+        if (scrollContainer.scrollTop > 30) {
+          balanceCard.classList.remove('p-3.5', 'rounded-[18px]');
+          balanceCard.classList.add('p-2.5', 'rounded-xl', 'shadow-sm');
+
+          subLabel.classList.add('hidden');
+          mainNum.classList.remove('text-2xl');
+          mainNum.classList.add('text-lg');
+
+          barsContainer.classList.remove('space-y-2', 'mt-2.5');
+          barsContainer.classList.add('grid', 'grid-cols-2', 'gap-x-3', 'gap-y-1', 'mt-1.5');
+
+          document.querySelectorAll('#balance-bars-container .h-2').forEach(b => {
+            b.classList.remove('h-2');
+            b.classList.add('h-1.5');
+          });
+        } else {
+          balanceCard.classList.add('p-3.5', 'rounded-[18px]');
+          balanceCard.classList.remove('p-2.5', 'rounded-xl', 'shadow-sm');
+
+          subLabel.classList.remove('hidden');
+          mainNum.classList.add('text-2xl');
+          mainNum.classList.remove('text-lg');
+
+          barsContainer.classList.add('space-y-2', 'mt-2.5');
+          barsContainer.classList.remove('grid', 'grid-cols-2', 'gap-x-3', 'gap-y-1', 'mt-1.5');
+
+          document.querySelectorAll('#balance-bars-container [class*="h-1.5"]').forEach(b => {
+            b.classList.add('h-2');
+            b.classList.remove('h-1.5');
+          });
+        }
+      });
+    }
+
+    function setAppMode(mode) {
+      currentMode = mode;
+      const btnKcal = document.getElementById('btn-mode-kcal');
+      const btnPorc = document.getElementById('btn-mode-porciones');
+
+      if (mode === 'kcal') {
+        btnKcal.className = 'px-3 py-1 rounded-full bg-[#22C55E] text-[#0E141A] font-bold text-xs shadow transition-all';
+        btnPorc.className = 'px-3 py-1 rounded-full font-semibold text-xs transition-all text-white/70';
+      } else {
+        btnPorc.className = 'px-3 py-1 rounded-full bg-[#22C55E] text-[#0E141A] font-bold text-xs shadow transition-all';
+        btnKcal.className = 'px-3 py-1 rounded-full font-semibold text-xs transition-all text-white/70';
+      }
+
+      renderMeals();
+      updateBalance();
+    }
+
+    function renderMeals() {
+      const container = document.getElementById('meals-list-container');
+      container.innerHTML = '';
+      openSwipedCard = null;
+
+      Object.entries(mealsData).forEach(([mealKey, meal]) => {
+        const totalKcal = meal.items.reduce((sum, item) => sum + (item.checked ? item.kcal : 0), 0);
+        const totalPorc = meal.items.reduce((sum, item) => sum + (item.checked ? item.portions : 0), 0);
+
+        const badgeInfo = currentMode === 'kcal'
+          ? `${totalKcal} kcal • P:${meal.items.reduce((s, i) => s + (i.checked ? i.p : 0), 0)}g`
+          : `${totalPorc} porc. • ${totalKcal} kcal`;
+
+        let mealHtml = `
+          <section class="w-full bg-[#F8FAFC] rounded-[18px] p-3.5 shadow-sm border border-white/60">
+            <div class="flex items-center justify-between pb-2.5">
+              <div class="flex items-center gap-2">
+                <span class="w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs" style="background-color: ${meal.bgIcon}; color: ${meal.colorIcon};">
+                  ${meal.icon}
+                </span>
+                <div>
+                  <h3 class="font-bold text-[#1E293B] text-sm">${meal.title}</h3>
+                  <span class="text-[11px] text-[#64748B]">${meal.time}</span>
+                </div>
+              </div>
+              <span class="px-2.5 py-0.5 rounded-full bg-[#E2E8F0] text-[#1E293B] font-bold text-[11px]">
+                ${badgeInfo}
+              </span>
+            </div>
+
+            <div class="space-y-2">
+        `;
+
+        meal.items.forEach(item => {
+          const detailText = currentMode === 'kcal'
+            ? `${item.grams}g • ${item.kcal} kcal • P: ${item.p}g • HC: ${item.hc}g`
+            : `${item.grams}g • ${item.portions} porc. ${item.group}`;
+
+          const checkedClass = item.checked ? 'bg-[#22C55E] text-white shadow-xs' : 'bg-[#E2E8F0] text-transparent';
+          const textClass = item.checked
+            ? 'text-[#94A3B8] line-through font-normal'
+            : 'text-[#0F172A] font-extrabold';
+
+          mealHtml += `
+            <div class="swipe-container relative overflow-hidden rounded-xl select-none bg-transparent">
+              <button onclick="deleteFoodItem('${mealKey}', '${item.id}')"
+                class="absolute inset-y-0 left-0 w-[75px] bg-red-500 hover:bg-red-600 active:bg-red-700 text-white flex flex-col items-center justify-center gap-1 font-bold text-[10px] transition-colors z-0 cursor-pointer"
+                title="Eliminar">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+                <span>Eliminar</span>
+              </button>
+
+              <div class="swipe-card relative z-10 bg-white p-2.5 rounded-xl border border-[#E2E8F0] flex items-center justify-between shadow-xs select-none cursor-grab active:cursor-grabbing"
+                data-meal="${mealKey}" data-id="${item.id}">
+                <div class="flex items-center gap-2 pointer-events-none">
+                  <span class="px-1.5 py-0.5 rounded font-bold text-[10px] border ${item.badgeBg} ${item.badgeText} ${item.badgeBorder}">
+                    ${item.groupBadge}
+                  </span>
+                  <div>
+                    <p class="font-bold text-xs ${textClass}">${item.name}</p>
+                    <p class="text-[10px] text-[#64748B] mt-0.5">${detailText}</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <button onclick="handleCardButtonClick(event, () => openReemplazoModal('${mealKey}', '${item.id}'))" class="w-7 h-7 rounded-full bg-[#F1F5F9] hover:bg-[#E2E8F0] text-[#64748B] flex items-center justify-center text-xs font-bold transition-colors border border-[#E2E8F0]" title="Reemplazar alimento">
+                    ⇄
+                  </button>
+                  <button onclick="handleCardButtonClick(event, () => toggleItemCheck('${mealKey}', '${item.id}'))" class="w-6 h-6 rounded-full flex items-center justify-center transition-all ${checkedClass}">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+
+        mealHtml += `
+            </div>
+            <button onclick="openAddFoodModal('${mealKey}')" class="w-full mt-2.5 py-2 rounded-xl bg-[#E2E8F0]/70 hover:bg-[#E2E8F0] text-[#1E293B] font-bold text-xs flex items-center justify-center gap-1.5 transition-colors">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+              </svg>
+              Añadir alimento / porción
+            </button>
+          </section>
+        `;
+
+        container.innerHTML += mealHtml;
+      });
+    }
+
+    function toggleItemCheck(mealKey, itemId) {
+      const item = mealsData[mealKey].items.find(i => i.id === itemId);
+      if (item) {
+        item.checked = !item.checked;
+        renderMeals();
+        updateBalance();
+      }
+    }
+
+    function updateBalance() {
+      let totalKcal = 0;
+      let totalP = 0;
+      let totalHC = 0;
+      let totalG = 0;
+      let totalPorc = 0;
+      let totalItems = 0;
+      let checkedItems = 0;
+
+      Object.values(mealsData).forEach(meal => {
+        meal.items.forEach(i => {
+          totalItems++;
+          if (i.checked) {
+            checkedItems++;
+            totalKcal += i.kcal;
+            totalP += i.p;
+            totalHC += i.hc;
+            totalG += i.g;
+            totalPorc += i.portions;
+          }
+        });
+      });
+
+      const targetKcal = 2300;
+      const targetPorc = 15;
+
+      const adherence = totalItems > 0 ? Math.round((checkedItems / totalItems) * 100) : 100;
+      document.getElementById('adherence-percent-text').innerText = `${adherence}%`;
+
+      if (currentMode === 'kcal') {
+        const remainingKcal = Math.max(0, targetKcal - totalKcal);
+        document.getElementById('balance-main-num').innerText = remainingKcal;
+        document.getElementById('balance-main-label').innerText = 'kcal restantes';
+        document.getElementById('balance-sub-label').innerText = `(${totalKcal} kcal consumidas hoy)`;
+
+        document.getElementById('bar-text-kcal').innerText = `${totalKcal} / ${targetKcal} KCAL`;
+        document.getElementById('bar-text-p').innerText = `${totalP} / 140 g`;
+        document.getElementById('bar-text-hc').innerText = `${totalHC} / 260 g`;
+        document.getElementById('bar-text-g').innerText = `${totalG} / 65 g`;
+      } else {
+        const remainingPorc = Math.max(0, Math.round((targetPorc - totalPorc) * 10) / 10);
+        document.getElementById('balance-main-num').innerText = remainingPorc;
+        document.getElementById('balance-main-label').innerText = 'porciones restantes';
+        document.getElementById('balance-sub-label').innerText = `(${Math.max(0, targetKcal - totalKcal)} kcal restantes)`;
+
+        document.getElementById('bar-text-kcal').innerText = `${totalKcal} / ${targetKcal}`;
+        document.getElementById('bar-text-p').innerText = `${Math.round(totalP / 25)} / 4 porc.`;
+        document.getElementById('bar-text-hc').innerText = `${Math.round(totalHC / 40)} / 6 porc.`;
+        document.getElementById('bar-text-g').innerText = `${Math.round(totalG / 15)} / 2 porc.`;
+      }
+
+      document.getElementById('bar-fill-kcal').style.width = `${Math.min(100, (totalKcal / targetKcal) * 100)}%`;
+      document.getElementById('bar-fill-p').style.width = `${Math.min(100, (totalP / 140) * 100)}%`;
+      document.getElementById('bar-fill-hc').style.width = `${Math.min(100, (totalHC / 260) * 100)}%`;
+      document.getElementById('bar-fill-g').style.width = `${Math.min(100, (totalG / 65) * 100)}%`;
+    }
+
+    function openReemplazoModal(mealKey, itemId) {
+      replacingMealId = mealKey;
+      replacingItemId = itemId;
+      const item = mealsData[mealKey].items.find(i => i.id === itemId);
+      if (!item) return;
+
+      selectedReplacementName = item.name;
+
+      const badgeEl = document.getElementById('reemplazo-modal-badge');
+      badgeEl.innerText = item.groupBadge || `[${item.group}]`;
+      badgeEl.className = `px-1.5 py-0.5 rounded font-bold text-[10px] border ${item.badgeBg} ${item.badgeText} ${item.badgeBorder}`;
+
+      document.getElementById('reemplazo-modal-title').innerText = `Reemplazar ${item.group}`;
+      document.getElementById('reemplazo-modal-subtitle').innerText = `Porción fija: ${item.portions} porc. (~${item.kcal} kcal)`;
+
+      const options = replacementOptions[item.group] || replacementOptions['HC'];
+      const listContainer = document.getElementById('reemplazo-options-list');
+      listContainer.innerHTML = '';
+
+      options.forEach(opt => {
+        const isSelected = opt.name === item.name;
+        const borderClass = isSelected ? 'border-2 border-[#22C55E] bg-[#F0FDF4]' : 'border border-[#E2E8F0] bg-[#F8FAFC]';
+        const radioIcon = isSelected
+          ? `<div class="w-4 h-4 rounded-full border-2 border-[#22C55E] bg-[#22C55E] flex items-center justify-center"><div class="w-1.5 h-1.5 rounded-full bg-white"></div></div>`
+          : `<div class="w-4 h-4 rounded-full border-2 border-[#CBD5E1] bg-white"></div>`;
+
+        listContainer.innerHTML += `
+          <label onclick="selectReplacementOption('${opt.name}')" class="flex items-center justify-between p-3 rounded-xl ${borderClass} cursor-pointer transition-colors shadow-xs">
+            <div class="flex flex-col">
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-xs text-[#0E141A]">${opt.name}</span>
+                ${isSelected ? '<span class="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-[#DCFCE7] text-[#15803D]">Actual</span>' : ''}
+              </div>
+              <span class="text-[11px] text-[#64748B] font-medium mt-0.5">${opt.desc}</span>
+            </div>
+            ${radioIcon}
+          </label>
+        `;
+      });
+
+      document.getElementById('modal-reemplazo').classList.remove('hidden');
+    }
+
+    function selectReplacementOption(name) {
+      selectedReplacementName = name;
+      const item = mealsData[replacingMealId].items.find(i => i.id === replacingItemId);
+      const options = replacementOptions[item.group] || replacementOptions['HC'];
+      const listContainer = document.getElementById('reemplazo-options-list');
+      listContainer.innerHTML = '';
+
+      options.forEach(opt => {
+        const isSelected = opt.name === name;
+        const borderClass = isSelected ? 'border-2 border-[#22C55E] bg-[#F0FDF4]' : 'border border-[#E2E8F0] bg-[#F8FAFC]';
+        const radioIcon = isSelected
+          ? `<div class="w-4 h-4 rounded-full border-2 border-[#22C55E] bg-[#22C55E] flex items-center justify-center"><div class="w-1.5 h-1.5 rounded-full bg-white"></div></div>`
+          : `<div class="w-4 h-4 rounded-full border-2 border-[#CBD5E1] bg-white"></div>`;
+
+        listContainer.innerHTML += `
+          <label onclick="selectReplacementOption('${opt.name}')" class="flex items-center justify-between p-3 rounded-xl ${borderClass} cursor-pointer transition-colors shadow-xs">
+            <div class="flex flex-col">
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-xs text-[#0E141A]">${opt.name}</span>
+                ${isSelected ? '<span class="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-[#DCFCE7] text-[#15803D]">Seleccionado</span>' : ''}
+              </div>
+              <span class="text-[11px] text-[#64748B] font-medium mt-0.5">${opt.desc}</span>
+            </div>
+            ${radioIcon}
+          </label>
+        `;
+      });
+    }
+
+    function confirmReemplazo() {
+      if (replacingMealId && replacingItemId && selectedReplacementName) {
+        const item = mealsData[replacingMealId].items.find(i => i.id === replacingItemId);
+        if (item) {
+          item.name = selectedReplacementName;
+          renderMeals();
+          updateBalance();
+        }
+      }
+      closeReemplazoModal();
+    }
+
+    function closeReemplazoModal() {
+      document.getElementById('modal-reemplazo').classList.add('hidden');
+    }
+
+    function openAddFoodModal(mealKey) {
+      activeMealId = mealKey;
+      const meal = mealsData[mealKey];
+      document.getElementById('add-food-title').innerText = `Añadir a ${meal.title}`;
+      document.getElementById('footer-active-meal-name').innerText = `Comida activa: ${meal.title}`;
+      document.getElementById('modal-add-food').classList.remove('hidden');
+      renderAddFoodAccordions();
+    }
+
+    function closeAddFoodModal() {
+      document.getElementById('modal-add-food').classList.add('hidden');
+    }
+
+    function switchAddTab(tabKey) {
+      activeAddTab = tabKey;
+
+      ['p', 'hc', 'g'].forEach(k => {
+        const btn = document.getElementById(`tab-macro-${k}`);
+        const line = document.getElementById(`tab-macro-${k}-line`);
+        if (k === tabKey.toLowerCase()) {
+          btn.className = 'flex-1 bg-white rounded-xl py-2 px-1.5 flex flex-col items-center justify-center shadow-xs transition-all';
+          line.className = `w-6 h-[2px] ${k === 'p' ? 'bg-[#22C55E]' : k === 'hc' ? 'bg-[#F97316]' : 'bg-[#3B82F6]'} rounded-full mt-1`;
+        } else {
+          btn.className = 'flex-1 rounded-xl py-2 px-1.5 flex flex-col items-center justify-center transition-all';
+          line.className = 'w-6 h-[2px] bg-transparent mt-1';
+        }
+      });
+
+      const cat = addFoodCatalog[activeAddTab];
+      if (cat && cat.subgroups.length > 0) {
+        openedAccordionId = cat.subgroups[0].id;
+      }
+
+      renderAddFoodAccordions();
+    }
+
+    function toggleAccordion(subgroupId) {
+      openedAccordionId = openedAccordionId === subgroupId ? null : subgroupId;
+      renderAddFoodAccordions();
+    }
+
+    function changePortionCounter(foodName, delta) {
+      if (!foodPortionCounters[foodName]) foodPortionCounters[foodName] = 1;
+      foodPortionCounters[foodName] = Math.max(0.5, Math.round((foodPortionCounters[foodName] + delta) * 10) / 10);
+      renderAddFoodAccordions();
+    }
+
+    function renderAddFoodAccordions(filterText = '') {
+      const container = document.getElementById('add-food-accordion-container');
+      container.innerHTML = '';
+
+      const cat = addFoodCatalog[activeAddTab];
+      if (!cat) return;
+
+      container.innerHTML += `
+        <div class="flex items-center justify-between py-1">
+          <span class="text-[11px] font-extrabold tracking-wider uppercase text-gray-500">${cat.label}</span>
+          <span class="bg-[#DCFCE7] text-[#15803D] text-[10px] font-bold px-2 py-0.5 rounded-full border border-[#86EFAC]/60">
+            ${cat.badge}
+          </span>
+        </div>
+      `;
+
+      cat.subgroups.forEach(sub => {
+        const isOpened = openedAccordionId === sub.id;
+
+        const visibleItems = filterText
+          ? sub.items.filter(i => i.name.toLowerCase().includes(filterText.toLowerCase()))
+          : sub.items;
+
+        if (filterText && visibleItems.length === 0) return;
+
+        if (isOpened || filterText) {
+          let subHtml = `
+            <div class="rounded-2xl border-2 border-[#22C55E]/60 bg-white overflow-hidden shadow-xs flex-shrink-0">
+              <div onclick="toggleAccordion('${sub.id}')" class="p-3.5 flex items-center justify-between bg-[#DCFCE7]/30 border-b border-[#86EFAC]/40 cursor-pointer">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-xl ${sub.bgIcon} flex items-center justify-center text-lg shrink-0 shadow-inner">
+                    ${sub.icon}
+                  </div>
+                  <div>
+                    <h3 class="text-sm font-bold text-gray-900 leading-tight">${sub.title}</h3>
+                    <p class="text-xs font-semibold text-gray-600 mt-0.5">${sub.desc}</p>
+                  </div>
+                </div>
+                <span class="w-7 h-7 rounded-full bg-white border border-[#22C55E]/40 flex items-center justify-center text-[#15803D] shadow-xs">
+                  <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M5 15l7-7 7 7" stroke-linecap="round" stroke-linejoin="round"></path>
+                  </svg>
+                </span>
+              </div>
+              <div class="p-2.5 flex flex-col gap-2 bg-[#F8FAFC]">
+          `;
+
+          visibleItems.forEach(item => {
+            const count = foodPortionCounters[item.name] || 1;
+            subHtml += `
+              <div class="bg-white border border-gray-200 rounded-xl p-2.5 flex items-center justify-between shadow-xs">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-lg ${sub.bgIcon} flex items-center justify-center text-base shrink-0">${item.icon}</div>
+                  <div>
+                    <p class="text-xs font-bold text-gray-800 leading-tight">${item.name}</p>
+                    <p class="text-[10px] text-gray-500 mt-0.5">${item.desc}</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                  <div class="flex items-center bg-[#F1F5F9] border border-gray-200 rounded-lg px-2 py-1 text-[11px] font-bold text-gray-700">
+                    <button onclick="changePortionCounter('${item.name}', -0.5)" class="text-gray-400 hover:text-gray-700 mr-1.5 px-0.5">-</button>
+                    <span>${count} porc.</span>
+                    <button onclick="changePortionCounter('${item.name}', 0.5)" class="text-gray-400 hover:text-gray-700 ml-1.5 px-0.5">+</button>
+                  </div>
+                  <button onclick="addNewFoodToMeal('${sub.groupKey}', '${item.name}', ${count}, ${item.p}, ${item.hc}, ${item.g}, ${item.kcal})" class="bg-[#22C55E] hover:brightness-95 active:scale-95 text-[#0E141A] text-[11px] font-extrabold px-2.5 py-1.5 rounded-lg shadow-xs transition-all">
+                    + Añadir
+                  </button>
+                </div>
+              </div>
+            `;
+          });
+
+          subHtml += `</div></div>`;
+          container.innerHTML += subHtml;
+        } else {
+          container.innerHTML += `
+            <article onclick="toggleAccordion('${sub.id}')" class="w-full bg-[#F8FAFC] rounded-2xl p-3.5 border border-gray-200/80 shadow-xs flex items-center justify-between hover:border-gray-300 active:bg-gray-100/70 transition-all cursor-pointer shrink-0">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl ${sub.bgIcon} flex items-center justify-center text-lg shrink-0 shadow-inner">
+                  ${sub.icon}
+                </div>
+                <div class="flex flex-col">
+                  <h3 class="text-sm font-bold text-gray-900 leading-tight">${sub.title}</h3>
+                  <span class="text-xs font-semibold text-gray-700 mt-0.5">${sub.desc}</span>
+                </div>
+              </div>
+              <div class="w-7 h-7 rounded-full bg-white border border-gray-200 flex items-center justify-center shrink-0 ml-2 shadow-xs">
+                <svg class="w-3.5 h-3.5 text-gray-500 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
+              </div>
+            </article>
+          `;
+        }
+      });
+    }
+
+    function filterAddFoodSearch(val) {
+      renderAddFoodAccordions(val);
+    }
+
+    function addNewFoodToMeal(groupKey, name, portions, p, hc, g, kcal) {
+      const meal = mealsData[activeMealId];
+      if (!meal) return;
+
+      const newItem = {
+        id: `item_${Date.now()}`,
+        name: name,
+        group: groupKey,
+        groupBadge: `[${groupKey}]`,
+        badgeBg: groupKey.includes('P') ? 'bg-[#DCFCE7]' : groupKey === 'HC' ? 'bg-[#FEF3C7]' : groupKey === 'Dulce' ? 'bg-[#FEE2E2]' : 'bg-[#E0E7FF]',
+        badgeText: groupKey.includes('P') ? 'text-[#15803D]' : groupKey === 'HC' ? 'text-[#D97706]' : groupKey === 'Dulce' ? 'text-[#DC2626]' : 'text-[#4F46E5]',
+        badgeBorder: groupKey.includes('P') ? 'border-[#BBF7D0]' : groupKey === 'HC' ? 'border-[#FDE68A]' : groupKey === 'Dulce' ? 'border-[#FECACA]' : 'border-[#C7D2FE]',
+        grams: Math.round(portions * 80),
+        portions: portions,
+        p: Math.round(p * portions),
+        hc: Math.round(hc * portions),
+        g: Math.round(g * portions),
+        kcal: Math.round(kcal * portions),
+        checked: true
+      };
+
+      meal.items.push(newItem);
+      renderMeals();
+      updateBalance();
+      closeAddFoodModal();
+    }
+  </script>
+</body>
+
+</html>

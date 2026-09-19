@@ -23,6 +23,12 @@
                 <p class="text-xs font-medium text-[#64748B] mt-1.5">Ingresa para ver tu plan nutricional</p>
             </div>
 
+            <div class="flex border-b border-gray-100 mb-6">
+                <button id="tab-login" class="flex-1 pb-3 text-sm font-bold text-[#1E293B] border-b-2 border-[#22C55E]">Iniciar Sesión</button>
+                <button id="tab-register" class="flex-1 pb-3 text-sm font-semibold text-[#94A3B8]">Registrarse</button>
+            </div>
+
+            <!-- Login Form -->
             <form id="login-form" class="space-y-4">
                 <div>
                     <label class="block text-[11px] font-extrabold uppercase tracking-wider text-[#64748B] mb-1.5 ml-1">Correo Electrónico</label>
@@ -42,53 +48,158 @@
                     Iniciar Sesión
                 </button>
             </form>
+            </form>
+
+            <!-- Register Form -->
+            <form id="register-form" class="space-y-4 hidden">
+                <div>
+                    <label class="block text-[11px] font-extrabold uppercase tracking-wider text-[#64748B] mb-1.5 ml-1">Nombre Completo</label>
+                    <input type="text" id="reg-name" required
+                        class="w-full bg-[#F8FAFC] border border-gray-200 text-sm font-bold text-gray-900 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#22C55E] transition-all"
+                        placeholder="Juan Pérez">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-extrabold uppercase tracking-wider text-[#64748B] mb-1.5 ml-1">Correo Electrónico</label>
+                    <input type="email" id="reg-email" required
+                        class="w-full bg-[#F8FAFC] border border-gray-200 text-sm font-bold text-gray-900 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#22C55E] transition-all"
+                        placeholder="tu@email.com">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-extrabold uppercase tracking-wider text-[#64748B] mb-1.5 ml-1">Contraseña</label>
+                    <input type="password" id="reg-password" required minlength="6"
+                        class="w-full bg-[#F8FAFC] border border-gray-200 text-sm font-bold text-gray-900 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#22C55E] transition-all"
+                        placeholder="Mínimo 6 caracteres">
+                </div>
+                
+                <button type="submit" id="btn-submit-reg"
+                    class="w-full bg-[#0E141A] text-white font-extrabold text-sm py-3.5 rounded-xl mt-2 shadow-md hover:bg-[#1E293B] active:scale-[0.98] transition-all">
+                    Crear Cuenta
+                </button>
+            </form>
             
             <div id="error-msg" class="hidden mt-4 text-center text-xs font-bold text-red-500 bg-red-50 py-2.5 rounded-xl border border-red-100"></div>
+            <div id="success-msg" class="hidden mt-4 text-center text-xs font-bold text-green-700 bg-green-50 py-2.5 rounded-xl border border-green-200"></div>
         </div>
     </main>
 
     <script type="module">
         import { supabase } from './js/supabase.js';
 
+        const tabLogin = document.getElementById('tab-login');
+        const tabRegister = document.getElementById('tab-register');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const errorBox = document.getElementById('error-msg');
+        const successBox = document.getElementById('success-msg');
+
+        // Tab Switching
+        tabLogin.addEventListener('click', () => {
+            tabLogin.className = 'flex-1 pb-3 text-sm font-bold text-[#1E293B] border-b-2 border-[#22C55E]';
+            tabRegister.className = 'flex-1 pb-3 text-sm font-semibold text-[#94A3B8]';
+            loginForm.classList.remove('hidden');
+            registerForm.classList.add('hidden');
+            errorBox.classList.add('hidden');
+            successBox.classList.add('hidden');
+        });
+
+        tabRegister.addEventListener('click', () => {
+            tabRegister.className = 'flex-1 pb-3 text-sm font-bold text-[#1E293B] border-b-2 border-[#22C55E]';
+            tabLogin.className = 'flex-1 pb-3 text-sm font-semibold text-[#94A3B8]';
+            registerForm.classList.remove('hidden');
+            loginForm.classList.add('hidden');
+            errorBox.classList.add('hidden');
+            successBox.classList.add('hidden');
+        });
+
+        // Handle Login
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const btn = document.getElementById('btn-submit');
-            const errorBox = document.getElementById('error-msg');
 
             btn.innerText = "Verificando credenciales...";
             btn.classList.add('opacity-75');
             btn.disabled = true;
             errorBox.classList.add('hidden');
+            successBox.classList.add('hidden');
 
             try {
-                // 1. Capa de Seguridad: Autenticación nativa
                 const { data: authData, error: authError } = await supabase.auth.signInWithPassword({ email, password });
                 if (authError) throw authError;
 
-                // 2. Capa Lógica: Consulta a la tabla de JUAN (profiles)
                 const { data: perfilData, error: perfilError } = await supabase
                     .from('profiles')
-                    .select('role') // Asegurate de que Juan le haya puesto "role" y no "rol"
+                    .select('role, status')
                     .eq('id', authData.user.id)
                     .single();
 
                 if (perfilError) throw perfilError;
 
-                // 3. Enrutamiento dinámico
                 if (perfilData.role === 'coach') {
                     window.location.href = './pages/coach-dashboard.html';
                 } else {
+                    if (perfilData.status === 'pendiente') {
+                        await supabase.auth.signOut();
+                        throw new Error('Tu cuenta aún está siendo revisada por el Coach.');
+                    }
+                    if (perfilData.status === 'rechazado') {
+                        await supabase.auth.signOut();
+                        throw new Error('Tu solicitud de cuenta ha sido rechazada.');
+                    }
                     window.location.href = './pages/alumno.html';
                 }
 
             } catch (error) {
                 console.error("Error de acceso:", error);
-                errorBox.innerText = "Acceso denegado. Verifica tus credenciales.";
+                errorBox.innerText = error.message === 'Invalid login credentials' ? 'Credenciales incorrectas' : error.message;
                 errorBox.classList.remove('hidden');
                 btn.innerText = "Iniciar Sesión";
+                btn.classList.remove('opacity-75');
+                btn.disabled = false;
+            }
+        });
+
+        // Handle Register
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('reg-name').value;
+            const email = document.getElementById('reg-email').value;
+            const password = document.getElementById('reg-password').value;
+            const btn = document.getElementById('btn-submit-reg');
+
+            btn.innerText = "Creando cuenta...";
+            btn.classList.add('opacity-75');
+            btn.disabled = true;
+            errorBox.classList.add('hidden');
+            successBox.classList.add('hidden');
+
+            try {
+                const { data, error } = await supabase.auth.signUp({
+                    email,
+                    password,
+                    options: { data: { full_name: name, role: 'alumno' } }
+                });
+
+                if (error) throw error;
+
+                await supabase.auth.signOut(); // Prevent auto-login
+
+                successBox.innerText = "Cuenta creada. Espera a que un Coach la apruebe para poder ingresar.";
+                successBox.classList.remove('hidden');
+                registerForm.reset();
+                
+                setTimeout(() => {
+                    tabLogin.click();
+                }, 3000);
+
+            } catch (error) {
+                errorBox.innerText = error.message;
+                errorBox.classList.remove('hidden');
+            } finally {
+                btn.innerText = "Crear Cuenta";
                 btn.classList.remove('opacity-75');
                 btn.disabled = false;
             }
