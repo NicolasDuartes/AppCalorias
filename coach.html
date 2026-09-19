@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel del Coach | AppCalorias</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👨‍🏫</text></svg>">
+  
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    .coach-container {
+      max-width: 1000px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    .user-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .user-info h3 {
+      margin: 0 0 0.25rem 0;
+      color: var(--text-primary);
+    }
+    .user-info p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-muted);
+      background: var(--bg-input);
+      border-radius: var(--radius-md);
+      border: 1px dashed var(--border-color);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <div class="logo-area">
+        <div class="logo-icon">👨‍🏫</div>
+        <div>
+          <h1 class="brand-title">Dashboard Coach</h1>
+          <p class="brand-subtitle">Gestión de Alumnos y Planes</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="btn-logout" class="btn btn-outline" title="Cerrar Sesión">
+          <span>🚪</span> Salir
+        </button>
+      </div>
+    </header>
+
+    <main class="coach-container">
+      <!-- Navigation Tabs -->
+      <nav class="tabs-container" role="tablist" style="margin-bottom: 2rem;">
+        <button class="tab-btn active" data-tab="tab-pendientes" role="tab">
+          <span>📥</span> Pool de Clientes (Nuevos)
+        </button>
+        <button class="tab-btn" data-tab="tab-activos" role="tab">
+          <span>👥</span> Mis Alumnos Activos
+        </button>
+      </nav>
+
+      <!-- Pestaña: Pool de Pendientes -->
+      <section id="tab-pendientes" class="tab-panel active">
+        <div class="card">
+          <h2 class="card-title"><span>📥</span> Solicitudes Pendientes</h2>
+          <p class="card-subtitle">Usuarios que se han registrado y están esperando ser asignados a un Coach.</p>
+          
+          <div id="pending-list" style="margin-top: 1.5rem;">
+            <div class="empty-state">Cargando solicitudes...</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Pestaña: Alumnos Activos -->
+      <section id="tab-activos" class="tab-panel">
+        <div class="card">
+          <h2 class="card-title"><span>👥</span> Mis Alumnos Activos</h2>
+          <p class="card-subtitle">Listado de los alumnos que gestionas actualmente.</p>
+          
+          <div id="active-list" style="margin-top: 1.5rem;">
+            <div class="empty-state">Próximamente: Panel de gestión de planes alimenticios</div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script type="module" src="js/coach.js"></script>
+</body>
+</html>
