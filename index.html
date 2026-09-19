@@ -1,621 +1,98 @@
 <!DOCTYPE html>
-<html lang="es" data-theme="dark">
+<html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AppCalorias | Calculadora Nutricional, Macros y Equivalencias</title>
-  <meta name="description" content="Calculadora nutricional avanzada basada en el sistema de Nico Duartes. BMR, NEAT, METs, TDEE, esquema de porciones, plan alimenticio y conversor de equivalencias.">
-  
-  <!-- Google Fonts: Outfit & Inter -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥑</text></svg>">
-  
-  <link rel="stylesheet" href="css/styles.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Login - AppCalorias</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/styles.css">
 </head>
-<body>
-  <div class="app-container">
-    <!-- Header -->
-    <header class="app-header">
-      <div class="logo-area">
-        <div class="logo-icon">🥑</div>
-        <div>
-          <h1 class="brand-title">AppCalorias</h1>
-          <p class="brand-subtitle">Calculadora Nutricional & Equivalencias • Sistema Nico Duartes</p>
-        </div>
-      </div>
-      <div class="header-actions">
-        <button id="btn-theme-toggle" class="btn btn-ghost" title="Cambiar tema (Claro / Oscuro)">🌙</button>
-        <button id="btn-reset-excel" class="btn btn-outline" title="Cargar los valores predeterminados del archivo Excel">
-          <span>🔄</span> Restablecer Excel
-        </button>
-        <button id="btn-print" class="btn btn-primary" title="Imprimir o guardar como PDF">
-          <span>📄</span> Imprimir / PDF
-        </button>
-      </div>
-    </header>
-
-    <!-- HUD / Quick Stats Bar -->
-    <section class="hud-bar" id="hud-bar">
-      <!-- Target Calories Card -->
-      <div class="stat-card featured">
-        <div class="stat-header">
-          <span>Calorías Objetivo</span>
-          <span id="hud-context-badge" class="badge badge-hc">Déficit leve</span>
-        </div>
-        <div class="stat-value">
-          <span id="hud-target-cals">2,187</span> <small>kcal</small>
-        </div>
-        <div class="stat-subtext" id="hud-tdee-subtext">TDEE + Termogénesis: 2,487 kcal</div>
-        <div class="stat-progress">
-          <div id="hud-cals-progress" class="stat-progress-fill fill-calories" style="width: 100%;"></div>
-        </div>
-      </div>
-
-      <!-- Real Calories from Meals -->
-      <div class="stat-card">
-        <div class="stat-header">
-          <span>Plan de Comidas</span>
-          <span id="hud-meal-status" class="status-pill optimal">Coherente</span>
-        </div>
-        <div class="stat-value">
-          <span id="hud-real-cals">2,275</span> <small>kcal</small>
-        </div>
-        <div class="stat-subtext" id="hud-cals-diff">+88 kcal de diferencia</div>
-        <div class="stat-progress">
-          <div id="hud-meal-cals-fill" class="stat-progress-fill fill-calories" style="width: 104%;"></div>
-        </div>
-      </div>
-
-      <!-- Protein Card -->
-      <div class="stat-card">
-        <div class="stat-header">
-          <span>Proteínas (18%)</span>
-          <span id="hud-p-badge" class="badge badge-p">P</span>
-        </div>
-        <div class="stat-value">
-          <span id="hud-p-real">122</span> / <small id="hud-p-target">98g</small>
-        </div>
-        <div class="stat-subtext" id="hud-p-diff">+24g vs requerido</div>
-        <div class="stat-progress">
-          <div id="hud-p-progress" class="stat-progress-fill fill-protein" style="width: 80%;"></div>
-        </div>
-      </div>
-
-      <!-- Fats Card -->
-      <div class="stat-card">
-        <div class="stat-header">
-          <span>Grasas (23%)</span>
-          <span id="hud-g-badge" class="badge badge-g">G</span>
-        </div>
-        <div class="stat-value">
-          <span id="hud-g-real">38.5</span> / <small id="hud-g-target">56g</small>
-        </div>
-        <div class="stat-subtext" id="hud-g-diff">-17g vs requerido</div>
-        <div class="stat-progress">
-          <div id="hud-g-progress" class="stat-progress-fill fill-fat" style="width: 68%;"></div>
-        </div>
-      </div>
-
-      <!-- Carbs Card -->
-      <div class="stat-card">
-        <div class="stat-header">
-          <span>Carbohidratos (59%)</span>
-          <span id="hud-ch-badge" class="badge badge-hc">CH</span>
-        </div>
-        <div class="stat-value">
-          <span id="hud-ch-real">360</span> / <small id="hud-ch-target">323g</small>
-        </div>
-        <div class="stat-subtext" id="hud-ch-diff">+37g vs requerido</div>
-        <div class="stat-progress">
-          <div id="hud-ch-progress" class="stat-progress-fill fill-carbs" style="width: 95%;"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Navigation Tabs -->
-    <nav class="tabs-container" role="tablist">
-      <button class="tab-btn active" data-tab="tab-context" role="tab">
-        <span>⚡</span> 1. Contexto Energético
-      </button>
-      <button class="tab-btn" data-tab="tab-portions" role="tab">
-        <span>📊</span> 2. Esquema de Porciones
-      </button>
-      <button class="tab-btn" data-tab="tab-meals" role="tab">
-        <span>🍽️</span> 3. Plan de Comidas
-      </button>
-      <button class="tab-btn" data-tab="tab-equivalences" role="tab">
-        <span>🔁</span> 4. Equivalencias & Alimentos
-      </button>
-    </nav>
-
-    <!-- =========================================================================
-         TAB 1: CONTEXTO ENERGÉTICO & TDEE
-         ========================================================================= -->
-    <main>
-      <section id="tab-context" class="tab-panel active">
-        <div class="grid-2">
-          <!-- Col 1: Datos Personales & Actividad -->
-          <div>
-            <!-- BMR Card -->
-            <div class="card">
-              <h2 class="card-title"><span>👤</span> 1) Metabolismo Basal (BMR)</h2>
-              <p class="card-subtitle">Calorías que el cuerpo quema en reposo absoluto (fórmula Mifflin-St Jeor).</p>
-              
-              <div class="form-grid">
-                <div class="form-group">
-                  <label class="form-label" for="input-gender">Género</label>
-                  <select id="input-gender" class="form-control">
-                    <option value="Hombre">Hombre</option>
-                    <option value="Mujer">Mujer</option>
-                  </select>
+<body class="w-full h-screen bg-[#3D553E] flex items-center justify-center p-4">
+    
+    <main class="w-full max-w-sm bg-white rounded-[32px] p-8 shadow-2xl border-t border-white/20 relative overflow-hidden">
+        <!-- Decoración visual -->
+        <div class="absolute top-0 right-0 -mr-16 -mt-16 w-48 h-48 bg-[#DCFCE7] rounded-full opacity-50 blur-3xl pointer-events-none"></div>
+        
+        <div class="relative z-10">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-[#22C55E] rounded-2xl mx-auto mb-4 shadow-lg flex items-center justify-center text-white text-3xl">
+                    🥑
                 </div>
-                <div class="form-group">
-                  <label class="form-label" for="input-weight">Peso (kg)</label>
-                  <input type="number" id="input-weight" class="form-control" value="70" min="30" max="250" step="0.5">
-                </div>
-                <div class="form-group">
-                  <label class="form-label" for="input-height">Altura (cm)</label>
-                  <input type="number" id="input-height" class="form-control" value="180" min="100" max="240" step="1">
-                </div>
-                <div class="form-group">
-                  <label class="form-label" for="input-age">Edad</label>
-                  <input type="number" id="input-age" class="form-control" value="23" min="12" max="100" step="1">
-                </div>
-              </div>
-
-              <div class="calc-breakdown" style="margin-top: 1rem;">
-                <div class="calc-step">
-                  <div class="calc-step-info">
-                    <span class="calc-step-title">BMR Total</span>
-                    <span class="calc-step-desc">Gasto metabólico en reposo</span>
-                  </div>
-                  <div class="calc-step-val" id="val-bmr">1,715 kcal</div>
-                </div>
-              </div>
+                <h1 class="text-2xl font-extrabold text-[#0E141A] tracking-tight">AppCalorias</h1>
+                <p class="text-xs font-medium text-[#64748B] mt-1.5">Ingresa para ver tu plan nutricional</p>
             </div>
 
-            <!-- NEAT Card -->
-            <div class="card">
-              <h2 class="card-title"><span>🚶</span> 2) Actividad Diaria (NEAT)</h2>
-              <p class="card-subtitle">Calorías quemadas en movimientos cotidianos no deportivos (pasos diarios × 0.04).</p>
-              
-              <div class="form-grid">
-                <div class="form-group" style="grid-column: 1 / -1;">
-                  <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <label class="form-label" for="input-steps">Pasos diarios promedio</label>
-                    <span id="steps-badge" class="badge badge-f">9,000 pasos</span>
-                  </div>
-                  <input type="range" id="input-steps" class="form-control" value="9000" min="2000" max="25000" step="500">
+            <form id="login-form" class="space-y-4">
+                <div>
+                    <label class="block text-[11px] font-extrabold uppercase tracking-wider text-[#64748B] mb-1.5 ml-1">Correo Electrónico</label>
+                    <input type="email" id="email" required
+                        class="w-full bg-[#F8FAFC] border border-gray-200 text-sm font-bold text-gray-900 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#22C55E] transition-all"
+                        placeholder="tu@email.com">
                 </div>
-              </div>
-
-              <div class="calc-breakdown" style="margin-top: 1rem;">
-                <div class="calc-step">
-                  <div class="calc-step-info">
-                    <span class="calc-step-title">NEAT Único</span>
-                    <span class="calc-step-desc">Pasos × 0.04</span>
-                  </div>
-                  <div class="calc-step-val" id="val-neat">360 kcal</div>
+                <div>
+                    <label class="block text-[11px] font-extrabold uppercase tracking-wider text-[#64748B] mb-1.5 ml-1">Contraseña</label>
+                    <input type="password" id="password" required
+                        class="w-full bg-[#F8FAFC] border border-gray-200 text-sm font-bold text-gray-900 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#22C55E] transition-all"
+                        placeholder="••••••••">
                 </div>
-                <div class="calc-step">
-                  <div class="calc-step-info">
-                    <span class="calc-step-title">BMR + NEAT</span>
-                    <span class="calc-step-desc">Reposo + Movimiento diario</span>
-                  </div>
-                  <div class="calc-step-val" id="val-bmr-neat">2,075 kcal</div>
-                </div>
-              </div>
-            </div>
-
-            <!-- METs Card -->
-            <div class="card">
-              <h2 class="card-title"><span>🏋️</span> 3) Gasto de Entrenamiento (METs)</h2>
-              <p class="card-subtitle">Gasto calórico de tus sesiones de gimnasio o deporte promediadas en la semana.</p>
-              
-              <div class="form-grid">
-                <div class="form-group">
-                  <label class="form-label" for="input-met">Intensidad (MET)</label>
-                  <select id="input-met" class="form-control">
-                    <option value="3.5">Ligero (3.5)</option>
-                    <option value="5.0" selected>Moderado/Sugerido (5.0)</option>
-                    <option value="6.5">Intenso (6.5)</option>
-                    <option value="8.0">Muy intenso / Crossfit (8.0)</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label class="form-label" for="input-hours">Horas por sesión</label>
-                  <input type="number" id="input-hours" class="form-control" value="1.2" min="0.2" max="4" step="0.1">
-                </div>
-                <div class="form-group">
-                  <label class="form-label" for="input-sessions">Días por semana</label>
-                  <input type="number" id="input-sessions" class="form-control" value="4" min="0" max="7" step="1">
-                </div>
-              </div>
-
-              <div class="calc-breakdown" style="margin-top: 1rem;">
-                <div class="calc-step">
-                  <div class="calc-step-info">
-                    <span class="calc-step-title">Gasto por sesión</span>
-                    <span class="calc-step-desc">MET × Peso × Horas</span>
-                  </div>
-                  <div class="calc-step-val" id="val-met-session">420 kcal</div>
-                </div>
-                <div class="calc-step">
-                  <div class="calc-step-info">
-                    <span class="calc-step-title">Gasto promedio por día</span>
-                    <span class="calc-step-desc">(Gasto sesión × Días) / 7</span>
-                  </div>
-                  <div class="calc-step-val" id="val-met-day">240 kcal</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Col 2: Resumen TDEE & Elección de Contexto -->
-          <div>
-            <!-- Total Daily Expenditure -->
-            <div class="card">
-              <h2 class="card-title"><span>🔥</span> 4) Gasto Total Diario (TDEE)</h2>
-              <p class="card-subtitle">Suma total de reposo, actividad diaria, entrenamiento y efecto termogénico de los alimentos.</p>
-
-              <div class="calc-breakdown">
-                <div class="calc-step">
-                  <div class="calc-step-info">
-                    <span class="calc-step-title">TDEE Base</span>
-                    <span class="calc-step-desc">BMR + NEAT + Entrenamiento</span>
-                  </div>
-                  <div class="calc-step-val" id="val-tdee-base">2,315 kcal</div>
-                </div>
-                <div class="calc-step">
-                  <div class="calc-step-info">
-                    <span class="calc-step-title">Termogénesis de los Alimentos (TEF)</span>
-                    <span class="calc-step-desc">Digestión y asimilación (BMR × 10%)</span>
-                  </div>
-                  <div class="calc-step-val" id="val-tef">+171.5 kcal</div>
-                </div>
-                <div class="calc-step" style="border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.08);">
-                  <div class="calc-step-info">
-                    <span class="calc-step-title" style="color: var(--accent-primary);">TDEE + Termogénesis Total</span>
-                    <span class="calc-step-desc">Tu punto de equilibrio energético real</span>
-                  </div>
-                  <div class="calc-step-val" id="val-tdee-tef" style="color: var(--accent-primary); font-size: 1.3rem;">2,486.5 kcal</div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Choose Context -->
-            <div class="card">
-              <h2 class="card-title"><span>🎯</span> 5) Elegir Contexto Energético</h2>
-              <p class="card-subtitle">Selecciona tu objetivo para fijar las calorías diarias y programar el plan.</p>
-
-              <div class="context-grid" id="context-options-grid">
-                <!-- Javascript will render options here -->
-              </div>
-
-              <div style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--border-color);">
-                <div class="form-group">
-                  <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <label class="form-label" for="input-custom-cals">Calorías Objetivo a Consumir (personalizable)</label>
-                    <span class="stat-subtext">Puedes redondear si deseas</span>
-                  </div>
-                  <div style="display: flex; gap: 0.5rem;">
-                    <input type="number" id="input-custom-cals" class="form-control" value="2186.5" step="10">
-                    <button id="btn-sync-context" class="btn btn-outline" title="Sincronizar con el valor exacto del contexto">Auto</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+                
+                <button type="submit" id="btn-submit"
+                    class="w-full bg-[#0E141A] text-white font-extrabold text-sm py-3.5 rounded-xl mt-2 shadow-md hover:bg-[#1E293B] active:scale-[0.98] transition-all">
+                    Iniciar Sesión
+                </button>
+            </form>
+            
+            <div id="error-msg" class="hidden mt-4 text-center text-xs font-bold text-red-500 bg-red-50 py-2.5 rounded-xl border border-red-100"></div>
         </div>
-      </section>
-
-      <!-- =========================================================================
-           TAB 2: ESQUEMA DE PORCIONES & MACROS
-           ========================================================================= -->
-      <section id="tab-portions" class="tab-panel">
-        <div class="grid-2">
-          <!-- Macros Card -->
-          <div class="card">
-            <h2 class="card-title"><span>🥩</span> Distribución de Macronutrientes</h2>
-            <p class="card-subtitle">Porcentajes recomendados del modelo: 18% Proteínas, 23% Grasas, 59% Carbohidratos.</p>
-
-            <div class="form-grid" style="margin-bottom: 1.25rem;">
-              <div class="form-group">
-                <label class="form-label" for="input-perc-p">Proteínas %</label>
-                <input type="number" id="input-perc-p" class="form-control" value="18" min="10" max="60" step="1">
-              </div>
-              <div class="form-group">
-                <label class="form-label" for="input-perc-g">Grasas %</label>
-                <input type="number" id="input-perc-g" class="form-control" value="23" min="10" max="50" step="1">
-              </div>
-              <div class="form-group">
-                <label class="form-label" for="input-perc-ch">Carbohidratos %</label>
-                <input type="number" id="input-perc-ch" class="form-control" value="59" min="10" max="80" step="1">
-              </div>
-            </div>
-
-            <div class="calc-breakdown">
-              <div class="calc-step">
-                <div class="calc-step-info">
-                  <span class="calc-step-title"><span class="badge badge-p">P</span> Proteínas Requeridas</span>
-                  <span class="calc-step-desc" id="desc-macro-p">394 kcal (4 kcal/g)</span>
-                </div>
-                <div class="calc-step-val" id="val-target-p">98.4 g</div>
-              </div>
-              <div class="calc-step">
-                <div class="calc-step-info">
-                  <span class="calc-step-title"><span class="badge badge-g">G</span> Grasas Requeridas</span>
-                  <span class="calc-step-desc" id="desc-macro-g">503 kcal (9 kcal/g)</span>
-                </div>
-                <div class="calc-step-val" id="val-target-g">55.9 g</div>
-              </div>
-              <div class="calc-step">
-                <div class="calc-step-info">
-                  <span class="calc-step-title"><span class="badge badge-hc">CH</span> Carbohidratos Requeridos</span>
-                  <span class="calc-step-desc" id="desc-macro-ch">1,290 kcal (4 kcal/g)</span>
-                </div>
-                <div class="calc-step-val" id="val-target-ch">322.5 g</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Portions Scheme Info Card -->
-          <div class="card">
-            <h2 class="card-title"><span>💡</span> Filosofía del Esquema</h2>
-            <p class="card-subtitle">El sistema de Nico Duartes agrupa los alimentos en porciones estandarizadas para simplificar la planificación sin tener que pesar cada gramo al miligramo.</p>
-            <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: var(--radius-md); padding: 1rem; margin-top: 0.5rem;">
-              <p style="font-size: 0.875rem; color: var(--text-primary); font-weight: 500;">
-                «No buscamos exactitud perfecta. Buscamos coherencia y adherencia en el tiempo.»
-              </p>
-              <p style="font-size: 0.775rem; color: var(--text-muted); margin-top: 0.5rem;">
-                Modifica el número de porciones de cada grupo para cuadrar tus requerimientos diarios.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Portions Table Card -->
-        <div class="card">
-          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-            <div>
-              <h2 class="card-title"><span>🔢</span> Esquema de Porciones Diarias</h2>
-              <p class="card-subtitle">Ajusta la cantidad de porciones para cada una de las 8 categorías del modelo.</p>
-            </div>
-            <button id="btn-reset-portions" class="btn btn-outline btn-sm">Restablecer Porciones Excel</button>
-          </div>
-
-          <div class="portions-table-wrap">
-            <table class="data-table" id="table-portions-scheme">
-              <thead>
-                <tr>
-                  <th>Categoría</th>
-                  <th style="width: 130px;">Cantidad</th>
-                  <th>Carbohidratos (g)</th>
-                  <th>Proteínas (g)</th>
-                  <th>Grasas (g)</th>
-                  <th>Calorías (kcal)</th>
-                </tr>
-              </thead>
-              <tbody id="tbody-portions-scheme">
-                <!-- Javascript will render rows here -->
-              </tbody>
-              <tfoot>
-                <tr>
-                  <td>TOTAL ESQUEMA</td>
-                  <td id="foot-portions-count">15.0 porc.</td>
-                  <td id="foot-portions-ch">320 g</td>
-                  <td id="foot-portions-p">117 g</td>
-                  <td id="foot-portions-g">45 g</td>
-                  <td id="foot-portions-kcal" style="color: var(--accent-primary);">2,153 kcal</td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
-
-          <!-- Verificación 1 -->
-          <div class="verification-box">
-            <div class="verification-title">
-              <h3 style="font-size: 0.95rem; font-weight: 700;">☑️ VERIFICACIÓN 1: Esquema de Porciones vs Requerimiento</h3>
-              <span class="verification-quote">«No buscamos exactitud perfecta. Buscamos coherencia.»</span>
-            </div>
-            <div class="verif-grid" id="verif-1-grid">
-              <!-- Rendered by JS -->
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- =========================================================================
-           TAB 3: PLAN DE COMIDAS
-           ========================================================================= -->
-      <section id="tab-meals" class="tab-panel">
-        <div class="card">
-          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
-            <div>
-              <h2 class="card-title"><span>🍽️</span> Plan Alimenticio Diario</h2>
-              <p class="card-subtitle">Distribución real de comidas: Desayuno, Almuerzo, Merienda y Cena con sus porciones y alimentos específicos.</p>
-            </div>
-            <div style="display: flex; gap: 0.5rem;">
-              <button id="btn-load-sample-meals" class="btn btn-outline btn-sm">Cargar Ejemplo del Excel</button>
-              <button id="btn-add-meal" class="btn btn-primary btn-sm">+ Agregar Comida</button>
-            </div>
-          </div>
-
-          <!-- Meals Container -->
-          <div id="meals-container">
-            <!-- Meal blocks rendered by JS -->
-          </div>
-
-          <!-- Verificación 2 -->
-          <div class="verification-box">
-            <div class="verification-title">
-              <h3 style="font-size: 0.95rem; font-weight: 700;">☑️ VERIFICACIÓN 2: Consumo Real en Comidas vs Requerimiento</h3>
-              <span class="verification-quote">«Tolerancias: Proteínas ±10g, Grasas ±10g, Carbohidratos ±15g, Calorías ±80 kcal»</span>
-            </div>
-            <div class="verif-grid" id="verif-2-grid">
-              <!-- Rendered by JS -->
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- =========================================================================
-           TAB 4: EQUIVALENCIAS Y BUSCADOR DE ALIMENTOS
-           ========================================================================= -->
-      <section id="tab-equivalences" class="tab-panel">
-        <!-- Interactive Converter Tool -->
-        <div class="converter-card">
-          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
-            <div>
-              <h2 class="card-title" style="color: var(--accent-blue);"><span>🔄</span> Calculadora Inteligente de Equivalencias</h2>
-              <p class="card-subtitle" style="margin-bottom: 0;">¿Quieres reemplazar un alimento de tu plan por otro? Averigua al instante cuántos gramos o medidas necesitas consumir.</p>
-            </div>
-          </div>
-
-          <div class="converter-grid">
-            <!-- Box A: Origen -->
-            <div class="converter-box">
-              <label class="form-label" style="color: var(--accent-primary);">1. Alimento que tienes en el plan</label>
-              <select id="conv-source-food" class="form-control" style="margin-top: 0.4rem; margin-bottom: 0.75rem;">
-                <!-- Filled by JS -->
-              </select>
-              <div class="form-grid">
-                <div class="form-group">
-                  <label class="form-label">Cantidad a sustituir</label>
-                  <input type="number" id="conv-source-amount" class="form-control" value="60" min="1" step="1">
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Unidad</label>
-                  <input type="text" id="conv-source-unit" class="form-control" value="gr" readonly>
-                </div>
-              </div>
-            </div>
-
-            <div class="converter-arrow">⇄</div>
-
-            <!-- Box B: Destino -->
-            <div class="converter-box">
-              <label class="form-label" style="color: var(--accent-blue);">2. Alimento por el que quieres cambiarlo</label>
-              <select id="conv-target-food" class="form-control" style="margin-top: 0.4rem; margin-bottom: 0.75rem;">
-                <!-- Filled by JS -->
-              </select>
-              <div class="form-grid">
-                <div class="form-group">
-                  <label class="form-label">Equivalente a consumir</label>
-                  <input type="text" id="conv-result-amount" class="form-control" value="210 gr" readonly style="font-weight: 700; color: var(--accent-primary);">
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Equivalencia</label>
-                  <input type="text" id="conv-result-portions" class="form-control" value="1.0 porción" readonly>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div id="conv-summary-text" class="converter-result">
-            60 gr de "Arroz" equivale a 210 gr de "Papa / Batata" (1.0 porción de Hidratos de carbono)
-          </div>
-        </div>
-
-        <!-- Food Catalog & Porciones -->
-        <div class="card">
-          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
-            <div>
-              <h2 class="card-title"><span>📚</span> Catálogo Completo de Alimentos y Medidas Caseras</h2>
-              <p class="card-subtitle">Todos los alimentos de la planilla de Nico Duartes con su aporte exacto por porción y medidas prácticas.</p>
-            </div>
-            <div style="max-width: 300px; width: 100%;">
-              <input type="text" id="catalog-search" class="form-control" placeholder="🔍 Buscar alimento...">
-            </div>
-          </div>
-
-          <!-- Category filter buttons -->
-          <div class="catalog-filters" id="catalog-filters">
-            <button class="filter-btn active" data-filter="all">Todos los grupos</button>
-            <button class="filter-btn" data-filter="HC">Carbohidratos (HC)</button>
-            <button class="filter-btn" data-filter="F">Frutas (F)</button>
-            <button class="filter-btn" data-filter="D">Dulces (D)</button>
-            <button class="filter-btn" data-filter="P">Proteína Magra (P)</button>
-            <button class="filter-btn" data-filter="PG">Proteína Grasa (PG)</button>
-            <button class="filter-btn" data-filter="M">Legumbres (M)</button>
-            <button class="filter-btn" data-filter="L">Lácteos (L)</button>
-            <button class="filter-btn" data-filter="G">Grasas (G)</button>
-          </div>
-
-          <!-- Foods Grid -->
-          <div class="catalog-grid" id="catalog-grid">
-            <!-- Rendered by JS -->
-          </div>
-        </div>
-      </section>
     </main>
-  </div>
 
-  <!-- Modal: Agregar Alimento a Comida -->
-  <div class="modal-backdrop" id="modal-add-item">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 style="font-size: 1.1rem; font-weight: 700;">Agregar Alimento a <span id="modal-meal-name">Comida</span></h3>
-        <button id="modal-close-btn" class="btn btn-ghost">✕</button>
-      </div>
-      <div class="modal-body">
-        <input type="hidden" id="modal-meal-id">
-        <div class="form-group" style="margin-bottom: 1rem;">
-          <label class="form-label" for="modal-category-select">Categoría del Alimento</label>
-          <select id="modal-category-select" class="form-control">
-            <option value="HC">Hidratos de carbono (HC)</option>
-            <option value="F">Fruta (F)</option>
-            <option value="D">Dulce (D)</option>
-            <option value="P">Proteína magra (P)</option>
-            <option value="PG">Proteína grasa (PG)</option>
-            <option value="M">Legumbre o mixta (M)</option>
-            <option value="L">Lácteos (L)</option>
-            <option value="G">Fruta oleosa / Grasas (G)</option>
-          </select>
-        </div>
+    <script type="module">
+        import { supabase } from './js/supabase.js';
 
-        <div class="form-group" style="margin-bottom: 1rem;">
-          <label class="form-label" for="modal-food-select">Alimento de la lista</label>
-          <select id="modal-food-select" class="form-control">
-            <!-- Options populated dynamically -->
-          </select>
-        </div>
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('btn-submit');
+            const errorBox = document.getElementById('error-msg');
 
-        <div class="form-grid" style="margin-bottom: 1rem;">
-          <div class="form-group">
-            <label class="form-label" for="modal-portions-input">Porciones</label>
-            <input type="number" id="modal-portions-input" class="form-control" value="1.0" min="0.25" max="10" step="0.25">
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="modal-desc-input">Descripción / Gramos</label>
-            <input type="text" id="modal-desc-input" class="form-control" placeholder="Ej: 140g o 1 unidad">
-          </div>
-        </div>
+            btn.innerText = "Verificando credenciales...";
+            btn.classList.add('opacity-75');
+            btn.disabled = true;
+            errorBox.classList.add('hidden');
 
-        <!-- Live Preview of Item Nutrients -->
-        <div style="background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.85rem; margin-top: 1rem;">
-          <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 0.4rem;">Aporte Nutricional Estimado</div>
-          <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 600;">
-            <span style="color: #60a5fa;">CH: <span id="modal-prev-ch">40</span>g</span>
-            <span style="color: #f87171;">P: <span id="modal-prev-p">5</span>g</span>
-            <span style="color: #facc15;">G: <span id="modal-prev-g">1</span>g</span>
-            <span style="color: var(--accent-primary);">Kcal: <span id="modal-prev-kcal">189</span></span>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button id="modal-cancel-btn" class="btn btn-outline">Cancelar</button>
-        <button id="modal-submit-btn" class="btn btn-primary">Guardar Alimento</button>
-      </div>
-    </div>
-  </div>
+            try {
+                // 1. Capa de Seguridad: Autenticación nativa
+                const { data: authData, error: authError } = await supabase.auth.signInWithPassword({ email, password });
+                if (authError) throw authError;
 
-  <!-- Toast Container -->
-  <div class="toast-container" id="toast-container"></div>
+                // 2. Capa Lógica: Consulta a la tabla de JUAN (profiles)
+                const { data: perfilData, error: perfilError } = await supabase
+                    .from('profiles')
+                    .select('role') // Asegurate de que Juan le haya puesto "role" y no "rol"
+                    .eq('id', authData.user.id)
+                    .single();
 
-  <!-- Application Logic (ES Modules) -->
-  <script type="module" src="js/app.js"></script>
+                if (perfilError) throw perfilError;
+
+                // 3. Enrutamiento dinámico
+                if (perfilData.role === 'coach') {
+                    window.location.href = './pages/coach-dashboard.html';
+                } else {
+                    window.location.href = './pages/alumno.html';
+                }
+
+            } catch (error) {
+                console.error("Error de acceso:", error);
+                errorBox.innerText = "Acceso denegado. Verifica tus credenciales.";
+                errorBox.classList.remove('hidden');
+                btn.innerText = "Iniciar Sesión";
+                btn.classList.remove('opacity-75');
+                btn.disabled = false;
+            }
+        });
+    </script>
 </body>
 </html>

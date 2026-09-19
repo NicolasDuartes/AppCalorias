@@ -11,3 +11,8 @@ desktop.ini
 
 # Logs
 *.log
+
+# Project specific ignores
+.agents/
+md entendimiento/
+html interfases/
