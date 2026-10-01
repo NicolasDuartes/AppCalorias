@@ -12,7 +12,19 @@ desktop.ini
 # Logs
 *.log
 
-# Project specific ignores
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Temporary / legacy directories (no son parte del producto)
 .agents/
-md entendimiento/
-html interfases/
+scratch/
+
+# Legacy source directories (reemplazadas por src/)
+# Mantener como referencia pero no trackear en git
+# html interfases/
+# md entendimiento/
+# js/
+# css/
+# pages/

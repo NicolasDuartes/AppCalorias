@@ -1,7 +1,7 @@
 // Calculadora y buscador de equivalencias nutricionales entre alimentos
 // Basado en las porciones estándar del modelo de Nico Duartes
 
-import { FOOD_CATEGORIES } from './data.js';
+import { FOOD_CATEGORIES } from '../data/food-catalog.js';
 
 /**
  * Devuelve una lista plana de todos los alimentos con su categoría

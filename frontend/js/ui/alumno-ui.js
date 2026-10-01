@@ -1,333 +1,14 @@
-<!DOCTYPE html>
-<html lang="es" class="h-full">
+    import { supabase } from '../../../backend/config/supabase.js';
 
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>AppCalorias - Diario Nutricional</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/styles.css">
-  <!-- Conexión a la base de datos -->
-  <script type="module" src="/js/supabase.js"></script>
-</head>
-
-<body class="w-full h-screen bg-[#3D553E] m-0 p-0 overflow-hidden flex justify-center text-slate-800">
-
-  <div
-    class="relative w-full md:max-w-2xl lg:max-w-3xl h-full bg-[#507052] flex flex-col justify-between shadow-2xl overflow-hidden">
-
-    <header class="w-full bg-[#507052] shrink-0 z-20 px-4 pt-3 pb-2">
-      <div class="flex items-center justify-between pb-2">
-        <h1 class="text-white text-2xl font-bold tracking-tight">Hoy</h1>
-        <div class="flex items-center gap-2">
-          <button
-            class="w-9 h-9 rounded-full flex items-center justify-center text-white hover:bg-white/10 transition-colors">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
-            </svg>
-          </button>
-          <div
-            class="w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-900 font-semibold text-xs border border-white/20">
-            <svg class="w-5 h-5 text-emerald-800" fill="currentColor" viewBox="0 0 24 24">
-              <path clip-rule="evenodd"
-                d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"
-                fill-rule="evenodd"></path>
-            </svg>
-          </div>
-        </div>
-      </div>
-
-      <div class="flex items-center justify-between pb-3">
-        <div>
-          <div class="flex items-center gap-1.5">
-            <h2 class="text-white text-base font-bold tracking-tight">Hoy, 24 Octubre</h2>
-            <span class="w-2 h-2 rounded-full bg-[#22C55E]"></span>
-          </div>
-          <p class="text-white/80 text-[11px] font-medium">Plan Hipertrofia &amp; Fuerza</p>
-        </div>
-        <div class="bg-[#111827]/80 p-1 rounded-full flex items-center shadow-inner border border-black/20">
-          <button id="btn-mode-kcal" onclick="setAppMode('kcal')"
-            class="px-3 py-1 rounded-full font-semibold text-xs transition-all text-white/70">
-            Kcal / g
-          </button>
-          <button id="btn-mode-porciones" onclick="setAppMode('porciones')"
-            class="px-3 py-1 rounded-full bg-[#22C55E] text-[#0E141A] font-bold text-xs shadow transition-all">
-            Porciones
-          </button>
-        </div>
-      </div>
-
-      <section id="balance-card"
-        class="w-full bg-[#F8FAFC] rounded-[18px] p-3.5 shadow-md border border-white/60 transition-all duration-300 ease-in-out">
-        <div class="flex items-start justify-between">
-          <div>
-            <span class="text-[10px] font-extrabold uppercase tracking-wider text-[#64748B]">Balance Diario</span>
-            <div class="flex items-baseline gap-1.5 mt-0.5">
-              <span id="balance-main-num"
-                class="text-2xl font-extrabold text-[#1E293B] tracking-tight transition-all duration-300">4</span>
-              <span id="balance-main-label" class="text-xs font-semibold text-[#1E293B]">porciones restantes</span>
-            </div>
-            <p id="balance-sub-label" class="text-[11px] text-[#64748B] transition-all duration-300">(800 kcal
-              restantes)</p>
-          </div>
-
-          <span id="balance-adherence-badge"
-            class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#DCFCE7] text-[#15803D] text-[11px] font-bold border border-[#86EFAC]/50">
-            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-              <path clip-rule="evenodd"
-                d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12a4.49 4.49 0 01-1.549 3.397 4.491 4.491 0 01-1.307 3.497 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.49 4.49 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
-                fill-rule="evenodd"></path>
-            </svg>
-            <span id="adherence-percent-text">100%</span>
-          </span>
-        </div>
-
-        <div id="balance-bars-container" class="mt-2.5 space-y-2 transition-all duration-300">
-          <div class="bar-row">
-            <div class="flex items-center justify-between text-[11px] mb-0.5">
-              <span class="font-bold text-[#1E293B] flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-[#22C55E]"></span> KCAL
-              </span>
-              <span id="bar-text-kcal" class="font-bold text-[#1E293B]">1500 / 2300</span>
-            </div>
-            <div class="w-full h-2 bg-[#E2E8F0] rounded-full overflow-hidden">
-              <div id="bar-fill-kcal" class="h-full bg-[#22C55E] rounded-full transition-all duration-300"
-                style="width: 65%;"></div>
-            </div>
-          </div>
-
-          <div class="bar-row">
-            <div class="flex items-center justify-between text-[11px] mb-0.5">
-              <span class="font-bold text-[#1E293B] flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-[#EF4444]"></span> Proteínas
-              </span>
-              <span id="bar-text-p" class="font-bold text-[#1E293B]">1 / 4 porc.</span>
-            </div>
-            <div class="w-full h-2 bg-[#E2E8F0] rounded-full overflow-hidden">
-              <div id="bar-fill-p" class="h-full bg-[#EF4444] rounded-full transition-all duration-300"
-                style="width: 25%;"></div>
-            </div>
-          </div>
-
-          <div class="bar-row">
-            <div class="flex items-center justify-between text-[11px] mb-0.5">
-              <span class="font-bold text-[#1E293B] flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-[#F97316]"></span> Carbohidratos
-              </span>
-              <span id="bar-text-hc" class="font-bold text-[#1E293B]">3 / 6 porc.</span>
-            </div>
-            <div class="w-full h-2 bg-[#E2E8F0] rounded-full overflow-hidden">
-              <div id="bar-fill-hc" class="h-full bg-[#F97316] rounded-full transition-all duration-300"
-                style="width: 50%;"></div>
-            </div>
-          </div>
-
-          <div class="bar-row">
-            <div class="flex items-center justify-between text-[11px] mb-0.5">
-              <span class="font-bold text-[#1E293B] flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-[#3B82F6]"></span> Grasas
-              </span>
-              <span id="bar-text-g" class="font-bold text-[#1E293B]">1.5 / 2 porc.</span>
-            </div>
-            <div class="w-full h-2 bg-[#E2E8F0] rounded-full overflow-hidden">
-              <div id="bar-fill-g" class="h-full bg-[#3B82F6] rounded-full transition-all duration-300"
-                style="width: 75%;"></div>
-            </div>
-          </div>
-        </div>
-      </section>
-    </header>
-
-    <main id="meals-list-container"
-      class="w-full flex-1 min-h-0 overflow-y-auto hide-scrollbar px-4 pt-1 pb-6 space-y-3">
-    </main>
-
-    <nav
-      class="w-full h-[64px] shrink-0 bg-[#0E141A]/95 backdrop-blur-md border-t border-white/10 flex items-center justify-around px-2 z-30">
-      <button class="flex flex-col items-center justify-center flex-1 text-[#22C55E] gap-0.5">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-            stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
-        </svg>
-        <span class="text-[10px] font-bold">Hoy</span>
-      </button>
-      <button
-        class="flex flex-col items-center justify-center flex-1 text-[#94A3B8] hover:text-white transition-colors gap-0.5">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-            stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
-        </svg>
-        <span class="text-[10px] font-medium">Mi Plan</span>
-      </button>
-      <button
-        class="flex flex-col items-center justify-center flex-1 text-[#94A3B8] hover:text-white transition-colors gap-0.5">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-          </path>
-        </svg>
-        <span class="text-[10px] font-medium">Progreso</span>
-      </button>
-      <button
-        class="flex flex-col items-center justify-center flex-1 text-[#94A3B8] hover:text-white transition-colors gap-0.5">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-            stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
-        </svg>
-        <span class="text-[10px] font-medium">Coach</span>
-      </button>
-    </nav>
-
-    <div id="modal-reemplazo"
-      class="hidden absolute inset-0 bg-black/60 backdrop-blur-xs z-50 flex flex-col justify-end transition-opacity">
-      <div
-        class="bg-white rounded-t-[28px] p-5 pb-6 shadow-2xl w-full max-w-2xl lg:max-w-3xl mx-auto border-t border-white/40 flex flex-col max-h-[82%]">
-        <div class="w-12 h-1.5 bg-[#CBD5E1] rounded-full mx-auto mb-3 shrink-0"></div>
-
-        <div class="flex items-start justify-between pb-3 border-b border-[#F1F5F9] shrink-0">
-          <div>
-            <div class="flex items-center gap-2">
-              <span id="reemplazo-modal-badge"
-                class="px-1.5 py-0.5 rounded bg-[#FEF3C7] text-[#D97706] font-bold text-[10px] border border-[#FDE68A]">[HC]</span>
-              <h3 id="reemplazo-modal-title" class="text-base font-bold text-[#0E141A] tracking-tight">Reemplazar
-                Alimento</h3>
-            </div>
-            <p id="reemplazo-modal-subtitle" class="text-[11px] text-[#64748B] font-medium mt-0.5">Porción fija de
-              equivalencia</p>
-          </div>
-          <button onclick="closeReemplazoModal()"
-            class="w-8 h-8 rounded-full bg-[#F1F5F9] text-[#64748B] hover:text-[#0E141A] flex items-center justify-center">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
-            </svg>
-          </button>
-        </div>
-
-        <div id="reemplazo-options-list" class="overflow-y-auto py-2 space-y-2 mt-1 hide-scrollbar">
-        </div>
-
-        <div class="mt-3 pt-2 shrink-0">
-          <button onclick="confirmReemplazo()"
-            class="w-full py-3 rounded-xl bg-[#22C55E] text-[#0E141A] font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-md active:scale-[0.99] transition-all">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
-            </svg>
-            Confirmar reemplazo
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <div id="modal-add-food"
-      class="hidden absolute inset-0 bg-[#507052] z-50 flex flex-col justify-between overflow-hidden">
-      <header class="w-full bg-[#507052] shrink-0 z-20 px-4 pt-5 pb-3 flex flex-col gap-3">
-        <div class="flex items-center justify-between">
-          <button onclick="closeAddFoodModal()"
-            class="w-9 h-9 rounded-full bg-black/20 flex items-center justify-center text-white hover:bg-black/30 active:scale-95 transition-all">
-            <svg class="w-5 h-5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path d="M15 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"></path>
-            </svg>
-          </button>
-          <div class="flex flex-col items-center text-center">
-            <h1 id="add-food-title" class="text-base font-bold text-white tracking-tight">Añadir a Desayuno</h1>
-            <p class="text-[11px] text-white/80 font-medium mt-0.5">Selecciona el grupo o equivalente</p>
-          </div>
-          <button onclick="closeAddFoodModal()"
-            class="w-9 h-9 rounded-full bg-black/20 flex items-center justify-center text-white hover:bg-black/30 active:scale-95 transition-all">
-            <svg class="w-4 h-4 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"></path>
-            </svg>
-          </button>
-        </div>
-
-        <div class="relative w-full">
-          <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-            <svg class="w-4 h-4 text-gray-400 stroke-[2.2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z" stroke-linecap="round"
-                stroke-linejoin="round"></path>
-            </svg>
-          </div>
-          <input id="add-food-search" oninput="filterAddFoodSearch(this.value)"
-            class="w-full h-10 pl-10 pr-12 bg-white text-gray-800 placeholder-gray-400 text-xs rounded-xl border-none focus:outline-none focus:ring-2 focus:ring-[#22C55E] shadow-sm"
-            placeholder="Buscar por nombre de alimento..." type="text">
-        </div>
-      </header>
-
-      <main class="w-full flex-1 min-h-0 bg-white rounded-t-[28px] flex flex-col overflow-hidden shadow-2xl z-10">
-        <div class="w-full flex justify-center pt-2.5 pb-1 shrink-0">
-          <div class="w-10 h-1 rounded-full bg-gray-300"></div>
-        </div>
-
-        <section class="px-4 py-2 shrink-0">
-          <div
-            class="bg-[#F1F5F9] p-1 rounded-2xl flex items-center justify-between gap-1 shadow-inner border border-gray-200/50">
-            <button id="tab-macro-p" onclick="switchAddTab('P')"
-              class="flex-1 bg-white rounded-xl py-2 px-1.5 flex flex-col items-center justify-center shadow-xs transition-all">
-              <div class="flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-[#22C55E]"></span>
-                <span class="text-xs font-bold text-gray-900 leading-none">Proteínas</span>
-              </div>
-              <span class="text-[10px] text-gray-500 font-medium mt-1">4 subgrupos</span>
-              <div id="tab-macro-p-line" class="w-6 h-[2px] bg-[#22C55E] rounded-full mt-1"></div>
-            </button>
-            <button id="tab-macro-hc" onclick="switchAddTab('HC')"
-              class="flex-1 rounded-xl py-2 px-1.5 flex flex-col items-center justify-center transition-all">
-              <div class="flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-[#F97316]"></span>
-                <span class="text-xs font-semibold text-gray-600 leading-none">Carbohidratos</span>
-              </div>
-              <span class="text-[10px] text-gray-400 font-medium mt-1">3 subgrupos</span>
-              <div id="tab-macro-hc-line" class="w-6 h-[2px] bg-transparent mt-1"></div>
-            </button>
-            <button id="tab-macro-g" onclick="switchAddTab('G')"
-              class="flex-1 rounded-xl py-2 px-1.5 flex flex-col items-center justify-center transition-all">
-              <div class="flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-[#3B82F6]"></span>
-                <span class="text-xs font-semibold text-gray-600 leading-none">Grasas</span>
-              </div>
-              <span class="text-[10px] text-gray-400 font-medium mt-1">1 subgrupo</span>
-              <div id="tab-macro-g-line" class="w-6 h-[2px] bg-transparent mt-1"></div>
-            </button>
-          </div>
-        </section>
-
-        <div id="add-food-accordion-container"
-          class="flex-1 overflow-y-auto px-4 pt-2 pb-6 hide-scrollbar flex flex-col gap-2.5">
-        </div>
-      </main>
-
-      <footer
-        class="w-full h-[72px] shrink-0 bg-white border-t border-gray-100 px-4 flex items-center justify-between z-30 shadow-[0_-4px_16px_rgba(0,0,0,0.06)]">
-        <div class="flex items-center gap-2.5">
-          <span class="relative flex h-3 w-3">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-3 w-3 bg-[#22C55E]"></span>
-          </span>
-          <div class="flex flex-col">
-            <span id="footer-active-meal-name" class="text-xs font-bold text-gray-900 leading-tight">Comida activa:
-              Desayuno</span>
-            <span id="footer-active-meal-desc" class="text-[11px] text-gray-500 leading-tight mt-0.5">Toca + Añadir para
-              registrar</span>
-          </div>
-        </div>
-        <button onclick="closeAddFoodModal()"
-          class="bg-[#0E141A] hover:bg-[#1E293B] text-white text-xs font-bold px-4 py-2.5 rounded-xl active:scale-95 transition-all shadow-md">
-          Listo
-        </button>
-      </footer>
-    </div>
-
-  </div>
-
-  <script>
     let currentMode = 'porciones';
     let activeMealId = 'desayuno';
+
+    // Dynamic targets from meal_plans
+    let targetKcal = 2300;
+    let targetP = 140;
+    let targetHC = 260;
+    let targetG = 65;
+    let targetPorc = 15;
 
     const mealsData = {
       desayuno: {
@@ -543,7 +224,35 @@
 
     let openSwipedCard = null;
 
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
+      // 0. AUTH GUARD: Verificar que es un alumno autenticado
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        window.location.href = '../index.html';
+        return;
+      }
+      
+      // Fetch latest active meal plan
+      try {
+        const { data: plans, error } = await supabase
+          .from('meal_plans')
+          .select('*')
+          .eq('alumno_id', session.user.id)
+          .eq('active', true)
+          .order('created_at', { ascending: false })
+          .limit(1);
+
+        if (!error && plans && plans.length > 0) {
+          targetKcal = plans[0].target_calories;
+          targetP = plans[0].target_protein_g;
+          targetHC = plans[0].target_carbs_g;
+          targetG = plans[0].target_fat_g;
+          targetPorc = Math.round(targetKcal / 150); // rough estimation for portions mode
+        }
+      } catch (e) {
+        console.error("Error fetching meal plan:", e);
+      }
+
       renderMeals();
       updateBalance();
       setupScrollCollapsing();
@@ -946,9 +655,6 @@
         });
       });
 
-      const targetKcal = 2300;
-      const targetPorc = 15;
-
       const adherence = totalItems > 0 ? Math.round((checkedItems / totalItems) * 100) : 100;
       document.getElementById('adherence-percent-text').innerText = `${adherence}%`;
 
@@ -959,9 +665,9 @@
         document.getElementById('balance-sub-label').innerText = `(${totalKcal} kcal consumidas hoy)`;
 
         document.getElementById('bar-text-kcal').innerText = `${totalKcal} / ${targetKcal} KCAL`;
-        document.getElementById('bar-text-p').innerText = `${totalP} / 140 g`;
-        document.getElementById('bar-text-hc').innerText = `${totalHC} / 260 g`;
-        document.getElementById('bar-text-g').innerText = `${totalG} / 65 g`;
+        document.getElementById('bar-text-p').innerText = `${totalP} / ${targetP} g`;
+        document.getElementById('bar-text-hc').innerText = `${totalHC} / ${targetHC} g`;
+        document.getElementById('bar-text-g').innerText = `${totalG} / ${targetG} g`;
       } else {
         const remainingPorc = Math.max(0, Math.round((targetPorc - totalPorc) * 10) / 10);
         document.getElementById('balance-main-num').innerText = remainingPorc;
@@ -969,15 +675,15 @@
         document.getElementById('balance-sub-label').innerText = `(${Math.max(0, targetKcal - totalKcal)} kcal restantes)`;
 
         document.getElementById('bar-text-kcal').innerText = `${totalKcal} / ${targetKcal}`;
-        document.getElementById('bar-text-p').innerText = `${Math.round(totalP / 25)} / 4 porc.`;
-        document.getElementById('bar-text-hc').innerText = `${Math.round(totalHC / 40)} / 6 porc.`;
-        document.getElementById('bar-text-g').innerText = `${Math.round(totalG / 15)} / 2 porc.`;
+        document.getElementById('bar-text-p').innerText = `${Math.round(totalP / 25)} / ${Math.round(targetP / 25)} porc.`;
+        document.getElementById('bar-text-hc').innerText = `${Math.round(totalHC / 40)} / ${Math.round(targetHC / 40)} porc.`;
+        document.getElementById('bar-text-g').innerText = `${Math.round(totalG / 15)} / ${Math.round(targetG / 15)} porc.`;
       }
 
       document.getElementById('bar-fill-kcal').style.width = `${Math.min(100, (totalKcal / targetKcal) * 100)}%`;
-      document.getElementById('bar-fill-p').style.width = `${Math.min(100, (totalP / 140) * 100)}%`;
-      document.getElementById('bar-fill-hc').style.width = `${Math.min(100, (totalHC / 260) * 100)}%`;
-      document.getElementById('bar-fill-g').style.width = `${Math.min(100, (totalG / 65) * 100)}%`;
+      document.getElementById('bar-fill-p').style.width = `${Math.min(100, (totalP / targetP) * 100)}%`;
+      document.getElementById('bar-fill-hc').style.width = `${Math.min(100, (totalHC / targetHC) * 100)}%`;
+      document.getElementById('bar-fill-g').style.width = `${Math.min(100, (totalG / targetG) * 100)}%`;
     }
 
     function openReemplazoModal(mealKey, itemId) {
@@ -1242,7 +948,75 @@
       updateBalance();
       closeAddFoodModal();
     }
-  </script>
-</body>
 
-</html>
+    // Exponer funciones globales (necesario al usar type="module")
+    window.setAppMode = setAppMode;
+    window.openAddFoodModal = openAddFoodModal;
+    window.closeAddFoodModal = closeAddFoodModal;
+    window.setAddFoodTab = setAddFoodTab;
+    window.toggleAccordion = toggleAccordion;
+    window.changePortionCounter = changePortionCounter;
+    window.filterAddFoodSearch = filterAddFoodSearch;
+    window.addNewFoodToMeal = addNewFoodToMeal;
+    window.openReemplazoModal = openReemplazoModal;
+    window.closeReemplazoModal = closeReemplazoModal;
+    window.confirmReplacement = confirmReplacement;
+    window.selectReplacementOption = selectReplacementOption;
+    window.deleteFoodItem = deleteFoodItem;
+    window.toggleItemCheck = toggleItemCheck;
+    window.handleCardButtonClick = handleCardButtonClick;
+
+    // Navegación entre pestañas
+    function cambiarVista(vista) {
+      const headerHoy = document.getElementById('header-hoy');
+      const mealsList = document.getElementById('meals-list-container');
+      const vistaMiPlan = document.getElementById('vista-mi-plan');
+      const vistaProgreso = document.getElementById('vista-progreso');
+      const vistaCoach = document.getElementById('vista-coach');
+
+      const navHoy = document.getElementById('nav-hoy');
+      const navMiPlan = document.getElementById('nav-mi-plan');
+      const navProgreso = document.getElementById('nav-progreso');
+      const navCoach = document.getElementById('nav-coach');
+
+      const resetNav = (nav) => {
+        nav.className = 'flex flex-col items-center justify-center flex-1 text-[#94A3B8] hover:text-white transition-colors gap-0.5';
+        nav.querySelector('span:last-child').className = 'text-[10px] font-medium';
+      };
+      const activeNav = (nav) => {
+        nav.className = 'flex flex-col items-center justify-center flex-1 text-[#22C55E] gap-0.5';
+        nav.querySelector('span:last-child').className = 'text-[10px] font-bold';
+      };
+
+      resetNav(navHoy);
+      resetNav(navMiPlan);
+      resetNav(navProgreso);
+      resetNav(navCoach);
+
+      headerHoy.classList.add('hidden');
+      mealsList.classList.add('hidden');
+      vistaMiPlan.classList.add('hidden');
+      vistaProgreso.classList.add('hidden');
+      vistaCoach.classList.add('hidden');
+
+      if (vista === 'hoy') {
+        headerHoy.classList.remove('hidden');
+        mealsList.classList.remove('hidden');
+        activeNav(navHoy);
+      } else if (vista === 'mi-plan') {
+        vistaMiPlan.classList.remove('hidden');
+        activeNav(navMiPlan);
+      } else if (vista === 'progreso') {
+        vistaProgreso.classList.remove('hidden');
+        activeNav(navProgreso);
+      } else if (vista === 'coach') {
+        vistaCoach.classList.remove('hidden');
+        activeNav(navCoach);
+      }
+    }
+
+    // Registrar listeners de navegación al cargar el módulo
+    document.getElementById('nav-hoy').addEventListener('click', () => cambiarVista('hoy'));
+    document.getElementById('nav-mi-plan').addEventListener('click', () => cambiarVista('mi-plan'));
+    document.getElementById('nav-progreso').addEventListener('click', () => cambiarVista('progreso'));
+    document.getElementById('nav-coach').addEventListener('click', () => cambiarVista('coach'));

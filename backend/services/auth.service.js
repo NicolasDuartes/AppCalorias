@@ -1,4 +1,4 @@
-import { supabase } from './supabase.js'
+import { supabase } from '../config/supabase.js'
 
 document.addEventListener('DOMContentLoaded', () => {
   const tabs = document.querySelectorAll('.auth-tab')

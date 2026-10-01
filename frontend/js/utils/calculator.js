@@ -1,7 +1,7 @@
 // Funciones matemáticas y lógicas de cálculo de calorías, TDEE, macros y tolerancias
 // Basado fielmente en las fórmulas de "Calculadora Nico Duartes.xlsx"
 
-import { FOOD_CATEGORIES, TOLERANCES } from './data.js';
+import { FOOD_CATEGORIES, TOLERANCES } from '../data/food-catalog.js';
 
 /**
  * 1) Metabolismo Basal (BMR) - Ecuación Mifflin-St Jeor

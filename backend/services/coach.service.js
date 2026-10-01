@@ -1,4 +1,4 @@
-import { supabase, requireAuth } from './supabase.js'
+import { supabase, requireAuth } from '../config/supabase.js'
 
 document.addEventListener('DOMContentLoaded', async () => {
   // 1. Validar que es un Coach autenticado

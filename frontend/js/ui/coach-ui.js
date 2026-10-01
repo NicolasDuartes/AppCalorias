@@ -1,166 +1,5 @@
-<!DOCTYPE html>
-<html lang="es" class="h-full">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Panel Coach - AppCalorias</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../css/styles.css">
-</head>
-
-<body class="w-full h-screen bg-[#3D553E] m-0 p-0 overflow-hidden flex justify-center text-slate-800">
-
-    <div class="relative w-full md:max-w-2xl lg:max-w-3xl h-full bg-[#507052] flex flex-col justify-between shadow-2xl overflow-hidden">
-
-        <!-- CABECERA DEL COACH -->
-        <header class="w-full shrink-0 z-20 px-4 pt-5 pb-4">
-            <div class="flex items-center justify-between pb-4">
-                <div>
-                    <h1 id="coach-greeting" class="text-white text-2xl font-bold tracking-tight">Hola, Coach</h1>
-                    <p class="text-white/80 text-xs font-medium mt-0.5">Gestión de alumnos</p>
-                </div>
-                <button id="btn-logout" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center border border-white/20 shadow-inner hover:bg-red-500/30 transition-colors" title="Cerrar sesión">
-                    <span class="text-lg">🚪</span>
-                </button>
-            </div>
-        </header>
-
-        <!-- CONTENEDOR PRINCIPAL -->
-        <main class="w-full flex-1 min-h-0 bg-[#F8FAFC] rounded-t-[32px] overflow-hidden flex flex-col shadow-[0_-8px_20px_rgba(0,0,0,0.15)] z-10 relative">
-            
-            <!-- ========================================== -->
-            <!-- VISTA 1: LISTA DE ALUMNOS (PERFILES)       -->
-            <!-- ========================================== -->
-            <div id="vista-lista" class="flex flex-col h-full w-full">
-                <div id="seccion-pendientes" class="w-full px-5 pt-6 pb-2 shrink-0 flex items-center justify-between hidden">
-                    <h2 class="text-base font-bold text-[#EAB308] tracking-tight">Solicitudes Pendientes</h2>
-                </div>
-                <div id="contenedor-pendientes" class="w-full px-4 space-y-3 mb-4 hidden">
-                    <!-- Tarjetas de pendientes -->
-                </div>
-
-                <div class="w-full px-5 pt-2 pb-2 shrink-0 flex items-center justify-between">
-                    <h2 class="text-base font-bold text-[#0E141A] tracking-tight">Directorio de Alumnos</h2>
-                </div>
-                
-                <!-- Aquí inyectaremos las tarjetas de alumnos con JS -->
-                <div id="contenedor-alumnos" class="flex-1 overflow-y-auto hide-scrollbar px-4 pb-6 space-y-3">
-                    <div class="text-center text-[#64748B] mt-10 text-xs font-medium font-bold">Cargando base de datos...</div>
-                </div>
-            </div>
-
-            <!-- ========================================== -->
-            <!-- VISTA 3: MIS ALUMNOS (APROBADOS)           -->
-            <!-- ========================================== -->
-            <div id="vista-alumnos" class="hidden flex flex-col h-full w-full">
-                <div class="w-full px-5 pt-6 pb-2 shrink-0 flex items-center justify-between">
-                    <h2 class="text-base font-bold text-[#0E141A] tracking-tight">Mis Alumnos</h2>
-                    <span id="badge-count" class="px-2.5 py-0.5 rounded-full bg-[#DCFCE7] text-[#15803D] text-[11px] font-bold border border-[#BBF7D0]">0</span>
-                </div>
-                <div id="contenedor-mis-alumnos" class="flex-1 overflow-y-auto hide-scrollbar px-4 pb-6 space-y-3">
-                    <div class="text-center text-[#64748B] mt-10 text-xs font-medium font-bold">Cargando...</div>
-                </div>
-            </div>
-
-            <!-- ========================================== -->
-            <!-- VISTA 2: FORMULARIO DE MÉTRICAS            -->
-            <!-- ========================================== -->
-            <div id="vista-metricas" class="hidden absolute inset-0 bg-white z-20 flex flex-col h-full w-full overflow-y-auto hide-scrollbar p-5 pb-24">
-                <div class="flex justify-between items-start mb-4 border-b border-gray-100 pb-3 shrink-0">
-                    <div>
-                        <h3 class="font-bold text-[#1E293B]" id="titulo-alumno">Métricas</h3>
-                        <p class="text-[11px] text-[#64748B]" id="subtitulo-alumno">Edad: - | Sexo: -</p>
-                    </div>
-                    <button onclick="window.volverALista()" class="w-8 h-8 rounded-full bg-[#F1F5F9] text-[#64748B] hover:text-[#0E141A] flex items-center justify-center transition-colors">
-                        ✕
-                    </button>
-                </div>
-
-                <form id="form-metricas" class="space-y-3">
-                    <!-- ID oculto para saber a qué perfil le asignamos las métricas -->
-                    <input type="hidden" id="input-perfil-id">
-
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="text-[11px] font-bold text-[#1E293B] ml-1">Peso (kg)</label>
-                            <input type="number" step="0.1" id="input-peso" required
-                                class="w-full bg-[#F8FAFC] border border-gray-200 text-xs font-bold text-gray-900 rounded-xl px-3 py-2 focus:ring-2 focus:ring-[#22C55E]" />
-                        </div>
-                        <div>
-                            <label class="text-[11px] font-bold text-[#1E293B] ml-1">Altura (cm)</label>
-                            <input type="number" id="input-altura" required
-                                class="w-full bg-[#F8FAFC] border border-gray-200 text-xs font-bold text-gray-900 rounded-xl px-3 py-2 focus:ring-2 focus:ring-[#22C55E]" />
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="text-[11px] font-bold text-[#1E293B] ml-1">Pasos diarios</label>
-                            <input type="number" id="input-pasos" required value="0"
-                                class="w-full bg-[#F8FAFC] border border-gray-200 text-xs font-bold text-gray-900 rounded-xl px-3 py-2 focus:ring-2 focus:ring-[#22C55E]" />
-                        </div>
-                        <div>
-                            <label class="text-[11px] font-bold text-[#1E293B] ml-1">Valor MET</label>
-                            <input type="number" step="0.1" id="input-met" required value="0.0"
-                                class="w-full bg-[#F8FAFC] border border-gray-200 text-xs font-bold text-gray-900 rounded-xl px-3 py-2 focus:ring-2 focus:ring-[#22C55E]" />
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="text-[11px] font-bold text-[#1E293B] ml-1">Entrenos / semana</label>
-                            <input type="number" id="input-entrenos" required value="0"
-                                class="w-full bg-[#F8FAFC] border border-gray-200 text-xs font-bold text-gray-900 rounded-xl px-3 py-2 focus:ring-2 focus:ring-[#22C55E]" />
-                        </div>
-                        <div>
-                            <label class="text-[11px] font-bold text-[#1E293B] ml-1">Horas / sesión</label>
-                            <input type="number" step="0.1" id="input-horas" required value="0.0"
-                                class="w-full bg-[#F8FAFC] border border-gray-200 text-xs font-bold text-gray-900 rounded-xl px-3 py-2 focus:ring-2 focus:ring-[#22C55E]" />
-                        </div>
-                    </div>
-
-                    <div class="col-span-2">
-                        <label class="text-[11px] font-bold text-[#1E293B] ml-1">Contexto Energético</label>
-                        <div class="grid grid-cols-3 gap-2 mt-1">
-                            <button type="button" class="btn-contexto py-2 rounded-xl border border-gray-200 text-xs font-bold text-gray-600 hover:bg-gray-50 transition-colors" data-value="1">Déficit</button>
-                            <button type="button" class="btn-contexto py-2 rounded-xl border border-gray-200 text-xs font-bold text-gray-600 hover:bg-gray-50 transition-colors" data-value="2">Mantenimiento</button>
-                            <button type="button" class="btn-contexto py-2 rounded-xl border border-gray-200 text-xs font-bold text-gray-600 hover:bg-gray-50 transition-colors" data-value="3">Superávit</button>
-                        </div>
-                        <input type="hidden" id="input-contexto" required>
-                    </div>
-
-                    <button type="submit" class="w-full mt-4 py-3 rounded-xl bg-[#22C55E] text-[#0E141A] font-extrabold text-xs shadow-sm active:scale-95 transition-transform">
-                        Guardar Métricas
-                    </button>
-                </form>
-            </div>
-        </main>
-
-        <!-- MENÚ INFERIOR FIJO -->
-        <nav class="w-full h-[64px] shrink-0 bg-[#0E141A]/95 backdrop-blur-md border-t border-white/10 flex items-center justify-around px-2 z-30">
-            <button id="nav-panel" onclick="window.cambiarVista('panel')" class="flex flex-col items-center justify-center flex-1 text-[#22C55E] gap-0.5">
-                <span class="text-lg">📋</span>
-                <span class="text-[10px] font-bold">Panel</span>
-            </button>
-            <button id="nav-alumnos" onclick="window.cambiarVista('alumnos')" class="flex flex-col items-center justify-center flex-1 text-[#94A3B8] hover:text-white transition-colors gap-0.5">
-                <span class="text-lg">👥</span>
-                <span class="text-[10px] font-medium">Alumnos</span>
-            </button>
-            <button class="flex flex-col items-center justify-center flex-1 text-[#94A3B8] hover:text-white transition-colors gap-0.5">
-                <span class="text-lg">📑</span>
-                <span class="text-[10px] font-medium">Plantillas</span>
-            </button>
-        </nav>
-    </div>
-
-    <!-- ========================================== -->
-    <!-- LÓGICA JAVASCRIPT PURO                     -->
-    <!-- ========================================== -->
-    <script type="module">
-        import { supabase } from '../js/supabase.js';
+        import { supabase } from '../../../backend/config/supabase.js';
+        import { calculateTDEE, calculateTargetMacros } from '../utils/calculator.js';
 
         // Variables globales
         let perfilesGlobal = [];
@@ -376,39 +215,62 @@
         window.cambiarVista = function(vista) {
             const vistaLista = document.getElementById('vista-lista');
             const vistaAlumnos = document.getElementById('vista-alumnos');
+            const vistaPlantillas = document.getElementById('vista-plantillas');
+            const vistaMetricas = document.getElementById('vista-metricas');
+            
             const navPanel = document.getElementById('nav-panel');
             const navAlumnos = document.getElementById('nav-alumnos');
+            const navPlantillas = document.getElementById('nav-plantillas');
+
+            // Reset navigation icons
+            const resetNav = (nav) => {
+                nav.className = 'flex flex-col items-center justify-center flex-1 text-[#94A3B8] hover:text-white transition-colors gap-0.5';
+                nav.querySelector('span:last-child').className = 'text-[10px] font-medium';
+            };
+            const activeNav = (nav) => {
+                nav.className = 'flex flex-col items-center justify-center flex-1 text-[#22C55E] gap-0.5';
+                nav.querySelector('span:last-child').className = 'text-[10px] font-bold';
+            };
+
+            resetNav(navPanel);
+            resetNav(navAlumnos);
+            resetNav(navPlantillas);
+
+            // Hide all views
+            vistaLista.classList.add('hidden');
+            vistaAlumnos.classList.add('hidden');
+            vistaPlantillas.classList.add('hidden');
+            vistaMetricas.classList.add('hidden');
 
             if (vista === 'panel') {
                 vistaLista.classList.remove('hidden');
-                vistaAlumnos.classList.add('hidden');
-                navPanel.className = 'flex flex-col items-center justify-center flex-1 text-[#22C55E] gap-0.5';
-                navPanel.querySelector('span:last-child').className = 'text-[10px] font-bold';
-                navAlumnos.className = 'flex flex-col items-center justify-center flex-1 text-[#94A3B8] hover:text-white transition-colors gap-0.5';
-                navAlumnos.querySelector('span:last-child').className = 'text-[10px] font-medium';
+                activeNav(navPanel);
             } else if (vista === 'alumnos') {
                 vistaAlumnos.classList.remove('hidden');
-                vistaLista.classList.add('hidden');
-                navAlumnos.className = 'flex flex-col items-center justify-center flex-1 text-[#22C55E] gap-0.5';
-                navAlumnos.querySelector('span:last-child').className = 'text-[10px] font-bold';
-                navPanel.className = 'flex flex-col items-center justify-center flex-1 text-[#94A3B8] hover:text-white transition-colors gap-0.5';
-                navPanel.querySelector('span:last-child').className = 'text-[10px] font-medium';
+                activeNav(navAlumnos);
+            } else if (vista === 'plantillas') {
+                vistaPlantillas.classList.remove('hidden');
+                activeNav(navPlantillas);
             }
         };
 
         // 3. CAMBIAR A VISTA DE FORMULARIO
         window.abrirFormularioMetricas = function(perfilId) {
             const perfil = perfilesGlobal.find(p => p.id === perfilId);
-            const nombreUsuario = perfil.nombre || perfil.name || 'Alumno';
-            const edadUsuario = perfil.edad || perfil.age || '-';
-            const sexoUsuario = perfil.sexo || perfil.sex || '-';
+            const nombreUsuario = perfil.nombre || perfil.name || perfil.full_name || 'Alumno';
+            const edadUsuario = perfil.edad || perfil.age || '';
+            const sexoUsuario = perfil.sexo || perfil.sex || 'Hombre';
             
             // Llenar etiquetas del título
             document.getElementById('titulo-alumno').innerText = `Métricas para ${nombreUsuario}`;
-            document.getElementById('subtitulo-alumno').innerText = `Edad: ${edadUsuario} | Sexo: ${sexoUsuario}`;
+            document.getElementById('subtitulo-alumno').innerText = `Email: ${perfil.email}`;
             
             // Guardar el ID en el input oculto
             document.getElementById('input-perfil-id').value = perfil.id;
+            
+            // Pre-llenar edad y sexo si existen
+            document.getElementById('input-edad').value = edadUsuario;
+            document.getElementById('input-sexo').value = sexoUsuario;
 
             // Ocultar lista, mostrar métricas
             document.getElementById('vista-lista').classList.add('hidden');
@@ -443,30 +305,68 @@
             });
         });
 
-        // 5. GUARDAR DATOS DEL FORMULARIO EN LA TABLA ALUMNOS
+        // 5. GUARDAR DATOS DEL FORMULARIO EN LA TABLA MEAL_PLANS
         document.getElementById('form-metricas').addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            // Verificar sesión actual (para evitar errores si cambió en otra pestaña)
+            const { data: { session: currentSession } } = await supabase.auth.getSession();
+            if (!currentSession || currentSession.user.id !== coachId) {
+                alert("Tu sesión expiró o cambiaste de usuario en otra pestaña. Por favor, recarga la página o vuelve a iniciar sesión como Coach.");
+                return;
+            }
 
             // Extraer y parsear valores del DOM
+            const alumnoId = document.getElementById('input-perfil-id').value;
+            const edad = parseInt(document.getElementById('input-edad').value);
+            const sexo = document.getElementById('input-sexo').value;
+            const peso = parseFloat(document.getElementById('input-peso').value);
+            const altura = parseInt(document.getElementById('input-altura').value);
+            const pasos = parseInt(document.getElementById('input-pasos').value);
+            const met = parseFloat(document.getElementById('input-met').value);
+            const horas = parseFloat(document.getElementById('input-horas').value);
+            const entrenos = parseInt(document.getElementById('input-entrenos').value);
+            const contextoVal = document.getElementById('input-contexto').value;
+
+            // Mapear contexto a porcentaje
+            // 1: Déficit (-20%), 2: Mantenimiento (0%), 3: Superávit (+15%)
+            let modifier = 0;
+            if (contextoVal === "1") modifier = -20;
+            if (contextoVal === "2") modifier = 0;
+            if (contextoVal === "3") modifier = 15;
+
+            // Calcular calorías y macros
+            const tdee = calculateTDEE(sexo, peso, altura, edad, pasos, met, horas, entrenos);
+            const targetKcal = Math.round(tdee * (1 + modifier / 100));
+            // Distribución típica: 30% Proteína, 40% Carbos, 30% Grasas
+            const macros = calculateTargetMacros(targetKcal, { protein: 30, fat: 30, carbs: 40 });
+
             const payload = {
-                perfil_id: document.getElementById('input-perfil-id').value, // Sigue guardando en tabla alumnos vinculando el id
-                peso: parseFloat(document.getElementById('input-peso').value),
-                altura: parseInt(document.getElementById('input-altura').value),
-                pasos_diarios: parseInt(document.getElementById('input-pasos').value),
-                met: parseFloat(document.getElementById('input-met').value),
-                horas_entrenamiento: parseFloat(document.getElementById('input-horas').value),
-                entrenos_semana: parseInt(document.getElementById('input-entrenos').value),
-                contexto_id: parseInt(document.getElementById('input-contexto').value)
+                alumno_id: alumnoId,
+                coach_id: coachId,
+                name: 'Plan Nutricional Automático',
+                target_calories: targetKcal,
+                target_protein_g: Math.round(macros.protein.grams),
+                target_carbs_g: Math.round(macros.carbs.grams),
+                target_fat_g: Math.round(macros.fat.grams),
+                notes: JSON.stringify({ peso, altura, edad, sexo, pasos, met, horas, entrenos, contexto: contextoVal }),
+                active: true
             };
 
             const btnText = e.submitter.innerText;
             e.submitter.innerText = "Guardando...";
 
             try {
-                const { error } = await supabase.from('alumnos').insert([payload]);
+                // Primero desactivar planes anteriores
+                await supabase.from('meal_plans')
+                    .update({ active: false })
+                    .eq('alumno_id', payload.alumno_id);
+
+                // Insertar el nuevo plan
+                const { error } = await supabase.from('meal_plans').insert([payload]);
                 if (error) throw error;
                 
-                alert("¡Métricas guardadas correctamente en la base de datos!");
+                alert("¡Métricas y Macros calculados y guardados correctamente!");
                 window.volverALista();
             } catch (error) {
                 console.error("Error al insertar:", error);
@@ -478,6 +378,3 @@
 
         // Ejecutar la carga al iniciar
         cargarDatosInciales();
-    </script>
-</body>
-</html>

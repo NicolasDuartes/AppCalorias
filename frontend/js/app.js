@@ -1,7 +1,7 @@
 // Controlador Principal de la Aplicación (AppCalorias)
 // Integra reactividad, interfaz de usuario, cálculos y persistencia
 
-import { FOOD_CATEGORIES, TOLERANCES, INITIAL_STATE } from './data.js';
+import { FOOD_CATEGORIES, TOLERANCES, INITIAL_STATE } from './data/food-catalog.js';
 import {
   calculateBMR,
   calculateNEAT,
@@ -14,17 +14,17 @@ import {
   calculateMealSubtotal,
   calculateTotalDayMeals,
   evaluateTolerance
-} from './calculator.js';
+} from './utils/calculator.js';
 import {
   getAllFoods,
   findFood,
   calculateFoodConversion
-} from './equivalences.js';
+} from './utils/equivalences.js';
 import {
   loadAppState,
   saveAppState,
   resetToDefaults
-} from './storage.js';
+} from './utils/storage.js';
 
 // Estado global en memoria
 let state = loadAppState();

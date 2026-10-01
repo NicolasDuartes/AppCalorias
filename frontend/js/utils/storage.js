@@ -1,6 +1,6 @@
 // Manejo de persistencia en localStorage y utilidades de respaldo / restauración
 
-import { INITIAL_STATE } from './data.js';
+import { INITIAL_STATE } from '../data/food-catalog.js';
 
 const STORAGE_KEY = 'app_calorias_duartes_v1';
 
