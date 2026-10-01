@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Unit Tests - Calculator</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/mocha/10.2.0/mocha.min.css" rel="stylesheet" />
+</head>
+<body>
+  <div id="mocha"></div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chai/4.3.7/chai.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mocha/10.2.0/mocha.min.js"></script>
+  <script>mocha.setup('bdd')</script>
+
+  <script type="module">
+    const { expect } = window.chai;
+    import {
+      calculateBMR,
+      calculateNEAT,
+      calculateTrainingExpenditure,
+      calculateTDEE,
+      calculateTargetMacros,
+      calculateFoodItemNutrients
+    } from '../js/calculator.js';
+
+    describe('Calculadora de Macros y Calorías (calculator.js)', () => {
+      
+      describe('calculateBMR(gender, weight, height, age)', () => {
+        it('should return correct BMR for Hombre (happy path)', () => {
+          // (10 * 80 + 6.25 * 180 - 5 * 30) + 5 = 800 + 1125 - 150 + 5 = 1780
+          const bmr = calculateBMR('Hombre', 80, 180, 30);
+          expect(bmr).to.equal(1780);
+        });
+
+        it('should return correct BMR for Mujer (happy path)', () => {
+          // (10 * 60 + 6.25 * 160 - 5 * 25) - 161 = 600 + 1000 - 125 - 161 = 1314
+          const bmr = calculateBMR('Mujer', 60, 160, 25);
+          expect(bmr).to.equal(1314);
+        });
+
+        it('should return 0 when inputs are 0 or negative (edge case)', () => {
+          expect(calculateBMR('Hombre', 0, 180, 30)).to.equal(0);
+          expect(calculateBMR('Mujer', 60, -10, 25)).to.equal(0);
+        });
+      });
+
+      describe('calculateNEAT(steps)', () => {
+        it('should return NEAT based on steps (happy path)', () => {
+          expect(calculateNEAT(10000)).to.equal(400);
+        });
+
+        it('should return 0 when steps are missing or invalid (edge case)', () => {
+          expect(calculateNEAT(null)).to.equal(0);
+          expect(calculateNEAT('invalid')).to.equal(0);
+        });
+      });
+
+      describe('calculateTrainingExpenditure(met, weight, hours, sessions)', () => {
+        it('should return correct expenditure per session and per day (happy path)', () => {
+          // MET 6, 80kg, 1.5h, 4 sessions/week
+          // perSession = 6 * 80 * 1.5 = 720
+          // perDay = (720 * 4) / 7 = 411.428... -> 411.4
+          const result = calculateTrainingExpenditure(6, 80, 1.5, 4);
+          expect(result.perSession).to.equal(720);
+          expect(result.perDay).to.equal(411.4);
+        });
+      });
+
+      describe('calculateTargetMacros(calories, percentages)', () => {
+        it('should return correct macro grams based on calories and percentages (happy path)', () => {
+          const result = calculateTargetMacros(2000, { protein: 30, fat: 30, carbs: 40 });
+          // Protein Kcal: 600 -> 150g
+          expect(result.protein.grams).to.equal(150);
+          // Fat Kcal: 600 -> 66.7g
+          expect(result.fat.grams).to.equal(66.7);
+          // Carbs Kcal: 800 -> 200g
+          expect(result.carbs.grams).to.equal(200);
+        });
+
+        it('should handle zero calories correctly (edge case)', () => {
+          const result = calculateTargetMacros(0);
+          expect(result.protein.grams).to.equal(0);
+        });
+      });
+
+      describe('calculateFoodItemNutrients(categoryCode, portions)', () => {
+        it('should return correct nutrients for HC (Carbohydrates)', () => {
+          const result = calculateFoodItemNutrients('HC', 2);
+          // HC: ch=40, p=5, g=1 -> 2 portions = ch=80, p=10, g=2
+          // kcal = 80*4 + 10*4 + 2*9 = 320 + 40 + 18 = 378
+          expect(result.ch).to.equal(80);
+          expect(result.p).to.equal(10);
+          expect(result.g).to.equal(2);
+          expect(result.kcal).to.equal(378);
+        });
+
+        it('should return correct nutrients for P (Protein)', () => {
+          const result = calculateFoodItemNutrients('P', 1.5);
+          // P: p=25, g=3 -> 1.5 portions = p=37.5, g=4.5
+          expect(result.p).to.equal(37.5);
+          expect(result.g).to.equal(4.5);
+          expect(result.ch).to.equal(0);
+        });
+      });
+    });
+  </script>
+
+  <script type="module">
+    mocha.run();
+  </script>
+</body>
+</html>
