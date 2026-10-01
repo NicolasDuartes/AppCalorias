@@ -122,13 +122,14 @@
                         </div>
                     </div>
 
-                    <div>
+                    <div class="col-span-2">
                         <label class="text-[11px] font-bold text-[#1E293B] ml-1">Contexto Energético</label>
-                        <select id="input-contexto" required
-                            class="w-full bg-[#F8FAFC] border border-gray-200 text-xs font-bold text-gray-900 rounded-xl px-3 py-2 focus:ring-2 focus:ring-[#22C55E] capitalize">
-                            <option value="" disabled selected>Seleccionar contexto...</option>
-                            <!-- Opciones inyectadas por JS -->
-                        </select>
+                        <div class="grid grid-cols-3 gap-2 mt-1">
+                            <button type="button" class="btn-contexto py-2 rounded-xl border border-gray-200 text-xs font-bold text-gray-600 hover:bg-gray-50 transition-colors" data-value="1">Déficit</button>
+                            <button type="button" class="btn-contexto py-2 rounded-xl border border-gray-200 text-xs font-bold text-gray-600 hover:bg-gray-50 transition-colors" data-value="2">Mantenimiento</button>
+                            <button type="button" class="btn-contexto py-2 rounded-xl border border-gray-200 text-xs font-bold text-gray-600 hover:bg-gray-50 transition-colors" data-value="3">Superávit</button>
+                        </div>
+                        <input type="hidden" id="input-contexto" required>
                     </div>
 
                     <button type="submit" class="w-full mt-4 py-3 rounded-xl bg-[#22C55E] text-[#0E141A] font-extrabold text-xs shadow-sm active:scale-95 transition-transform">
@@ -211,19 +212,8 @@
                 if (errPendientes) throw errPendientes;
                 renderizarListaPendientes(pendientes || []);
 
-                // B. Traer opciones de contextos (Tabla enums)
-                const { data: contextos, error: errContextos } = await supabase
-                    .from('enums')
-                    .select('id, valor')
-                    .eq('categoria', 'contexto_energetico');
-                
-                if (errContextos) throw errContextos;
-                
-                // Cargar opciones en el select del formulario
-                const selectContexto = document.getElementById('input-contexto');
-                contextos.forEach(ctx => {
-                    selectContexto.innerHTML += `<option value="${ctx.id}">${ctx.valor}</option>`;
-                });
+                // Opciones fijas para el contexto
+                // (Se removió la llamada a tabla 'enums' porque ahora hay botones fijos)
 
             } catch (error) {
                 console.error("Error al cargar base de datos:", error);
@@ -430,7 +420,28 @@
             document.getElementById('vista-metricas').classList.add('hidden');
             document.getElementById('vista-lista').classList.remove('hidden');
             document.getElementById('form-metricas').reset(); // Limpiar inputs
+            
+            // Limpiar botones contexto
+            document.querySelectorAll('.btn-contexto').forEach(b => {
+                b.classList.remove('bg-[#22C55E]', 'text-white', 'border-[#22C55E]');
+                b.classList.add('text-gray-600', 'border-gray-200');
+            });
+            document.getElementById('input-contexto').value = '';
         };
+
+        // EVENTOS BOTONES CONTEXTO
+        document.querySelectorAll('.btn-contexto').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.btn-contexto').forEach(b => {
+                    b.classList.remove('bg-[#22C55E]', 'text-white', 'border-[#22C55E]');
+                    b.classList.add('text-gray-600', 'border-gray-200');
+                });
+                const target = e.currentTarget;
+                target.classList.remove('text-gray-600', 'border-gray-200');
+                target.classList.add('bg-[#22C55E]', 'text-white', 'border-[#22C55E]');
+                document.getElementById('input-contexto').value = target.dataset.value;
+            });
+        });
 
         // 5. GUARDAR DATOS DEL FORMULARIO EN LA TABLA ALUMNOS
         document.getElementById('form-metricas').addEventListener('submit', async (e) => {
