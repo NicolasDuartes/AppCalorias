@@ -1,10 +1,7 @@
 {
   "mcpServers": {
     "supabase": {
-      "serverUrl": "https://mcp.supabase.com/mcp?project_ref=yqvrssewbltzxmlvynuw",
-      "headers": {
-        "Authorization": "Bearer sbp_fce645ca38ce986672b77280099efd4e3fbb6471"
-      }
+      "serverUrl": "https://mcp.supabase.com/mcp?project_ref=yqvrssewbltzxmlvynuw&features=docs%2Caccount%2Cdatabase%2Cdebugging%2Cdevelopment%2Cfunctions%2Cbranching"
     }
   }
 }

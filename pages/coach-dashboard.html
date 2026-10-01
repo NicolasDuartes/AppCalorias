@@ -19,12 +19,12 @@
         <header class="w-full shrink-0 z-20 px-4 pt-5 pb-4">
             <div class="flex items-center justify-between pb-4">
                 <div>
-                    <h1 class="text-white text-2xl font-bold tracking-tight">Hola, Coach</h1>
+                    <h1 id="coach-greeting" class="text-white text-2xl font-bold tracking-tight">Hola, Coach</h1>
                     <p class="text-white/80 text-xs font-medium mt-0.5">Gestión de alumnos</p>
                 </div>
-                <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center border border-white/20 shadow-inner">
-                    <span class="text-lg">📋</span>
-                </div>
+                <button id="btn-logout" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center border border-white/20 shadow-inner hover:bg-red-500/30 transition-colors" title="Cerrar sesión">
+                    <span class="text-lg">🚪</span>
+                </button>
             </div>
         </header>
 
@@ -49,6 +49,19 @@
                 <!-- Aquí inyectaremos las tarjetas de alumnos con JS -->
                 <div id="contenedor-alumnos" class="flex-1 overflow-y-auto hide-scrollbar px-4 pb-6 space-y-3">
                     <div class="text-center text-[#64748B] mt-10 text-xs font-medium font-bold">Cargando base de datos...</div>
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- VISTA 3: MIS ALUMNOS (APROBADOS)           -->
+            <!-- ========================================== -->
+            <div id="vista-alumnos" class="hidden flex flex-col h-full w-full">
+                <div class="w-full px-5 pt-6 pb-2 shrink-0 flex items-center justify-between">
+                    <h2 class="text-base font-bold text-[#0E141A] tracking-tight">Mis Alumnos</h2>
+                    <span id="badge-count" class="px-2.5 py-0.5 rounded-full bg-[#DCFCE7] text-[#15803D] text-[11px] font-bold border border-[#BBF7D0]">0</span>
+                </div>
+                <div id="contenedor-mis-alumnos" class="flex-1 overflow-y-auto hide-scrollbar px-4 pb-6 space-y-3">
+                    <div class="text-center text-[#64748B] mt-10 text-xs font-medium font-bold">Cargando...</div>
                 </div>
             </div>
 
@@ -127,11 +140,11 @@
 
         <!-- MENÚ INFERIOR FIJO -->
         <nav class="w-full h-[64px] shrink-0 bg-[#0E141A]/95 backdrop-blur-md border-t border-white/10 flex items-center justify-around px-2 z-30">
-            <button class="flex flex-col items-center justify-center flex-1 text-[#22C55E] gap-0.5">
+            <button id="nav-panel" onclick="window.cambiarVista('panel')" class="flex flex-col items-center justify-center flex-1 text-[#22C55E] gap-0.5">
                 <span class="text-lg">📋</span>
                 <span class="text-[10px] font-bold">Panel</span>
             </button>
-            <button class="flex flex-col items-center justify-center flex-1 text-[#94A3B8] hover:text-white transition-colors gap-0.5">
+            <button id="nav-alumnos" onclick="window.cambiarVista('alumnos')" class="flex flex-col items-center justify-center flex-1 text-[#94A3B8] hover:text-white transition-colors gap-0.5">
                 <span class="text-lg">👥</span>
                 <span class="text-[10px] font-medium">Alumnos</span>
             </button>
@@ -148,24 +161,45 @@
     <script type="module">
         import { supabase } from '../js/supabase.js';
 
-        // Variable global para almacenar los datos temporalmente en memoria
+        // Variables globales
         let perfilesGlobal = [];
+        let misAlumnosGlobal = [];
+        let coachId = null;
+
+        // 0. AUTH GUARD: Verificar que es un coach autenticado
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+            window.location.href = '../index.html';
+        } else {
+            coachId = session.user.id;
+            const nombre = session.user.user_metadata?.full_name || 'Coach';
+            document.getElementById('coach-greeting').innerText = `Hola, ${nombre.split(' ')[0]}`;
+        }
+
+        // Logout
+        document.getElementById('btn-logout').addEventListener('click', async () => {
+            await supabase.auth.signOut();
+            window.location.href = '../index.html';
+        });
 
         // 1. INICIALIZACIÓN: Cargar datos al entrar a la página
         async function cargarDatosInciales() {
             try {
-                // A. Traer perfiles (Alumnos APROBADOS) desde la tabla
+                // A. Traer perfiles (Alumnos APROBADOS de ESTE coach)
                 const { data: perfiles, error: errPerfiles } = await supabase
                     .from('profiles')
                     .select('*')
                     .eq('role', 'alumno')
-                    .eq('status', 'aprobado');
+                    .eq('status', 'aprobado')
+                    .eq('coach_id', coachId);
                 
                 if (errPerfiles) throw errPerfiles;
                 perfilesGlobal = perfiles || [];
+                misAlumnosGlobal = perfiles || [];
 
                 // Renderizar la lista en el HTML
                 renderizarListaAlumnos();
+                renderizarMisAlumnos();
 
                 // A.2 Traer perfiles (Alumnos PENDIENTES)
                 const { data: pendientes, error: errPendientes } = await supabase
@@ -302,6 +336,73 @@
                 alert("Error al aprobar: " + error.message);
                 btn.innerText = textOriginal;
                 btn.disabled = false;
+            }
+        };
+
+        // 2.C FUNCIÓN PARA DIBUJAR MIS ALUMNOS (pestaña Alumnos)
+        function renderizarMisAlumnos() {
+            const contenedor = document.getElementById('contenedor-mis-alumnos');
+            const badge = document.getElementById('badge-count');
+            
+            badge.innerText = misAlumnosGlobal.length;
+
+            if (misAlumnosGlobal.length === 0) {
+                contenedor.innerHTML = '<div class="text-center text-[#64748B] mt-10 text-xs font-medium">Aún no tienes alumnos aprobados.</div>';
+                return;
+            }
+
+            let htmlHTML = '';
+            misAlumnosGlobal.forEach(perfil => {
+                const nombreUsuario = perfil.nombre || perfil.name || perfil.full_name || 'Sin Nombre';
+                const iniciales = nombreUsuario.substring(0, 2).toUpperCase();
+                
+                htmlHTML += `
+                    <article class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm flex flex-col gap-3">
+                        <div class="flex items-start justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-[#DCFCE7] flex items-center justify-center text-[#15803D] font-bold text-sm border border-[#BBF7D0]">
+                                    ${iniciales}
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-[#1E293B] text-sm capitalize">${nombreUsuario}</h3>
+                                    <p class="text-[10px] text-[#64748B] font-medium">${perfil.email}</p>
+                                </div>
+                            </div>
+                            <span class="px-2 py-0.5 rounded-full bg-[#DCFCE7] text-[#15803D] text-[10px] font-bold border border-[#BBF7D0]">Activo</span>
+                        </div>
+                        <div class="grid grid-cols-1 gap-2 mt-1">
+                            <button onclick="window.abrirFormularioMetricas('${perfil.id}')"
+                                class="py-2.5 rounded-xl bg-[#22C55E] text-[#0E141A] font-extrabold text-[11px] shadow-sm active:scale-95 transition-transform">
+                                Cargar Métricas y Contexto
+                            </button>
+                        </div>
+                    </article>
+                `;
+            });
+            contenedor.innerHTML = htmlHTML;
+        }
+
+        // NAVEGACIÓN INFERIOR: Cambiar entre Panel y Alumnos
+        window.cambiarVista = function(vista) {
+            const vistaLista = document.getElementById('vista-lista');
+            const vistaAlumnos = document.getElementById('vista-alumnos');
+            const navPanel = document.getElementById('nav-panel');
+            const navAlumnos = document.getElementById('nav-alumnos');
+
+            if (vista === 'panel') {
+                vistaLista.classList.remove('hidden');
+                vistaAlumnos.classList.add('hidden');
+                navPanel.className = 'flex flex-col items-center justify-center flex-1 text-[#22C55E] gap-0.5';
+                navPanel.querySelector('span:last-child').className = 'text-[10px] font-bold';
+                navAlumnos.className = 'flex flex-col items-center justify-center flex-1 text-[#94A3B8] hover:text-white transition-colors gap-0.5';
+                navAlumnos.querySelector('span:last-child').className = 'text-[10px] font-medium';
+            } else if (vista === 'alumnos') {
+                vistaAlumnos.classList.remove('hidden');
+                vistaLista.classList.add('hidden');
+                navAlumnos.className = 'flex flex-col items-center justify-center flex-1 text-[#22C55E] gap-0.5';
+                navAlumnos.querySelector('span:last-child').className = 'text-[10px] font-bold';
+                navPanel.className = 'flex flex-col items-center justify-center flex-1 text-[#94A3B8] hover:text-white transition-colors gap-0.5';
+                navPanel.querySelector('span:last-child').className = 'text-[10px] font-medium';
             }
         };
 
