@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mi contexto energético · Alumno</title>
+  <link rel="stylesheet" href="../../css/base.css">
+  <link rel="stylesheet" href="../../css/components.css">
+</head>
+<body>
+  <div class="pantalla">
+    <main class="contenido">
+      <header class="encabezado">
+        <a class="btn-icono" href="perfil.html" aria-label="Volver"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></a>
+        <div class="encabezado__textos">
+          <h1 class="titulo">Contexto energético</h1>
+          <p class="sub">Calculá tus calorías objetivo</p>
+        </div>
+      </header>
+
+      <section class="card" aria-labelledby="t-datos">
+        <h2 class="seccion-titulo" id="t-datos">Datos del cliente</h2>
+        <div class="campo">
+          <span class="campo__etiqueta">Género</span>
+          <div class="segmentado" role="group" aria-label="Género">
+            <button type="button" aria-pressed="true">Masculino</button>
+            <button type="button" aria-pressed="false">Femenino</button>
+          </div>
+        </div>
+        <div class="grilla-2">
+          <label class="campo">
+            <span class="campo__etiqueta">Peso</span>
+            <span class="input input--derecha"><input type="text" inputmode="decimal" name="peso" value="78"><span class="unidad">kg</span></span>
+          </label>
+          <label class="campo">
+            <span class="campo__etiqueta">Altura</span>
+            <span class="input input--derecha"><input type="text" inputmode="decimal" name="altura" value="178"><span class="unidad">cm</span></span>
+          </label>
+          <label class="campo">
+            <span class="campo__etiqueta">Edad</span>
+            <span class="input input--derecha"><input type="text" inputmode="decimal" name="edad" value="30"><span class="unidad">años</span></span>
+          </label>
+          <label class="campo">
+            <span class="campo__etiqueta">Pasos diarios</span>
+            <span class="input input--derecha"><input type="text" inputmode="decimal" name="pasos" value="8000"><span class="unidad">pasos</span></span>
+          </label>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="t-entreno">
+        <h2 class="seccion-titulo" id="t-entreno">Entrenamiento</h2>
+        <div class="grilla-3">
+          <label class="campo">
+            <span class="campo__etiqueta">MET</span>
+            <span class="input input--derecha"><input type="text" inputmode="decimal" name="met" value="6"><span class="unidad"></span></span>
+          </label>
+          <label class="campo">
+            <span class="campo__etiqueta">Duración</span>
+            <span class="input input--derecha"><input type="text" inputmode="decimal" name="duracion" value="1"><span class="unidad">h</span></span>
+          </label>
+          <label class="campo">
+            <span class="campo__etiqueta">Por semana</span>
+            <span class="input input--derecha"><input type="text" inputmode="decimal" name="entrenos" value="4"><span class="unidad">días</span></span>
+          </label>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="t-resultados">
+        <h2 class="seccion-titulo" id="t-resultados">Gasto energético</h2>
+        <div class="resultado"><span class="resultado__nombre">BMR (metabolismo basal)</span><span><span class="num num--s">1.748</span> <span class="unidad">kcal</span></span></div>
+        <div class="resultado"><span class="resultado__nombre">NEAT (pasos)</span><span><span class="num num--s">312</span> <span class="unidad">kcal</span></span></div>
+        <div class="resultado"><span class="resultado__nombre">NEAT + BMR</span><span><span class="num num--s">2.060</span> <span class="unidad">kcal</span></span></div>
+        <div class="resultado"><span class="resultado__nombre">Gasto por sesión</span><span><span class="num num--s">468</span> <span class="unidad">kcal</span></span></div>
+        <div class="resultado"><span class="resultado__nombre">Promedio diario de entreno</span><span><span class="num num--s">267</span> <span class="unidad">kcal</span></span></div>
+        <div class="resultado resultado--destacado"><span class="resultado__nombre">TDEE</span><span><span class="num num--s">2.327</span> <span class="unidad">kcal</span></span></div>
+        <div class="resultado resultado--destacado"><span class="resultado__nombre">TDEE + termogénesis</span><span><span class="num num--s">2.560</span> <span class="unidad">kcal</span></span></div>
+      </section>
+
+      <section class="columna" aria-labelledby="t-dieta">
+        <h2 class="seccion-titulo" id="t-dieta">Tipo de dieta</h2>
+        <!-- Desplegable sin JS: <details> abre y cierra la lista -->
+        <details class="desplegable">
+          <summary>
+            <span class="columna"><span class="negrita">Déficit moderado</span><span class="sub">−500 kcal · 2.060 kcal/día</span></span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+          </summary>
+          <div class="opciones" role="listbox" aria-label="Tipo de dieta">
+            <button class="opcion" type="button" role="option" aria-selected="false">
+              <span class="radio"></span>
+              <span class="opcion__textos"><span class="negrita texto-15">Déficit leve</span><span class="sub">−300 kcal</span></span>
+              <span class="num num--s">2.260</span>
+            </button>
+            <button class="opcion" type="button" role="option" aria-selected="true">
+              <span class="radio"></span>
+              <span class="opcion__textos"><span class="negrita texto-15">Déficit moderado</span><span class="sub">−500 kcal</span></span>
+              <span class="num num--s">2.060</span>
+            </button>
+            <button class="opcion" type="button" role="option" aria-selected="false">
+              <span class="radio"></span>
+              <span class="opcion__textos"><span class="negrita texto-15">Mantenimiento</span><span class="sub">Igual al gasto</span></span>
+              <span class="num num--s">2.560</span>
+            </button>
+            <button class="opcion" type="button" role="option" aria-selected="false">
+              <span class="radio"></span>
+              <span class="opcion__textos"><span class="negrita texto-15">Superávit leve</span><span class="sub">+300 kcal</span></span>
+              <span class="num num--s">2.860</span>
+            </button>
+            <button class="opcion" type="button" role="option" aria-selected="false">
+              <span class="radio"></span>
+              <span class="opcion__textos"><span class="negrita texto-15">Superávit moderado</span><span class="sub">+500 kcal</span></span>
+              <span class="num num--s">3.060</span>
+            </button>
+            <details>
+              <summary class="opcion" role="option" aria-selected="false">
+                <span class="radio"></span>
+                <span class="opcion__textos"><span class="negrita texto-15">Personalizar</span><span class="sub">Según peso objetivo y plazo</span></span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+              </summary>
+              <div class="panel-personalizar">
+                <div class="grilla-2">
+          <label class="campo">
+            <span class="campo__etiqueta">Peso actual</span>
+            <span class="input input--derecha"><input type="text" inputmode="decimal" name="pesoActual" value="78"><span class="unidad">kg</span></span>
+          </label>
+          <label class="campo">
+            <span class="campo__etiqueta">Peso objetivo</span>
+            <span class="input input--derecha"><input type="text" inputmode="decimal" name="pesoObjetivo" value="72"><span class="unidad">kg</span></span>
+          </label>
+                </div>
+                <label class="campo">
+                  <span class="fila fila--entre"><span class="campo__etiqueta">Plazo</span><span class="texto-14"><span class="negrita">12 semanas</span> · ≈ 2,8 meses</span></span>
+                  <input class="rango" type="range" name="semanas" min="1" max="52" value="12">
+                  <span class="rango-marcas"><span>1 sem</span><span>52 sem</span></span>
+                </label>
+                <div class="grilla-3">
+                  <div class="mini-dato"><span class="sub">Cambio</span><span class="num num--s">−6,0 <span class="unidad">kg</span></span></div>
+                  <div class="mini-dato"><span class="sub">Por semana</span><span class="num num--s">−0,50 <span class="unidad">kg</span></span></div>
+                  <div class="mini-dato"><span class="sub">Ajuste diario</span><span class="num num--s">−550 <span class="unidad">kcal</span></span></div>
+                </div>
+        <div class="resultado resultado--destacado"><span class="resultado__nombre">Calorías a consumir</span><span><span class="num num--s">2.010</span> <span class="unidad">kcal/día</span></span></div>
+                <!-- Se muestra solo si el ritmo supera el 1 % del peso por semana -->
+                <p class="aviso" hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17v.5"/></svg><span>El ritmo supera el 1 % del peso corporal por semana. Revisá que sea sostenible.</span></p>
+              </div>
+            </details>
+          </div>
+        </details>
+      </section>
+
+      <section class="card card--oscura" aria-labelledby="t-objetivo">
+        <h2 class="sub" id="t-objetivo">Calorías objetivo</h2>
+        <p><span class="num num--xl">2.060</span> <span class="unidad">kcal/día</span></p>
+        <p class="sub">Déficit moderado: −500 kcal sobre 2.560</p>
+      </section>
+
+      <button class="btn btn--primario btn--alto" type="button">Guardar contexto</button>
+    </main>
+
+    <nav class="barra-inferior" aria-label="Navegación principal">
+      <a class="barra-inferior__item" href="perfil.html" aria-current="page"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg><span>Perfil</span></a>
+      <a class="barra-inferior__item" href="dashboard.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="7" height="9" rx="1.5"/><rect x="13" y="4" width="7" height="5" rx="1.5"/><rect x="13" y="11" width="7" height="9" rx="1.5"/><rect x="4" y="15" width="7" height="5" rx="1.5"/></svg><span>Dashboard</span></a>
+      <!-- Progreso y Ajustes todavía no tienen pantalla -->
+      <button class="barra-inferior__item" type="button"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 20V11M12 20V5M19 20v-6M3 20h18"/></svg><span>Progreso</span></button>
+      <button class="barra-inferior__item" type="button"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span>Ajustes</span></button>
+    </nav>
+  </div>
+</body>
+</html>

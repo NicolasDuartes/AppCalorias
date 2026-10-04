@@ -1,0 +1,122 @@
+/* ==========================================================
+   base.css — colores, tipografías y reseteo
+   ========================================================== */
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap");
+
+:root {
+  /* Marca */
+  --verde: #1E6847;
+  --verde-oscuro: #134631;
+  --verde-claro: #E4EFE8;
+  --verde-texto-claro: #D3E6DA;
+  --verde-brillante: #7FD3A4;
+
+  /* Neutros */
+  --fondo: #F3F5F1;
+  --blanco: #FFFFFF;
+  --tinta: #17211C;
+  --gris: #5B665F;
+  --gris-oscuro: #4A554E;
+  --gris-claro: #B9C4BD;
+  --gris-suave: #EEF1EC;
+  --borde: #E3E7E1;
+  --borde-fuerte: #D6DDD7;
+  --borde-punteado: #AEB8B1;
+  --pista: #E6EBE5;
+
+  /* Macros y estados */
+  --azul: #2B59C3;
+  --azul-claro: #DCE9F7;
+  --azul-oscuro: #22508F;
+  --naranja: #E39A2D;
+  --naranja-claro: #F6E3C8;
+  --naranja-oscuro: #8A4E0B;
+  --violeta: #A8467F;
+  --rojo: #8A3B2E;
+  --rojo-borde: #E7C9C2;
+
+  /* Tipografía */
+  --fuente-titulos: "Bricolage Grotesque", "Helvetica Neue", sans-serif;
+  --fuente-texto: "Instrument Sans", "Helvetica Neue", sans-serif;
+
+  /* Formas */
+  --radio-chico: 12px;
+  --radio-medio: 16px;
+  --radio-tarjeta: 24px;
+  --sombra-flotante: 0 10px 24px rgba(23, 33, 28, 0.22);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+}
+
+body {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #DDE3DC;
+  font-family: var(--fuente-texto);
+  font-size: 16px;
+  color: var(--tinta);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+a {
+  color: var(--verde);
+}
+
+a:hover {
+  color: var(--verde-oscuro);
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+ul,
+ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+svg {
+  flex-shrink: 0;
+}
+
+:focus-visible {
+  outline: 2px solid var(--verde);
+  outline-offset: 2px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

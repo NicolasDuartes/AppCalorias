@@ -2,6 +2,9 @@
 
 Aplicación web de seguimiento nutricional con sistema **Coach → Alumno**.
 
+> [!NOTE]
+> **Actualización:** Se han añadido las carpetas `AppCalorias` y `AppCalorias-Coach`. Su contenido se encuentra en proceso de revisión y debe ser optimizado y adaptado al nuevo formato y estilo.
+
 ---
 
 ## Tecnologías
@@ -20,6 +23,8 @@ Aplicación web de seguimiento nutricional con sistema **Coach → Alumno**.
 ```
 AppCalorias/
 │
+├── AppCalorias/            # 📁 Nuevo módulo (pendiente de optimización y adaptación de estilo/formato)
+├── AppCalorias-coach/      # 📁 Nuevo módulo Coach (pendiente de optimización y adaptación de estilo/formato)
 ├── index.html              # 🚪 Entry point — Login / Registro
 ├── README.md
 ├── DESIGN.md               # Decisiones de diseño visual
