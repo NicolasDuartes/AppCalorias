@@ -1,0 +1,121 @@
+/* ==========================================================
+   alumno.css — solo pantallas del alumno (semana, anillo, comidas, agua)
+   Se carga TERCERO en pages/alumno/*.
+   ========================================================== */
+
+.dias { display: flex; justify-content: space-between; }
+
+.dia {
+  width: 44px;
+  height: 62px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border: 1px solid transparent;
+  border-radius: var(--radio-fila);
+  background: transparent;
+  color: var(--tinta);
+}
+
+.dia__letra { font-size: 12px; font-weight: 500; opacity: 0.8; }
+
+.dia__numero { font-family: var(--fuente-titulos); font-size: 18px; font-weight: 600; }
+
+.dia--futuro { color: var(--gris-medio); }
+
+.dia[aria-current="date"] { background: var(--blanco); border: 1.5px solid var(--verde); }
+
+.dia[aria-pressed="true"] { background: var(--verde); border-color: var(--verde); color: var(--blanco); }
+
+.anillo { position: relative; width: 148px; height: 148px; flex-shrink: 0; }
+
+.anillo svg { transform: rotate(-90deg); }
+
+.anillo__centro {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.barra--fina { height: 6px; border-radius: 3px; }
+
+.macros--borde { padding-top: 18px; border-top: 1px solid var(--borde); }
+
+.comida {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  border-radius: var(--radio-lista);
+  background: var(--blanco);
+}
+
+.comida--pendiente { gap: 12px; border: 1.5px dashed var(--trazo); }
+
+.comida__titulo { font-size: 16px; font-weight: 600; }
+
+.renglones {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 10px;
+  border-top: 1px solid var(--gris-suave);
+  font-size: 14px;
+}
+
+.renglones--caja {
+  padding: 10px 12px;
+  border-top: none;
+  border-radius: var(--radio-fila);
+  background: var(--fondo);
+}
+
+.renglon { display: flex; justify-content: space-between; gap: 10px; }
+
+.renglon > span:last-child { color: var(--gris); }
+
+.vasos { display: flex; justify-content: space-between; }
+
+.vaso {
+  width: 36px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+.vaso path { fill: var(--blanco); stroke: var(--trazo); }
+
+.vaso[aria-pressed="true"] path { fill: var(--agua); stroke: var(--agua-borde); }
+
+.accion-rapida {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--borde);
+  border-radius: 18px;
+  background: var(--blanco);
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.accion-rapida--oscura { border-color: var(--tinta); background: var(--tinta); color: var(--blanco); }
+
+.btn-icono--favorito { color: var(--terracota); }
+
+.btn-icono--favorito:hover { color: var(--terracota); }
+
+.btn-icono--favorito[aria-pressed="true"] svg { fill: currentColor; }

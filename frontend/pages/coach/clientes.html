@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Clientes · Coach</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../../css/base.css">
+  <link rel="stylesheet" href="../../css/components.css">
+  <link rel="stylesheet" href="../../css/pages/coach.css">
+</head>
+<body>
+  <!-- Iconos de esta página: se dibujan con <svg class="icono"><use href="#nombre"/></svg> -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="flecha-derecha" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+    <symbol id="mas" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="cerrar" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></symbol>
+    <symbol id="buscar" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.3-4.3"/></symbol>
+    <symbol id="clientes" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17" cy="9" r="2.5"/><path d="M16.5 14c2.9.2 5 2.3 5 5.5"/></symbol>
+    <symbol id="plantillas" viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/></symbol>
+    <symbol id="alimentos" viewBox="0 0 24 24"><path d="M12 7c-1.5-1-5-1.3-6.3 1.7-1.4 3.2.3 8 2.3 10.5 1.2 1.5 2.4 1.3 4 .6 1.6.7 2.8.9 4-.6 2-2.5 3.7-7.3 2.3-10.5C17 5.7 13.5 6 12 7z"/><path d="M12 7c0-2 1-3.5 3-4"/></symbol>
+    <symbol id="perfil" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></symbol>
+  </svg>
+  <div class="pantalla">
+    <main class="contenido contenido--holgado">
+      <header class="columna">
+        <p class="sub">Panel del coach</p>
+        <h1 class="titulo titulo--grande">Clientes</h1>
+      </header>
+
+      <label class="buscador">
+        <span class="texto-gris"><svg class="icono" width="20" height="20" aria-hidden="true"><use href="#buscar"/></svg></span>
+        <span class="sr-only">Buscar cliente</span>
+        <input type="search" name="buscar" placeholder="Buscar cliente">
+      </label>
+
+      <div class="segmentado" role="group" aria-label="Filtrar clientes">
+        <button type="button" aria-pressed="true">Todos · 2</button>
+        <button type="button" aria-pressed="false">Activos · 1</button>
+        <button type="button" aria-pressed="false">Inactivos · 1</button>
+      </div>
+
+      <section class="columna" aria-labelledby="titulo-lista">
+        <h2 class="sr-only" id="titulo-lista">Lista de clientes</h2>
+        <ul class="lista">
+          <li>
+            <a class="fila-link" href="cliente.html">
+              <span class="avatar avatar--azul">BB</span>
+              <span class="fila-link__textos">
+                <span class="fila-link__nombre">benja.blason</span>
+                <span class="fila-link__linea"><span class="tag tag--verde"><span class="tag__punto"></span>Activo</span><span class="sub">Plan de descenso de peso</span></span>
+              </span>
+              <span class="chevron"><svg class="icono" width="20" height="20" aria-hidden="true"><use href="#flecha-derecha"/></svg></span>
+            </a>
+          </li>
+          <li>
+            <a class="fila-link" href="cliente.html">
+              <span class="avatar avatar--naranja">JG</span>
+              <span class="fila-link__textos">
+                <span class="fila-link__nombre">juanG.fit</span>
+                <span class="fila-link__linea"><span class="tag tag--gris"><span class="tag__punto"></span>Inactivo</span><span class="sub">Plan de ganancia muscular</span></span>
+              </span>
+              <span class="chevron"><svg class="icono" width="20" height="20" aria-hidden="true"><use href="#flecha-derecha"/></svg></span>
+            </a>
+          </li>
+        </ul>
+      </section>
+    </main>
+
+    <!-- ===== Navegación del coach (igual en todas las pantallas del coach) ===== -->
+    <nav class="barra-inferior" aria-label="Navegación del coach">
+      <a class="barra-inferior__item" href="clientes.html" aria-current="page"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#clientes"/></svg><span>Clientes</span></a>
+      <button class="barra-inferior__item" type="button"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#plantillas"/></svg><span>Plantillas</span></button>
+      <a class="barra-inferior__mas" href="#anadir-cliente" aria-label="Añadir cliente"><svg class="icono icono--grueso" width="26" height="26" aria-hidden="true"><use href="#mas"/></svg></a>
+      <button class="barra-inferior__item" type="button"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#alimentos"/></svg><span>Alimentos</span></button>
+      <button class="barra-inferior__item" type="button"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#perfil"/></svg><span>Perfil</span></button>
+    </nav>
+
+    <!-- Ventana "Añadir cliente": se abre con el botón + (href="#anadir-cliente") gracias a :target -->
+    <div class="modal-fondo" id="anadir-cliente" role="dialog" aria-modal="true" aria-labelledby="titulo-anadir">
+      <a class="modal-fondo__cerrar" href="#" aria-label="Cerrar ventana" tabindex="-1"></a>
+      <div class="modal">
+        <div class="fila fila--entre">
+          <h2 class="titulo" id="titulo-anadir">Añadir cliente</h2>
+          <a class="btn-icono" href="#" aria-label="Cerrar"><svg class="icono" width="20" height="20" aria-hidden="true"><use href="#cerrar"/></svg></a>
+        </div>
+        <label class="campo">
+          <span class="campo__etiqueta">ID de cliente</span>
+          <span class="input"><input type="text" name="idCliente" placeholder="Ej.: benja.blason" autocomplete="off"></span>
+        </label>
+        <!-- El envío de la solicitud se conecta con JS más adelante -->
+        <button class="btn btn--primario" type="button">Enviar solicitud</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

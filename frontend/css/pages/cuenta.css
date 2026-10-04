@@ -1,0 +1,70 @@
+/* ==========================================================
+   cuenta.css — solo la pantalla de crear cuenta (index.html)
+   Se carga TERCERO en index.html.
+   ========================================================== */
+
+.logo {
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radio-medio);
+  background: var(--verde);
+  color: var(--blanco);
+}
+
+.tipo-cuenta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+  border: 2px solid transparent;
+  border-radius: var(--radio-lista);
+  background: var(--blanco);
+  cursor: pointer;
+}
+
+.tipo-cuenta:has(input:checked) { border-color: var(--verde); }
+
+.tipo-cuenta:has(input:focus-visible) { outline: 2px solid var(--verde); outline-offset: 2px; }
+
+.tipo-cuenta__icono {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 13px;
+  background: var(--verde-claro);
+  color: var(--verde);
+}
+
+.tipo-cuenta:has(input:checked) .tipo-cuenta__icono { background: var(--verde); color: var(--blanco); }
+
+.tipo-cuenta:has(input:checked) .radio { border-color: var(--verde); }
+
+.tipo-cuenta:has(input:checked) .radio::after {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--verde);
+}
+
+.fuerza { display: flex; gap: 4px; }
+
+.fuerza span { flex: 1; height: 4px; border-radius: 2px; background: var(--borde); }
+
+.form-cuenta:has(#tipo-coach:checked) .solo-alumno,
+.form-cuenta:has(#tipo-alumno:checked) .solo-coach { display: none; }
+
+.form-cuenta:not(:has(#acepta:checked)) .cta-crear {
+  pointer-events: none;
+  background: var(--deshabilitado);
+  color: var(--gris-oscuro);
+}
+
+.aviso-terminos { display: none; }
+
+.form-cuenta:not(:has(#acepta:checked)) .aviso-terminos { display: block; }
