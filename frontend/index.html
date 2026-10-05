@@ -22,8 +22,8 @@
         </div>
       </header>
 
-      <!-- Sin JS: el tipo elegido cambia el botón final con CSS (:has) -->
-      <form class="form-cuenta columna" style="gap: 22px">
+      <!-- El tipo elegido cambia el botón final con CSS (:has); el envío lo maneja js/ui/cuenta-ui.js -->
+      <form class="form-cuenta columna" style="gap: 22px" novalidate>
         <fieldset class="columna" style="gap: 10px; border: 0; margin: 0; padding: 0">
           <legend class="campo__etiqueta--fuerte" style="margin-bottom: 10px">¿Cómo vas a usar la app?</legend>
           <div class="grilla-2">
@@ -51,7 +51,8 @@
         <div class="columna" style="gap: 14px">
           <label class="campo">
             <span class="campo__etiqueta campo__etiqueta--fuerte">Nombre de usuario</span>
-            <span class="input input--alto"><span class="input__prefijo" aria-hidden="true">@</span><input type="text" name="usuario" autocomplete="username" placeholder="tu.usuario" required minlength="3"></span>
+            <span class="input input--alto"><span class="input__prefijo" aria-hidden="true">@</span><input type="text" name="usuario" autocomplete="username" placeholder="tu.usuario" required minlength="3" maxlength="30" pattern="[a-z0-9._]{3,30}" autocapitalize="none" spellcheck="false" aria-describedby="usuario-ayuda"></span>
+            <span class="sub ayuda-usuario" id="usuario-ayuda" aria-live="polite">Minúsculas, números, punto o guion bajo.</span>
           </label>
           <label class="campo">
             <span class="campo__etiqueta campo__etiqueta--fuerte">Correo electrónico</span>
@@ -61,9 +62,9 @@
             <label class="campo__etiqueta campo__etiqueta--fuerte" for="clave">Contraseña</label>
             <span class="input input--alto" style="padding-right: 4px">
               <input id="clave" type="password" name="clave" autocomplete="new-password" required minlength="8" aria-describedby="clave-ayuda">
-              <button class="btn-accion" type="button" aria-label="Mostrar contraseña" style="color: var(--gris)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg></button>
+              <button class="btn-accion" type="button" id="ver-clave" aria-pressed="false" aria-label="Mostrar contraseña" style="color: var(--gris)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg></button>
             </span>
-            <div class="fuerza" aria-hidden="true"><span></span><span></span><span></span></div>
+            <div class="fuerza" data-nivel="0" aria-hidden="true"><span></span><span></span><span></span></div>
             <span class="sub" id="clave-ayuda" style="font-size: 12px">Mínimo 8 caracteres, con letras y números.</span>
           </div>
         </div>
@@ -74,13 +75,14 @@
         </label>
 
         <div class="columna" style="gap: 12px">
-          <a class="btn btn--primario btn--alto cta-crear solo-alumno" href="pages/alumno/dashboard.html">Crear cuenta de alumno</a>
-          <a class="btn btn--primario btn--alto cta-crear solo-coach" href="pages/coach/clientes.html">Crear cuenta de coach</a>
+          <p class="mensaje-cuenta" id="mensaje-cuenta" role="alert" hidden></p>
+          <button class="btn btn--primario btn--alto cta-crear solo-alumno" type="submit">Crear cuenta de alumno</button>
+          <button class="btn btn--primario btn--alto cta-crear solo-coach" type="submit">Crear cuenta de coach</button>
           <p class="nota-centrada aviso-terminos" style="font-size: 13px">Aceptá los términos para continuar.</p>
           <p class="derecha" style="text-align: center; font-size: 14px; color: var(--gris-oscuro)">¿Ya tenés cuenta? <button class="btn--texto negrita" type="button" style="border: 0; background: none; min-height: 44px; padding: 0 4px">Iniciá sesión</button></p>
         </div>
       </form>
     </main>
-  </div>
+  <script type="module" src="js/ui/cuenta-ui.js"></script>
 </body>
 </html>

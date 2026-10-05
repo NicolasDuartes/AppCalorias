@@ -56,6 +56,26 @@
 
 .fuerza span { flex: 1; height: 4px; border-radius: 2px; background: var(--borde); }
 
+/* Fuerza de la contraseña: 1 débil, 2 aceptable, 3 fuerte (lo calcula cuenta-ui.js) */
+.fuerza[data-nivel="1"] span:nth-child(1) { background: var(--rojo); }
+.fuerza[data-nivel="2"] span:nth-child(-n+2) { background: var(--naranja); }
+.fuerza[data-nivel="3"] span { background: var(--verde); }
+
+.ayuda-usuario { font-size: 12px; }
+.ayuda-usuario[data-tipo="ok"] { color: var(--verde); }
+.ayuda-usuario[data-tipo="error"] { color: var(--rojo); }
+
+.mensaje-cuenta {
+  padding: 12px 14px;
+  border-radius: var(--radio-fila);
+  font-size: 14px;
+  line-height: 1.4;
+  border: 1px solid var(--rojo-borde);
+  background: var(--blanco);
+  color: var(--rojo);
+}
+.mensaje-cuenta[data-tipo="ok"] { border-color: transparent; background: var(--verde-claro); color: var(--verde); }
+
 .form-cuenta:has(#tipo-coach:checked) .solo-alumno,
 .form-cuenta:has(#tipo-alumno:checked) .solo-coach { display: none; }
 
