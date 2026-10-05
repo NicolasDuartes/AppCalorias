@@ -7,7 +7,7 @@
    ========================================================== */
 import { supabase } from '../data/supabase.js';
 
-const INICIO = '../../index.html';
+const LOGIN = '../../login.html';
 const PANTALLA_COACH = '../coach/clientes.html';
 
 const el = (id) => document.getElementById(id);
@@ -67,10 +67,15 @@ el('copiar-codigo').addEventListener('click', async () => {
   setTimeout(() => { el('copiar-texto').textContent = 'Copiar'; }, 2000);
 });
 
+el('cerrar-sesion').addEventListener('click', async () => {
+  await supabase.auth.signOut();
+  window.location.href = LOGIN;
+});
+
 async function cargar() {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) {
-    window.location.href = INICIO;
+    window.location.href = LOGIN;
     return;
   }
 
