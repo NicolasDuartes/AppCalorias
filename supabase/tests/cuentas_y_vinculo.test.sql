@@ -51,7 +51,7 @@ $$;
 do $$
 begin
   begin
-    insert into auth.users (email, raw_user_meta_data) values ('dup@test.com', '{"username":"coach.martina"}');
+    insert into auth.users (id, email, raw_user_meta_data) values ('11111111-1111-1111-1111-1111111111d1', 'dup@test.com', '{"username":"coach.martina"}');
     raise exception 'FALLO: se permitió un @usuario repetido';
   exception when unique_violation then null;
   end;
