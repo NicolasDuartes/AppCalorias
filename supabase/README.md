@@ -6,6 +6,7 @@ cualquiera del equipo pueda ver qué se aplicó y repetirlo.
 ```
 supabase/
 ├── migrations/   # Cambios al esquema, en orden por fecha (AAAAMMDDHHMMSS_nombre.sql)
+├── rollback/     # Reversión de cada migración (mismo nombre + .down.sql)
 └── tests/        # Pruebas: simulan usuarios y verifican permisos (no dejan datos)
 ```
 
@@ -18,6 +19,21 @@ supabase/
    `ROLLBACK`, así que no deja usuarios ni datos de prueba.
 
 Cada migración corre en una transacción: si algo falla, no se aplica nada.
+
+## Volver atrás
+
+Si una migración se aplicó bien pero hay que deshacerla, se corre su archivo de
+`rollback/` en el SQL Editor. También corre en una transacción.
+
+Para `20261005120000_cuentas_y_vinculo`, **antes de aplicar la migración**, guardar
+los valores de `status` (la migración borra esa columna):
+
+```sql
+create table public.profiles_status_backup as select id, status from public.profiles;
+```
+
+La reversión los recupera de esa tabla. Cuando ya no haga falta volver atrás:
+`drop table public.profiles_status_backup;`
 
 ## Cuentas y vínculo coach–alumno (`20261005120000_cuentas_y_vinculo.sql`)
 
