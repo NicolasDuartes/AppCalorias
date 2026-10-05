@@ -15,28 +15,34 @@
   <div class="pantalla">
     <main class="contenido contenido--holgado" style="gap: 16px">
       <header class="encabezado" style="gap: 16px">
-        <span class="avatar avatar--perfil avatar--azul" role="img" aria-label="Foto de perfil">BB</span>
+        <span class="avatar avatar--perfil avatar--azul" id="perfil-iniciales" role="img" aria-label="Foto de perfil"></span>
         <div class="encabezado__textos" style="gap: 2px">
-          <h1 class="titulo">benja.blason</h1>
-          <p class="sub">30 años · 178 cm · Masculino</p>
+          <h1 class="titulo" id="perfil-usuario">Cargando…</h1>
+          <!-- Edad, altura y sexo: se completan cuando se guarde la antropometría -->
+          <p class="sub" id="perfil-datos" hidden></p>
         </div>
         <button class="btn-icono" type="button" aria-label="Editar perfil"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/></svg></button>
       </header>
 
       <section class="card card--oscura" aria-label="Tu ID de cliente">
         <div class="card__fila">
-          <div class="columna"><span class="sub">Tu ID de cliente</span><span class="codigo-id">NF-4821-BB</span></div>
-          <!-- Copiar al portapapeles se conecta con JS más adelante -->
-          <button class="btn-translucido" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5.5A1.5 1.5 0 0 0 14.5 4h-9A1.5 1.5 0 0 0 4 5.5v9A1.5 1.5 0 0 0 5.5 16H8"/></svg>Copiar</button>
+          <div class="columna"><span class="sub">Tu ID de cliente</span><span class="codigo-id" id="codigo-cliente">—</span></div>
+          <button class="btn-translucido" type="button" id="copiar-codigo" disabled><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5.5A1.5 1.5 0 0 0 14.5 4h-9A1.5 1.5 0 0 0 4 5.5v9A1.5 1.5 0 0 0 5.5 16H8"/></svg><span id="copiar-texto">Copiar</span></button>
         </div>
         <p class="sub">Compartilo con tu coach para que pueda agregarte y armarte el plan.</p>
       </section>
 
-      <section class="fila-link" aria-label="Tu coach">
-        <span class="avatar avatar--chico avatar--naranja">CM</span>
-        <span class="fila-link__textos"><span class="sub">Tu coach</span><span class="fila-link__nombre">coach.martina</span></span>
+      <!-- Coach: js/ui/perfil-ui.js muestra una de las dos según el vínculo -->
+      <section class="fila-link" id="coach-vinculado" aria-label="Tu coach" hidden>
+        <span class="avatar avatar--chico avatar--naranja" id="coach-iniciales"></span>
+        <span class="fila-link__textos"><span class="sub">Tu coach</span><span class="fila-link__nombre" id="coach-usuario"></span></span>
         <span class="tag tag--verde"><span class="tag__punto"></span>Vinculado</span>
       </section>
+      <section class="fila-link fila-link--punteada" id="coach-sin-vincular" aria-label="Coach" hidden>
+        <span class="avatar avatar--chico avatar--gris"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="8" r="4"/><path d="M3 20.5c1.3-3.6 3.9-5.5 7-5.5 1.5 0 2.9.4 4 1.2M18 15v6M15 18h6"/></svg></span>
+        <span class="fila-link__textos"><span class="negrita texto-15">Todavía no tenés coach</span><span class="sub">Compartí tu ID de cliente con un coach para que te agregue.</span></span>
+      </section>
+      <p class="mensaje-perfil" id="mensaje-perfil" role="alert" hidden></p>
 
       <section class="lista" aria-labelledby="t-alimentacion">
         <h2 class="seccion-titulo" id="t-alimentacion">Mi alimentación</h2>
@@ -105,5 +111,6 @@
       <button class="barra-inferior__item" type="button"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span>Ajustes</span></button>
     </nav>
   </div>
+  <script type="module" src="../../js/ui/perfil-ui.js"></script>
 </body>
 </html>

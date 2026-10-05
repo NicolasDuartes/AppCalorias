@@ -119,3 +119,13 @@
 .btn-icono--favorito:hover { color: var(--terracota); }
 
 .btn-icono--favorito[aria-pressed="true"] svg { fill: currentColor; }
+
+.mensaje-perfil {
+  padding: 12px 14px;
+  border: 1px solid var(--rojo-borde);
+  border-radius: var(--radio-fila);
+  background: var(--blanco);
+  color: var(--rojo);
+  font-size: 14px;
+  line-height: 1.4;
+}

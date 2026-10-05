@@ -74,6 +74,9 @@
   box-sizing: border-box;
 }
 
+/* Lo que se oculta con el atributo hidden queda oculto aunque su clase tenga display */
+[hidden] { display: none !important; }
+
 html,
 body {
   margin: 0;
