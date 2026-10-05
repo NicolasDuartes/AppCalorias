@@ -35,13 +35,17 @@
 
       <!-- ===== Cabecera del cliente ===== -->
       <section class="columna columna--centro">
-        <span class="avatar avatar--grande avatar--azul">BB</span>
-        <h1 class="titulo">benja.blason</h1>
-        <span class="tag tag--grande tag--verde"><span class="tag__punto"></span>Plan activo</span>
+        <span class="avatar avatar--grande avatar--azul" id="cliente-iniciales"></span>
+        <h1 class="titulo" id="cliente-usuario">Cargando…</h1>
+        <span class="sub" id="cliente-codigo"></span>
+        <!-- Estado del plan: vuelve cuando haya planes en la base -->
+        <span class="tag tag--grande tag--verde" hidden><span class="tag__punto"></span>Plan activo</span>
       </section>
 
+      <p class="mensaje" id="mensaje-cliente" role="alert" hidden></p>
+
       <!-- ===== Secciones del cliente ===== -->
-      <section class="columna" aria-label="Secciones del cliente">
+      <section class="columna" id="secciones-cliente" aria-label="Secciones del cliente">
         <ul class="lista">
           <li>
             <a class="fila-link" href="../shared/contexto.html">
@@ -85,6 +89,8 @@
           </li>
         </ul>
       </section>
+
+      <a class="btn btn--peligro-texto" href="#eliminar" id="boton-eliminar" hidden>Eliminar cliente</a>
     </main>
 
     <!-- ===== Navegación del coach (igual en todas las pantallas del coach) ===== -->
@@ -95,6 +101,23 @@
       <button class="barra-inferior__item" type="button"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#alimentos"/></svg><span>Alimentos</span></button>
       <button class="barra-inferior__item" type="button"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#perfil"/></svg><span>Perfil</span></button>
     </nav>
+
+    <!-- Confirmación: se abre con href="#eliminar" gracias a :target -->
+    <div class="modal-fondo" id="eliminar" role="alertdialog" aria-modal="true" aria-labelledby="t-eliminar">
+      <a class="modal-fondo__cerrar" href="#" aria-label="Cancelar" tabindex="-1"></a>
+      <div class="modal">
+        <div class="columna">
+          <h2 class="titulo" id="t-eliminar">¿Eliminar a <span class="nombre-cliente"></span> de tus clientes?</h2>
+          <p class="sub texto-14">Deja de aparecer en tu lista y no vas a poder ver sus datos. Su cuenta no se borra: lo podés volver a agregar con su ID de cliente.</p>
+        </div>
+        <p class="mensaje" id="mensaje-eliminar" role="alert" hidden></p>
+        <div class="grilla-2">
+          <a class="btn btn--secundario" href="#">Cancelar</a>
+          <button class="btn btn--peligro" type="button" id="confirmar-eliminar">Eliminar</button>
+        </div>
+      </div>
+    </div>
   </div>
+  <script type="module" src="../../js/ui/cliente-ui.js"></script>
 </body>
 </html>

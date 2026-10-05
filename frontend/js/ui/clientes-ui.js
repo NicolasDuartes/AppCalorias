@@ -49,7 +49,7 @@ function filaCliente(cliente, indice) {
   const nombre = nombreDe(cliente);
   const li = document.createElement('li');
   li.innerHTML = `
-    <a class="fila-link" href="cliente.html">
+    <a class="fila-link">
       <span class="avatar"></span>
       <span class="fila-link__textos">
         <span class="fila-link__nombre"></span>
@@ -57,6 +57,7 @@ function filaCliente(cliente, indice) {
       </span>
       <span class="chevron"><svg class="icono" width="20" height="20" aria-hidden="true"><use href="#flecha-derecha"/></svg></span>
     </a>`;
+  li.querySelector('.fila-link').href = `cliente.html#id=${cliente.id}`;
   const avatar = li.querySelector('.avatar');
   avatar.classList.add(COLORES_AVATAR[indice % COLORES_AVATAR.length]);
   avatar.textContent = iniciales(nombre);
@@ -156,6 +157,13 @@ async function iniciar() {
     return;
   }
   await cargarClientes(session.user.id);
+
+  // Al volver de eliminar un cliente (cliente.html manda #eliminado=usuario)
+  const eliminado = new URLSearchParams(window.location.hash.slice(1)).get('eliminado');
+  if (eliminado) {
+    mostrarMensaje(el('mensaje-clientes'), `Eliminaste a @${eliminado} de tus clientes.`, 'ok');
+    history.replaceState(null, '', window.location.pathname);
+  }
 }
 
 iniciar();
