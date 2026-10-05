@@ -24,14 +24,19 @@ function mostrarMensaje(texto, tipo = 'error') {
   mensaje.hidden = false;
 }
 
-// Lleva a la pantalla del rol del usuario logueado
-async function irSegunRol(userId) {
+async function cargarPerfil(userId) {
   const { data: perfil, error } = await supabase
     .from('profiles')
-    .select('role')
+    .select('role, username, email')
     .eq('id', userId)
     .single();
-  if (error || !perfil) {
+  return error ? null : perfil;
+}
+
+// Lleva a la pantalla del rol del usuario logueado
+async function irSegunRol(userId) {
+  const perfil = await cargarPerfil(userId);
+  if (!perfil) {
     mostrarMensaje('Entraste, pero no se pudo cargar tu perfil. Volvé a probar en unos minutos.');
     return;
   }
@@ -94,6 +99,26 @@ botonReenviar.addEventListener('click', async () => {
   mostrarMensaje(`Te reenviamos el correo de confirmación a ${correo}.`, 'ok');
 });
 
-// Si ya hay una sesión abierta, entra directo
+// Si ya hay una sesión abierta, pregunta si seguir con esa cuenta o usar otra
+const sesionAbierta = document.getElementById('sesion-abierta');
+
+document.getElementById('continuar-sesion').addEventListener('click', async () => {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session) await irSegunRol(session.user.id);
+});
+
+document.getElementById('usar-otra-cuenta').addEventListener('click', async () => {
+  await supabase.auth.signOut();
+  sesionAbierta.hidden = true;
+  form.hidden = false;
+  campoCorreo.focus();
+});
+
 const { data: { session } } = await supabase.auth.getSession();
-if (session) await irSegunRol(session.user.id);
+if (session) {
+  const perfil = await cargarPerfil(session.user.id);
+  document.getElementById('sesion-usuario').textContent =
+    perfil?.username ? `@${perfil.username}` : session.user.email;
+  sesionAbierta.hidden = false;
+  form.hidden = true;
+}

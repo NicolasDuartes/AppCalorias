@@ -22,6 +22,13 @@
         </div>
       </header>
 
+      <!-- Si ya hay una sesión abierta, js/ui/login-ui.js muestra esto en lugar del formulario -->
+      <section class="card columna" id="sesion-abierta" style="gap: 14px" hidden>
+        <p class="texto-15">Ya iniciaste sesión como <span class="negrita" id="sesion-usuario"></span>.</p>
+        <button class="btn btn--primario" type="button" id="continuar-sesion">Continuar</button>
+        <button class="btn btn--secundario" type="button" id="usar-otra-cuenta">Usar otra cuenta</button>
+      </section>
+
       <!-- El envío lo maneja js/ui/login-ui.js -->
       <form class="form-login columna" style="gap: 22px" novalidate>
         <div class="columna" style="gap: 14px">
