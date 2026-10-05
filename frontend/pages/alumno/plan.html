@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mi plan · Alumno</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../../css/base.css">
+  <link rel="stylesheet" href="../../css/components.css">
+  <link rel="stylesheet" href="../../css/pages/alumno.css">
+</head>
+<body>
+  <!-- Iconos de esta página: se dibujan con <svg class="icono"><use href="#nombre"/></svg> -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="volver" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></symbol>
+    <symbol id="flecha-abajo" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+    <symbol id="gota" viewBox="0 0 24 24"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></symbol>
+  </svg>
+  <div class="pantalla">
+    <main class="contenido">
+      <!-- ===== Encabezado ===== -->
+      <header class="encabezado">
+        <a class="btn-icono" href="dashboard.html" aria-label="Volver"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#volver"/></svg></a>
+        <div class="encabezado__textos">
+          <h1 class="titulo">Mi plan</h1>
+          <p class="sub">Asignado por tu coach</p>
+        </div>
+      </header>
+
+      <!-- ===== Estado y vigencia ===== -->
+      <section class="card">
+        <div class="card__fila"><span class="tag tag--grande tag--verde"><span class="tag__punto"></span>Activo</span><span class="sub negrita">Versión 3</span></div>
+        <div class="grilla-2">
+          <div class="columna"><span class="sub">Vigente desde</span><span class="negrita texto-15">15 Sep 2026</span></div>
+          <div class="columna"><span class="sub">Modalidad</span><span class="negrita texto-15">Día único</span></div>
+        </div>
+      </section>
+
+      <!-- ===== Resumen fijo del plan ===== -->
+      <section class="card card--fija" aria-label="Resumen del plan">
+        <div class="card__fila">
+          <p><span class="num num--l">1.967</span> <span class="unidad">kcal/día</span></p>
+          <span class="sub">Objetivo 2.060</span>
+        </div>
+        <div class="reparto"><span class="p" style="width: 29%"></span><span class="c" style="width: 39%"></span><span class="g" style="width: 32%"></span></div>
+        <div class="macros">
+          <div class="macro"><span class="macro__nombre"><span class="punto punto--p"></span>Proteínas</span><span class="num num--s">141 <span class="unidad">g · 29 %</span></span></div>
+          <div class="macro"><span class="macro__nombre"><span class="punto punto--c"></span>Carbohidratos</span><span class="num num--s">193 <span class="unidad">g · 39 %</span></span></div>
+          <div class="macro"><span class="macro__nombre"><span class="punto punto--g"></span>Grasas</span><span class="num num--s">69 <span class="unidad">g · 32 %</span></span></div>
+        </div>
+      </section>
+
+      <!-- ===== Desayuno ===== -->
+      <details class="acordeon" open>
+        <summary>
+          <span class="acordeon__textos">
+            <span class="acordeon__titulo">Desayuno</span>
+            <span class="acordeon__linea"><span class="negrita texto-14">464 kcal</span><span class="sub">P 31 · C 53 · G 14</span></span>
+          </span>
+          <span class="acordeon__flecha"><svg class="icono" width="20" height="20" aria-hidden="true"><use href="#flecha-abajo"/></svg></span>
+        </summary>
+        <div class="acordeon__cuerpo">
+          <div>
+            <div class="item-lectura">
+              <span class="item-lectura__textos"><span class="negrita texto-15">Avena</span><span class="sub">60 g · P 10,1 · C 39,6 · G 4,1</span></span>
+              <span class="num num--s">233 <span class="unidad">kcal</span></span>
+            </div>
+            <div class="item-lectura">
+              <span class="item-lectura__textos"><span class="negrita texto-15">Leche descremada</span><span class="sub">250 ml · P 8,5 · C 12,5 · G 0,3</span></span>
+              <span class="num num--s">88 <span class="unidad">kcal</span></span>
+            </div>
+            <div class="item-lectura">
+              <span class="item-lectura__textos"><span class="negrita texto-15">Huevo entero</span><span class="sub">100 g · P 12,6 · C 0,7 · G 9,5</span></span>
+              <span class="num num--s">143 <span class="unidad">kcal</span></span>
+            </div>
+          </div>
+          <p class="nota">Avena cocida con la leche; huevo revuelto sin aceite.</p>
+        </div>
+      </details>
+      <!-- ===== Almuerzo ===== -->
+      <details class="acordeon">
+        <summary>
+          <span class="acordeon__textos">
+            <span class="acordeon__titulo">Almuerzo</span>
+            <span class="acordeon__linea"><span class="negrita texto-14">570 kcal</span><span class="sub">P 51 · C 50 · G 16</span></span>
+          </span>
+          <span class="acordeon__flecha"><svg class="icono" width="20" height="20" aria-hidden="true"><use href="#flecha-abajo"/></svg></span>
+        </summary>
+        <div class="acordeon__cuerpo">
+          <div>
+            <div class="item-lectura">
+              <span class="item-lectura__textos"><span class="negrita texto-15">Pechuga de pollo cocida</span><span class="sub">150 g · P 46,5 · C 0 · G 5,4</span></span>
+              <span class="num num--s">248 <span class="unidad">kcal</span></span>
+            </div>
+            <div class="item-lectura">
+              <span class="item-lectura__textos"><span class="negrita texto-15">Arroz blanco cocido</span><span class="sub">180 g · P 4,9 · C 50,4 · G 0,5</span></span>
+              <span class="num num--s">234 <span class="unidad">kcal</span></span>
+            </div>
+            <div class="item-lectura">
+              <span class="item-lectura__textos"><span class="negrita texto-15">Aceite de oliva</span><span class="sub">10 ml · P 0 · C 0 · G 10</span></span>
+              <span class="num num--s">88 <span class="unidad">kcal</span></span>
+            </div>
+          </div>
+        </div>
+      </details>
+      <!-- ===== Merienda ===== -->
+      <details class="acordeon">
+        <summary>
+          <span class="acordeon__textos">
+            <span class="acordeon__titulo">Merienda</span>
+            <span class="acordeon__linea"><span class="negrita texto-14">388 kcal</span><span class="sub">P 21 · C 38 · G 19</span></span>
+          </span>
+          <span class="acordeon__flecha"><svg class="icono" width="20" height="20" aria-hidden="true"><use href="#flecha-abajo"/></svg></span>
+        </summary>
+        <div class="acordeon__cuerpo">
+          <div>
+            <div class="item-lectura">
+              <span class="item-lectura__textos"><span class="negrita texto-15">Yogur griego natural</span><span class="sub">170 g · P 15,3 · C 6,1 · G 8,5</span></span>
+              <span class="num num--s">165 <span class="unidad">kcal</span></span>
+            </div>
+            <div class="item-lectura">
+              <span class="item-lectura__textos"><span class="negrita texto-15">Banana</span><span class="sub">120 g · P 1,3 · C 27,4 · G 0,4</span></span>
+              <span class="num num--s">107 <span class="unidad">kcal</span></span>
+            </div>
+            <div class="item-lectura">
+              <span class="item-lectura__textos"><span class="negrita texto-15">Almendras</span><span class="sub">20 g · P 4,2 · C 4,3 · G 10</span></span>
+              <span class="num num--s">116 <span class="unidad">kcal</span></span>
+            </div>
+          </div>
+        </div>
+      </details>
+      <!-- ===== Cena ===== -->
+      <details class="acordeon">
+        <summary>
+          <span class="acordeon__textos">
+            <span class="acordeon__titulo">Cena</span>
+            <span class="acordeon__linea"><span class="negrita texto-14">545 kcal</span><span class="sub">P 38 · C 52 · G 20</span></span>
+          </span>
+          <span class="acordeon__flecha"><svg class="icono" width="20" height="20" aria-hidden="true"><use href="#flecha-abajo"/></svg></span>
+        </summary>
+        <div class="acordeon__cuerpo">
+          <div>
+            <div class="item-lectura">
+              <span class="item-lectura__textos"><span class="negrita texto-15">Salmón rosado</span><span class="sub">150 g · P 30 · C 0 · G 19,5</span></span>
+              <span class="num num--s">312 <span class="unidad">kcal</span></span>
+            </div>
+            <div class="item-lectura">
+              <span class="item-lectura__textos"><span class="negrita texto-15">Batata asada</span><span class="sub">200 g · P 4 · C 41,4 · G 0,3</span></span>
+              <span class="num num--s">180 <span class="unidad">kcal</span></span>
+            </div>
+            <div class="item-lectura">
+              <span class="item-lectura__textos"><span class="negrita texto-15">Brócoli al vapor</span><span class="sub">150 g · P 3,6 · C 10,8 · G 0,6</span></span>
+              <span class="num num--s">53 <span class="unidad">kcal</span></span>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <!-- ===== Hidratación y pautas ===== -->
+      <section class="card">
+        <div class="fila">
+          <span class="tile tile--azul"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#gota"/></svg></span>
+          <div class="crece columna"><span class="negrita texto-15">3,0 L de agua por día</span><span class="sub">Creatina 5 g por día</span></div>
+        </div>
+      </section>
+    </main>
+
+    <nav class="barra-inferior" aria-label="Navegación principal">
+      <a class="barra-inferior__item" href="perfil.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg><span>Perfil</span></a>
+      <a class="barra-inferior__item" href="dashboard.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="7" height="9" rx="1.5"/><rect x="13" y="4" width="7" height="5" rx="1.5"/><rect x="13" y="11" width="7" height="9" rx="1.5"/><rect x="4" y="15" width="7" height="5" rx="1.5"/></svg><span>Dashboard</span></a>
+      <!-- Progreso y Ajustes todavía no tienen pantalla -->
+      <button class="barra-inferior__item" type="button"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 20V11M12 20V5M19 20v-6M3 20h18"/></svg><span>Progreso</span></button>
+      <button class="barra-inferior__item" type="button"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span>Ajustes</span></button>
+    </nav>
+  </div>
+</body>
+</html>
