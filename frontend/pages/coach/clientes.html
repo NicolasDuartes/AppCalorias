@@ -33,10 +33,11 @@
       <label class="buscador">
         <span class="texto-gris"><svg class="icono" width="20" height="20" aria-hidden="true"><use href="#buscar"/></svg></span>
         <span class="sr-only">Buscar cliente</span>
-        <input type="search" name="buscar" placeholder="Buscar cliente">
+        <input type="search" name="buscar" id="buscar-cliente" placeholder="Buscar por @usuario o ID" autocomplete="off">
       </label>
 
-      <div class="segmentado" role="group" aria-label="Filtrar clientes">
+      <!-- Activos / inactivos: vuelve cuando haya planes y registros en la base -->
+      <div class="segmentado" role="group" aria-label="Filtrar clientes" hidden>
         <button type="button" aria-pressed="true">Todos · 2</button>
         <button type="button" aria-pressed="false">Activos · 1</button>
         <button type="button" aria-pressed="false">Inactivos · 1</button>
@@ -44,28 +45,17 @@
 
       <section class="columna" aria-labelledby="titulo-lista">
         <h2 class="sr-only" id="titulo-lista">Lista de clientes</h2>
-        <ul class="lista">
-          <li>
-            <a class="fila-link" href="cliente.html">
-              <span class="avatar avatar--azul">BB</span>
-              <span class="fila-link__textos">
-                <span class="fila-link__nombre">benja.blason</span>
-                <span class="fila-link__linea"><span class="tag tag--verde"><span class="tag__punto"></span>Activo</span><span class="sub">Plan de descenso de peso</span></span>
-              </span>
-              <span class="chevron"><svg class="icono" width="20" height="20" aria-hidden="true"><use href="#flecha-derecha"/></svg></span>
-            </a>
-          </li>
-          <li>
-            <a class="fila-link" href="cliente.html">
-              <span class="avatar avatar--naranja">JG</span>
-              <span class="fila-link__textos">
-                <span class="fila-link__nombre">juanG.fit</span>
-                <span class="fila-link__linea"><span class="tag tag--gris"><span class="tag__punto"></span>Inactivo</span><span class="sub">Plan de ganancia muscular</span></span>
-              </span>
-              <span class="chevron"><svg class="icono" width="20" height="20" aria-hidden="true"><use href="#flecha-derecha"/></svg></span>
-            </a>
-          </li>
-        </ul>
+        <p class="mensaje" id="mensaje-clientes" role="status" hidden></p>
+        <p class="sub" id="cargando-clientes">Cargando clientes…</p>
+        <!-- js/ui/clientes-ui.js arma una fila por alumno vinculado -->
+        <ul class="lista" id="lista-clientes"></ul>
+        <p class="sub" id="sin-resultados" hidden>Ningún cliente coincide con la búsqueda.</p>
+        <section class="vacio" id="sin-clientes" hidden>
+          <span class="vacio__icono"><svg class="icono" width="32" height="32" aria-hidden="true"><use href="#clientes"/></svg></span>
+          <h2 class="titulo">Todavía no tenés clientes</h2>
+          <p class="sub texto-14">Pedile a tu alumno su ID de cliente (está en su perfil) y agregalo con el botón +.</p>
+          <a class="btn btn--primario" href="#anadir-cliente">Añadir cliente</a>
+        </section>
       </section>
     </main>
 
@@ -86,14 +76,18 @@
           <h2 class="titulo" id="titulo-anadir">Añadir cliente</h2>
           <a class="btn-icono" href="#" aria-label="Cerrar"><svg class="icono" width="20" height="20" aria-hidden="true"><use href="#cerrar"/></svg></a>
         </div>
-        <label class="campo">
-          <span class="campo__etiqueta">ID de cliente</span>
-          <span class="input"><input type="text" name="idCliente" placeholder="Ej.: benja.blason" autocomplete="off"></span>
-        </label>
-        <!-- El envío de la solicitud se conecta con JS más adelante -->
-        <button class="btn btn--primario" type="button">Enviar solicitud</button>
+        <form class="columna" id="form-anadir" style="gap: 16px" novalidate>
+          <label class="campo">
+            <span class="campo__etiqueta">ID de cliente</span>
+            <span class="input"><input type="text" name="idCliente" id="id-cliente" placeholder="Ej.: NF-1234-AB" autocomplete="off" autocapitalize="characters" spellcheck="false" required aria-describedby="ayuda-id"></span>
+            <span class="sub" id="ayuda-id" style="font-size: 12px">Tu alumno lo encuentra en su perfil.</span>
+          </label>
+          <p class="mensaje" id="mensaje-anadir" role="alert" hidden></p>
+          <button class="btn btn--primario" type="submit" id="boton-anadir">Agregar cliente</button>
+        </form>
       </div>
     </div>
   </div>
+  <script type="module" src="../../js/ui/clientes-ui.js"></script>
 </body>
 </html>

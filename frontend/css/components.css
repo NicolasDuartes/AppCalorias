@@ -1249,3 +1249,15 @@ summary.opcion::-webkit-details-marker { display: none; }
 }
 
 .icono--grueso { stroke-width: 2.2; }
+
+/* Mensaje de resultado (error por defecto; data-tipo="ok" para éxito) */
+.mensaje {
+  padding: 12px 14px;
+  border: 1px solid var(--rojo-borde);
+  border-radius: var(--radio-fila);
+  background: var(--blanco);
+  color: var(--rojo);
+  font-size: 14px;
+  line-height: 1.4;
+}
+.mensaje[data-tipo="ok"] { border-color: transparent; background: var(--verde-claro); color: var(--verde); }
