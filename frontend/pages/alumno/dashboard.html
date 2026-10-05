@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hoy · Alumno</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../../css/base.css">
+  <link rel="stylesheet" href="../../css/components.css">
+  <link rel="stylesheet" href="../../css/pages/alumno.css">
+</head>
+<body>
+  <div class="pantalla">
+    <main class="contenido contenido--holgado">
+      <header class="fila fila--entre">
+        <div class="columna">
+          <span class="sub negrita texto-14">Jueves 1 de octubre</span>
+          <h1 class="titulo titulo--grande">Hoy</h1>
+        </div>
+        <button class="btn-icono" type="button" aria-label="Elegir fecha"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></button>
+      </header>
+
+      <div class="dias" aria-label="Semana">
+        <button class="dia" type="button" aria-label="lunes 28" aria-pressed="false"><span class="dia__letra">L</span><span class="dia__numero">28</span></button>
+        <button class="dia" type="button" aria-label="martes 29" aria-pressed="false"><span class="dia__letra">M</span><span class="dia__numero">29</span></button>
+        <button class="dia" type="button" aria-label="miércoles 30" aria-pressed="false"><span class="dia__letra">M</span><span class="dia__numero">30</span></button>
+        <button class="dia" type="button" aria-label="jueves 1" aria-current="date" aria-pressed="true"><span class="dia__letra">J</span><span class="dia__numero">1</span></button>
+        <button class="dia dia--futuro" type="button" aria-label="viernes 2" aria-pressed="false"><span class="dia__letra">V</span><span class="dia__numero">2</span></button>
+        <button class="dia dia--futuro" type="button" aria-label="sábado 3" aria-pressed="false"><span class="dia__letra">S</span><span class="dia__numero">3</span></button>
+        <button class="dia dia--futuro" type="button" aria-label="domingo 4" aria-pressed="false"><span class="dia__letra">D</span><span class="dia__numero">4</span></button>
+      </div>
+
+      <section class="card" aria-label="Resumen de calorías">
+        <div class="fila" style="gap: 20px">
+          <div class="anillo">
+            <svg width="148" height="148" viewBox="0 0 148 148" aria-hidden="true">
+              <circle cx="74" cy="74" r="62" fill="none" stroke="var(--pista)" stroke-width="12"/>
+              <circle cx="74" cy="74" r="62" fill="none" stroke="var(--verde)" stroke-width="12" stroke-linecap="round" stroke-dasharray="226.5 389.6"/>
+            </svg>
+            <div class="anillo__centro"><span class="num num--l">837</span><span class="sub">kcal restantes</span></div>
+          </div>
+          <div class="crece columna" style="gap: 14px">
+            <div class="columna"><span class="sub">Objetivo</span><span class="num num--m">2.000 <span class="unidad">kcal</span></span></div>
+            <div class="separador"></div>
+            <div class="columna"><span class="sub">Consumido</span><span class="num num--m">1.163 <span class="unidad">kcal</span></span></div>
+          </div>
+        </div>
+        <div class="macros macros--borde">
+          <div class="columna">
+            <span class="sub negrita">Proteínas</span>
+            <div class="barra barra--fina"><span class="p" style="width: 57%"></span></div>
+            <span class="negrita texto-14">68 / 120 g</span>
+          </div>
+          <div class="columna">
+            <span class="sub negrita">Carbohidratos</span>
+            <div class="barra barra--fina"><span class="c" style="width: 62%"></span></div>
+            <span class="negrita texto-14">142 / 230 g</span>
+          </div>
+          <div class="columna">
+            <span class="sub negrita">Grasas</span>
+            <div class="barra barra--fina"><span class="g" style="width: 63%"></span></div>
+            <span class="negrita texto-14">41 / 65 g</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="columna" style="gap: 12px" aria-labelledby="t-comidas">
+        <div class="fila fila--entre fila--base">
+          <h2 class="titulo" id="t-comidas">Comidas</h2>
+          <a class="fila negrita texto-14 sin-subrayado" style="gap: 4px; min-height: 44px" href="plan.html">Ver mi plan<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></a>
+        </div>
+
+      <article class="comida">
+        <div class="fila">
+          <div class="crece columna"><h3 class="comida__titulo">Desayuno</h3><span class="sub">305 kcal · 8:10</span></div>
+          <a class="tile" href="agregar.html" aria-label="Agregar al desayuno"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></a>
+        </div>
+        <div class="renglones">
+          <div class="renglon"><span>Café con leche</span><span>95</span></div>
+          <div class="renglon"><span>Tostadas integrales con queso (2)</span><span>210</span></div>
+        </div>
+      </article>
+
+      <article class="comida">
+        <div class="fila">
+          <div class="crece columna"><h3 class="comida__titulo">Almuerzo</h3><span class="sub">541 kcal · 13:20</span></div>
+          <a class="tile" href="agregar.html" aria-label="Agregar al almuerzo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></a>
+        </div>
+        <div class="renglones">
+          <div class="renglon"><span>Milanesa de pollo al horno</span><span>285</span></div>
+          <div class="renglon"><span>Ensalada mixta</span><span>60</span></div>
+          <div class="renglon"><span>Pan francés (40 g)</span><span>118</span></div>
+          <div class="renglon"><span>Manzana</span><span>78</span></div>
+        </div>
+      </article>
+
+      <article class="comida">
+        <div class="fila">
+          <div class="crece columna"><h3 class="comida__titulo">Merienda</h3><span class="sub">317 kcal · 17:45</span></div>
+          <a class="tile" href="agregar.html" aria-label="Agregar a la merienda"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></a>
+        </div>
+        <div class="renglones">
+          <div class="renglon"><span>Yogur natural con granola</span><span>210</span></div>
+          <div class="renglon"><span>Banana</span><span>107</span></div>
+        </div>
+      </article>
+
+      <article class="comida comida--pendiente">
+        <div class="fila">
+          <div class="crece columna"><h3 class="comida__titulo">Cena</h3><span class="sub">Te quedan 837 kcal para hoy</span></div>
+          <span class="tag tag--verde">Plan · 545 kcal</span>
+        </div>
+        <div class="renglones renglones--caja">
+          <span class="antetitulo">Según tu plan</span>
+          <div class="renglon"><span>Salmón rosado · 150 g</span><span>312</span></div>
+          <div class="renglon"><span>Batata al horno · 200 g</span><span>180</span></div>
+          <div class="renglon"><span>Brócoli al vapor · 150 g</span><span>53</span></div>
+        </div>
+        <div class="grilla-2" style="gap: 8px">
+          <button class="btn btn--chico btn--primario" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>Comí esto</button>
+          <a class="btn btn--chico btn--secundario" href="agregar.html">Comí otra cosa</a>
+        </div>
+      </article>
+      </section>
+
+      <section class="card" aria-labelledby="t-agua">
+        <div class="fila fila--entre fila--base">
+          <h2 class="seccion-titulo" id="t-agua">Agua</h2>
+          <span class="sub texto-14">1,25 de 2 L</span>
+        </div>
+        <div class="vasos">
+        <button class="vaso" type="button" aria-pressed="true" aria-label="Vaso 1"><svg width="28" height="36" viewBox="0 0 28 36" aria-hidden="true"><path d="M3 3h22l-2.6 28.2A3 3 0 0 1 19.4 34H8.6a3 3 0 0 1-3-2.8z" stroke-width="2" stroke-linejoin="round"/></svg></button>
+        <button class="vaso" type="button" aria-pressed="true" aria-label="Vaso 2"><svg width="28" height="36" viewBox="0 0 28 36" aria-hidden="true"><path d="M3 3h22l-2.6 28.2A3 3 0 0 1 19.4 34H8.6a3 3 0 0 1-3-2.8z" stroke-width="2" stroke-linejoin="round"/></svg></button>
+        <button class="vaso" type="button" aria-pressed="true" aria-label="Vaso 3"><svg width="28" height="36" viewBox="0 0 28 36" aria-hidden="true"><path d="M3 3h22l-2.6 28.2A3 3 0 0 1 19.4 34H8.6a3 3 0 0 1-3-2.8z" stroke-width="2" stroke-linejoin="round"/></svg></button>
+        <button class="vaso" type="button" aria-pressed="true" aria-label="Vaso 4"><svg width="28" height="36" viewBox="0 0 28 36" aria-hidden="true"><path d="M3 3h22l-2.6 28.2A3 3 0 0 1 19.4 34H8.6a3 3 0 0 1-3-2.8z" stroke-width="2" stroke-linejoin="round"/></svg></button>
+        <button class="vaso" type="button" aria-pressed="true" aria-label="Vaso 5"><svg width="28" height="36" viewBox="0 0 28 36" aria-hidden="true"><path d="M3 3h22l-2.6 28.2A3 3 0 0 1 19.4 34H8.6a3 3 0 0 1-3-2.8z" stroke-width="2" stroke-linejoin="round"/></svg></button>
+        <button class="vaso" type="button" aria-pressed="false" aria-label="Vaso 6"><svg width="28" height="36" viewBox="0 0 28 36" aria-hidden="true"><path d="M3 3h22l-2.6 28.2A3 3 0 0 1 19.4 34H8.6a3 3 0 0 1-3-2.8z" stroke-width="2" stroke-linejoin="round"/></svg></button>
+        <button class="vaso" type="button" aria-pressed="false" aria-label="Vaso 7"><svg width="28" height="36" viewBox="0 0 28 36" aria-hidden="true"><path d="M3 3h22l-2.6 28.2A3 3 0 0 1 19.4 34H8.6a3 3 0 0 1-3-2.8z" stroke-width="2" stroke-linejoin="round"/></svg></button>
+        <button class="vaso" type="button" aria-pressed="false" aria-label="Vaso 8"><svg width="28" height="36" viewBox="0 0 28 36" aria-hidden="true"><path d="M3 3h22l-2.6 28.2A3 3 0 0 1 19.4 34H8.6a3 3 0 0 1-3-2.8z" stroke-width="2" stroke-linejoin="round"/></svg></button>
+        </div>
+      </section>
+    </main>
+
+    <nav class="barra-inferior" aria-label="Navegación principal">
+      <a class="barra-inferior__item" href="perfil.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg><span>Perfil</span></a>
+      <a class="barra-inferior__item" href="dashboard.html" aria-current="page"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="7" height="9" rx="1.5"/><rect x="13" y="4" width="7" height="5" rx="1.5"/><rect x="13" y="11" width="7" height="9" rx="1.5"/><rect x="4" y="15" width="7" height="5" rx="1.5"/></svg><span>Dashboard</span></a>
+      <!-- Progreso y Ajustes todavía no tienen pantalla -->
+      <button class="barra-inferior__item" type="button"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 20V11M12 20V5M19 20v-6M3 20h18"/></svg><span>Progreso</span></button>
+      <button class="barra-inferior__item" type="button"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span>Ajustes</span></button>
+    </nav>
+  </div>
+</body>
+</html>

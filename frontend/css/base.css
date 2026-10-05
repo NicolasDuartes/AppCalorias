@@ -1,0 +1,254 @@
+/* ==========================================================
+   base.css — variables (colores, tipografía, formas), reseteo, marco de pantalla y textos
+   Se carga PRIMERO en todas las páginas.
+   ========================================================== */
+
+/* Tokens de diseño: única fuente de verdad de colores, tipografía, formas y medidas */
+:root {
+  /* Marca */
+  --verde: #1E6847;
+  --verde-oscuro: #134631;
+  --verde-claro: #E4EFE8;
+  --verde-texto-claro: #D3E6DA;
+  --verde-brillante: #7FD3A4;
+
+  /* Neutros */
+  --fondo: #F3F5F1;
+  --fondo-app: #DDE3DC;          /* fuera del marco del teléfono; líneas de pestañas */
+  --fondo-subida: #F7F8F5;
+  --fondo-oscurecido: #7E8781;
+  --blanco: #FFFFFF;
+  --tinta: #17211C;
+  --gris: #5B665F;
+  --gris-oscuro: #4A554E;
+  --gris-medio: #8A948D;
+  --gris-claro: #B9C4BD;
+  --gris-suave: #EEF1EC;
+  --gris-tag: #ECEEEB;
+  --borde: #E3E7E1;
+  --borde-fuerte: #D6DDD7;
+  --borde-punteado: #AEB8B1;
+  --trazo: #C5CEC6;              /* ejes, agarres, vasos vacíos */
+  --deshabilitado: #C9D2CB;
+  --pista: #E6EBE5;
+
+  /* Colores semánticos */
+  --azul: #2B59C3;
+  --azul-claro: #DCE9F7;
+  --azul-oscuro: #22508F;
+  --naranja: #E39A2D;
+  --naranja-claro: #F6E3C8;
+  --naranja-oscuro: #8A4E0B;
+  --violeta: #A8467F;
+  --rojo: #8A3B2E;
+  --rojo-borde: #E7C9C2;
+  --terracota: #B4461A;
+  --agua: #7FB3E8;
+  --agua-borde: #2F6FB5;
+
+  /* Macronutrientes (cambiar acá cambia todas las barras y puntos) */
+  --macro-p: var(--azul);
+  --macro-c: var(--naranja);
+  --macro-g: var(--violeta);
+
+  /* Tipografía */
+  --fuente-titulos: "Bricolage Grotesque", "Helvetica Neue", sans-serif;
+  --fuente-texto: "Instrument Sans", "Helvetica Neue", sans-serif;
+
+  /* Formas */
+  --radio-chico: 12px;
+  --radio-fila: 14px;
+  --radio-medio: 16px;
+  --radio-lista: 20px;
+  --radio-tarjeta: 24px;
+  --sombra-flotante: 0 10px 24px rgba(23, 33, 28, 0.22);
+
+  /* Medidas */
+  --pad-contenido: 20px;
+}
+
+/* ---------- Reseteo y elementos HTML ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+}
+
+body {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--fondo-app);
+  font-family: var(--fuente-texto);
+  font-size: 16px;
+  color: var(--tinta);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+a {
+  color: var(--verde);
+}
+
+a:hover {
+  color: var(--verde-oscuro);
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+ul,
+ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+svg {
+  flex-shrink: 0;
+}
+
+:focus-visible {
+  outline: 2px solid var(--verde);
+  outline-offset: 2px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* ---------- Marco de pantalla y contenedor ---------- */
+.pantalla {
+  position: relative;
+  width: min(100vw, 390px);
+  height: min(100dvh, 844px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--fondo);
+}
+
+@media (min-width: 500px) {
+  .pantalla {
+    border-radius: 36px;
+    box-shadow: 0 20px 60px rgba(23, 33, 28, 0.18);
+  }
+}
+
+.contenido {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--pad-contenido) var(--pad-contenido) 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.contenido > * {
+  flex-shrink: 0;
+}
+
+.contenido--holgado {
+  padding-top: 28px;
+  gap: 20px;
+}
+
+/* ---------- Tipografía ---------- */
+.titulo {
+  font-family: var(--fuente-titulos);
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+}
+
+.titulo--grande {
+  font-size: 32px;
+  letter-spacing: -0.02em;
+}
+
+.seccion-titulo {
+  font-family: var(--fuente-titulos);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.sub {
+  font-size: 13px;
+  color: var(--gris);
+  line-height: 1.4;
+}
+
+.num {
+  font-family: var(--fuente-titulos);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.num--xl { font-size: 52px; line-height: 1; }
+
+.num--l { font-size: 30px; line-height: 1; }
+
+.num--m { font-size: 20px; }
+
+.num--s { font-size: 16px; }
+
+.unidad {
+  font-family: var(--fuente-texto);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gris);
+  letter-spacing: 0;
+}
+
+.antetitulo {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gris);
+}
+
+.antetitulo--verde { color: var(--verde); font-size: 13px; }
+
+.separador { height: 1px; background: var(--borde); }
+
+.codigo-id { font-family: var(--fuente-titulos); font-size: 26px; font-weight: 700; letter-spacing: 0.06em; }
+

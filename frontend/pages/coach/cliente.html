@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>benja.blason · Coach</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../../css/base.css">
+  <link rel="stylesheet" href="../../css/components.css">
+  <link rel="stylesheet" href="../../css/pages/coach.css">
+</head>
+<body>
+  <!-- Iconos de esta página: se dibujan con <svg class="icono"><use href="#nombre"/></svg> -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="volver" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></symbol>
+    <symbol id="flecha-derecha" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+    <symbol id="mas" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="planes" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></symbol>
+    <symbol id="energia" viewBox="0 0 24 24"><path d="M12 3c1 3.5 5 5.5 5 10a5 5 0 0 1-10 0c0-2.5 1.5-4 2.5-5 .3 1.7 1 2.7 2 3 0-3 .5-5.5.5-8z"/></symbol>
+    <symbol id="medidas" viewBox="0 0 24 24"><circle cx="9" cy="12" r="6"/><circle cx="9" cy="12" r="2"/><path d="M9 18h12v-4M15 18v-2M18 18v-2"/></symbol>
+    <symbol id="seguimiento" viewBox="0 0 24 24"><path d="M4 20V4M4 20h16"/><path d="M7 15l3.5-3.5 3 3L18 10"/><circle cx="18" cy="16" r="2.5"/><path d="M20 18l1.5 1.5"/></symbol>
+    <symbol id="clientes" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17" cy="9" r="2.5"/><path d="M16.5 14c2.9.2 5 2.3 5 5.5"/></symbol>
+    <symbol id="plantillas" viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/></symbol>
+    <symbol id="alimentos" viewBox="0 0 24 24"><path d="M12 7c-1.5-1-5-1.3-6.3 1.7-1.4 3.2.3 8 2.3 10.5 1.2 1.5 2.4 1.3 4 .6 1.6.7 2.8.9 4-.6 2-2.5 3.7-7.3 2.3-10.5C17 5.7 13.5 6 12 7z"/><path d="M12 7c0-2 1-3.5 3-4"/></symbol>
+    <symbol id="perfil" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></symbol>
+  </svg>
+  <div class="pantalla">
+    <main class="contenido contenido--holgado">
+      <!-- ===== Encabezado ===== -->
+      <header class="encabezado">
+        <a class="btn-icono" href="clientes.html" aria-label="Volver a clientes"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#volver"/></svg></a>
+      </header>
+
+      <!-- ===== Cabecera del cliente ===== -->
+      <section class="columna columna--centro">
+        <span class="avatar avatar--grande avatar--azul">BB</span>
+        <h1 class="titulo">benja.blason</h1>
+        <span class="tag tag--grande tag--verde"><span class="tag__punto"></span>Plan activo</span>
+      </section>
+
+      <!-- ===== Secciones del cliente ===== -->
+      <section class="columna" aria-label="Secciones del cliente">
+        <ul class="lista">
+          <li>
+            <a class="fila-link" href="../shared/contexto.html">
+              <span class="tile"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#energia"/></svg></span>
+              <span class="fila-link__textos">
+                <span class="fila-link__nombre">Contexto energético</span>
+                <span class="sub">TDEE 2.327 kcal · Déficit moderado</span>
+              </span>
+              <span class="chevron"><svg class="icono" width="20" height="20" aria-hidden="true"><use href="#flecha-derecha"/></svg></span>
+            </a>
+          </li>
+          <li>
+            <a class="fila-link" href="../shared/antropometria.html">
+              <span class="tile"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#medidas"/></svg></span>
+              <span class="fila-link__textos">
+                <span class="fila-link__nombre">Cargar Antropometría</span>
+                <span class="sub">Última medición: 12 Sep 2026</span>
+              </span>
+              <span class="chevron"><svg class="icono" width="20" height="20" aria-hidden="true"><use href="#flecha-derecha"/></svg></span>
+            </a>
+          </li>
+          <li>
+            <a class="fila-link" href="plan-nuevo.html">
+              <span class="tile"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#planes"/></svg></span>
+              <span class="fila-link__textos">
+                <span class="fila-link__nombre">Plan alimenticio</span>
+                <span class="sub">2.060 kcal/día · Versión 3</span>
+              </span>
+              <span class="chevron"><svg class="icono" width="20" height="20" aria-hidden="true"><use href="#flecha-derecha"/></svg></span>
+            </a>
+          </li>
+          <li>
+            <div class="fila-link" aria-disabled="true">
+              <span class="tile tile--azul"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#seguimiento"/></svg></span>
+              <span class="fila-link__textos">
+                <span class="fila-link__nombre">Seguimiento</span>
+                <span class="sub">Evolución de peso y adherencia</span>
+              </span>
+              <span class="tag tag--gris">Pronto</span>
+            </div>
+          </li>
+        </ul>
+      </section>
+    </main>
+
+    <!-- ===== Navegación del coach (igual en todas las pantallas del coach) ===== -->
+    <nav class="barra-inferior" aria-label="Navegación del coach">
+      <a class="barra-inferior__item" href="clientes.html" aria-current="page"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#clientes"/></svg><span>Clientes</span></a>
+      <button class="barra-inferior__item" type="button"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#plantillas"/></svg><span>Plantillas</span></button>
+      <a class="barra-inferior__mas" href="clientes.html#anadir-cliente" aria-label="Añadir cliente"><svg class="icono icono--grueso" width="26" height="26" aria-hidden="true"><use href="#mas"/></svg></a>
+      <button class="barra-inferior__item" type="button"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#alimentos"/></svg><span>Alimentos</span></button>
+      <button class="barra-inferior__item" type="button"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#perfil"/></svg><span>Perfil</span></button>
+    </nav>
+  </div>
+</body>
+</html>

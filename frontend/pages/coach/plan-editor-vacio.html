@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Editor de plan · Coach</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../../css/base.css">
+  <link rel="stylesheet" href="../../css/components.css">
+  <link rel="stylesheet" href="../../css/pages/coach.css">
+</head>
+<body>
+  <!-- Iconos de esta página: se dibujan con <svg class="icono"><use href="#nombre"/></svg> -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="volver" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></symbol>
+    <symbol id="flecha-abajo" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+    <symbol id="mas" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="gota" viewBox="0 0 24 24"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></symbol>
+    <symbol id="clientes" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17" cy="9" r="2.5"/><path d="M16.5 14c2.9.2 5 2.3 5 5.5"/></symbol>
+    <symbol id="plantillas" viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/></symbol>
+    <symbol id="alimentos" viewBox="0 0 24 24"><path d="M12 7c-1.5-1-5-1.3-6.3 1.7-1.4 3.2.3 8 2.3 10.5 1.2 1.5 2.4 1.3 4 .6 1.6.7 2.8.9 4-.6 2-2.5 3.7-7.3 2.3-10.5C17 5.7 13.5 6 12 7z"/><path d="M12 7c0-2 1-3.5 3-4"/></symbol>
+    <symbol id="perfil" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></symbol>
+  </svg>
+  <div class="pantalla">
+    <main class="contenido">
+      <!-- ===== Encabezado ===== -->
+      <header class="encabezado">
+        <a class="btn-icono" href="plan-nuevo.html" aria-label="Volver"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#volver"/></svg></a>
+        <div class="encabezado__textos">
+          <h1 class="titulo">Plan alimenticio</h1>
+          <p class="sub">benja.blason · Día único</p>
+        </div>
+        <button class="btn btn--chico btn--secundario" type="button">Borrador</button>
+      </header>
+
+      <!-- ===== Resumen fijo de calorías y macros ===== -->
+      <section class="card card--fija" aria-label="Resumen de calorías del plan">
+        <div class="card__fila">
+          <p><span class="num num--m">0</span> <span class="unidad">/ 2.060 kcal</span></p>
+          <span class="tag tag--naranja">Faltan 2.060 kcal</span>
+        </div>
+        <div class="barra"><span style="width: 0%"></span></div>
+        <div class="macros">
+          <div class="macro"><span class="macro__nombre"><span class="punto punto--p"></span>Proteínas</span><span class="num num--s">0 <span class="unidad">g</span></span></div>
+          <div class="macro"><span class="macro__nombre"><span class="punto punto--c"></span>Carbohidratos</span><span class="num num--s">0 <span class="unidad">g</span></span></div>
+          <div class="macro"><span class="macro__nombre"><span class="punto punto--g"></span>Grasas</span><span class="num num--s">0 <span class="unidad">g</span></span></div>
+        </div>
+      </section>
+
+      <!-- ===== Desayuno ===== -->
+      <details class="acordeon" open>
+        <summary>
+          <span class="acordeon__textos">
+            <span class="acordeon__titulo">Desayuno</span>
+            <span class="acordeon__linea"><span class="negrita texto-14">0 kcal</span><span class="sub">Sin alimentos</span></span>
+          </span>
+          <span class="acordeon__flecha"><svg class="icono" width="20" height="20" aria-hidden="true"><use href="#flecha-abajo"/></svg></span>
+        </summary>
+        <div class="acordeon__cuerpo">
+
+          <a class="btn btn--punteado" href="buscar-alimento.html"><svg class="icono icono--grueso" width="18" height="18" aria-hidden="true"><use href="#mas"/></svg>Añadir alimento</a>
+          <label class="campo">
+            <span class="campo__etiqueta">Notas de desayuno</span>
+            <textarea class="textarea" name="nota-desayuno" rows="2" placeholder="Indicaciones para esta comida"></textarea>
+          </label>
+        </div>
+      </details>
+      <!-- ===== Almuerzo ===== -->
+      <details class="acordeon">
+        <summary>
+          <span class="acordeon__textos">
+            <span class="acordeon__titulo">Almuerzo</span>
+            <span class="acordeon__linea"><span class="negrita texto-14">0 kcal</span><span class="sub">Sin alimentos</span></span>
+          </span>
+          <span class="acordeon__flecha"><svg class="icono" width="20" height="20" aria-hidden="true"><use href="#flecha-abajo"/></svg></span>
+        </summary>
+        <div class="acordeon__cuerpo">
+
+          <a class="btn btn--punteado" href="buscar-alimento.html"><svg class="icono icono--grueso" width="18" height="18" aria-hidden="true"><use href="#mas"/></svg>Añadir alimento</a>
+          <label class="campo">
+            <span class="campo__etiqueta">Notas de almuerzo</span>
+            <textarea class="textarea" name="nota-almuerzo" rows="2" placeholder="Indicaciones para esta comida"></textarea>
+          </label>
+        </div>
+      </details>
+      <!-- ===== Merienda ===== -->
+      <details class="acordeon">
+        <summary>
+          <span class="acordeon__textos">
+            <span class="acordeon__titulo">Merienda</span>
+            <span class="acordeon__linea"><span class="negrita texto-14">0 kcal</span><span class="sub">Sin alimentos</span></span>
+          </span>
+          <span class="acordeon__flecha"><svg class="icono" width="20" height="20" aria-hidden="true"><use href="#flecha-abajo"/></svg></span>
+        </summary>
+        <div class="acordeon__cuerpo">
+
+          <a class="btn btn--punteado" href="buscar-alimento.html"><svg class="icono icono--grueso" width="18" height="18" aria-hidden="true"><use href="#mas"/></svg>Añadir alimento</a>
+          <label class="campo">
+            <span class="campo__etiqueta">Notas de merienda</span>
+            <textarea class="textarea" name="nota-merienda" rows="2" placeholder="Indicaciones para esta comida"></textarea>
+          </label>
+        </div>
+      </details>
+      <!-- ===== Cena ===== -->
+      <details class="acordeon">
+        <summary>
+          <span class="acordeon__textos">
+            <span class="acordeon__titulo">Cena</span>
+            <span class="acordeon__linea"><span class="negrita texto-14">0 kcal</span><span class="sub">Sin alimentos</span></span>
+          </span>
+          <span class="acordeon__flecha"><svg class="icono" width="20" height="20" aria-hidden="true"><use href="#flecha-abajo"/></svg></span>
+        </summary>
+        <div class="acordeon__cuerpo">
+
+          <a class="btn btn--punteado" href="buscar-alimento.html"><svg class="icono icono--grueso" width="18" height="18" aria-hidden="true"><use href="#mas"/></svg>Añadir alimento</a>
+          <label class="campo">
+            <span class="campo__etiqueta">Notas de cena</span>
+            <textarea class="textarea" name="nota-cena" rows="2" placeholder="Indicaciones para esta comida"></textarea>
+          </label>
+        </div>
+      </details>
+
+      <!-- ===== Comida extra ===== -->
+      <button class="btn btn--punteado" type="button"><svg class="icono icono--grueso" width="18" height="18" aria-hidden="true"><use href="#mas"/></svg>Añadir colación / comida extra</button>
+
+      <!-- ===== Pautas e hidratación ===== -->
+      <details class="acordeon">
+        <summary>
+          <span class="tile tile--azul"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#gota"/></svg></span>
+          <span class="acordeon__textos"><span class="acordeon__titulo">Pautas e hidratación</span><span class="sub">Agua, suplementos y notas generales</span></span>
+          <span class="acordeon__flecha"><svg class="icono" width="20" height="20" aria-hidden="true"><use href="#flecha-abajo"/></svg></span>
+        </summary>
+        <div class="acordeon__cuerpo">
+          <label class="campo">
+            <span class="campo__etiqueta">Agua por día</span>
+            <span class="input input--derecha"><input type="text" inputmode="decimal" name="agua" value="" placeholder="0,0"><span class="unidad">L</span></span>
+          </label>
+          <label class="campo">
+            <span class="campo__etiqueta">Suplementación y pautas</span>
+            <textarea class="textarea" name="pautas" rows="3" placeholder="Ej.: creatina, horarios, sustituciones"></textarea>
+          </label>
+        </div>
+      </details>
+
+      <!-- ===== Acción principal (bloqueada hasta que haya alimentos) ===== -->
+      <button class="btn btn--primario btn--alto" type="button" disabled>Guardar y asignar plan</button>
+    </main>
+
+    <!-- ===== Navegación del coach (igual en todas las pantallas del coach) ===== -->
+    <nav class="barra-inferior" aria-label="Navegación del coach">
+      <a class="barra-inferior__item" href="clientes.html" aria-current="page"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#clientes"/></svg><span>Clientes</span></a>
+      <button class="barra-inferior__item" type="button"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#plantillas"/></svg><span>Plantillas</span></button>
+      <a class="barra-inferior__mas" href="clientes.html#anadir-cliente" aria-label="Añadir cliente"><svg class="icono icono--grueso" width="26" height="26" aria-hidden="true"><use href="#mas"/></svg></a>
+      <button class="barra-inferior__item" type="button"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#alimentos"/></svg><span>Alimentos</span></button>
+      <button class="barra-inferior__item" type="button"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#perfil"/></svg><span>Perfil</span></button>
+    </nav>
+  </div>
+</body>
+</html>

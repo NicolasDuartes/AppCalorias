@@ -28,3 +28,5 @@ scratch/
 # js/
 # css/
 # pages/
+node_modules/
+frontend_backup/
