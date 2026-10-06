@@ -41,7 +41,7 @@ Un perfil por cuenta de Supabase Auth. Lo crea un trigger al registrarse.
 | `username` | @usuario, único, en minúsculas. | El propio usuario. |
 | `client_code` | ID de cliente `NF-1234-AB`, solo alumnos. | Nadie (lo genera la base). |
 | `coach_id` | Coach del alumno, o vacío. | `vincular_alumno` / `desvincular_alumno`. |
-| `sexo`, `fecha_nacimiento` | Datos fijos para los cálculos. | El alumno o su coach, con `actualizar_datos_personales`. |
+| `sexo`, `fecha_nacimiento` | Datos fijos para los cálculos. Se cargan al crear la cuenta (solo alumnos). | El alumno o su coach, con `actualizar_datos_personales`. |
 | `full_name`, `avatar_url` | Nombre y foto. Sin uso por ahora. | El propio usuario. |
 
 ## Datos cargados vs. resultados calculados
@@ -116,6 +116,7 @@ alguien llame a la API sin pasar por la app.
 |---|---|
 | `20261005120000_cuentas_y_vinculo.sql` | @usuario, ID de cliente, vínculo por código, cierre de accesos abiertos. |
 | `20261006120000_contexto_y_antropometria.sql` | Sexo y fecha de nacimiento, `permisos_alumno`, `contextos_energeticos`, `antropometrias`. |
+| `20261006130000_datos_personales_en_registro.sql` | El alta guarda sexo y fecha de nacimiento del alumno. |
 
 Las tablas de planes y registro diario son anteriores a estas migraciones y
 todavía no tienen archivo en `migrations/`.
