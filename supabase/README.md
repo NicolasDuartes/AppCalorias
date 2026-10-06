@@ -3,6 +3,8 @@
 Los cambios al esquema se guardan acá como archivos SQL, en orden, para que
 cualquiera del equipo pueda ver qué se aplicó y repetirlo.
 
+Cómo están organizados los datos (tablas, relaciones y permisos): [ESQUEMA.md](ESQUEMA.md).
+
 ```
 supabase/
 ├── migrations/   # Cambios al esquema, en orden por fecha (AAAAMMDDHHMMSS_nombre.sql)
@@ -42,7 +44,10 @@ La reversión los recupera de esa tabla. Cuando ya no haga falta volver atrás:
 ```js
 await supabase.auth.signUp({
   email, password,
-  options: { data: { role: 'alumno' /* o 'coach' */, username: 'tu.usuario' } }
+  options: { data: {
+    role: 'alumno' /* o 'coach' */, username: 'tu.usuario',
+    sexo: 'F', fecha_nacimiento: '1998-07-21' // solo alumnos; si son inválidos quedan vacíos
+  } }
 })
 ```
 
@@ -65,3 +70,36 @@ Antes de registrar se puede chequear el usuario con
 - `role`, `coach_id`, `client_code` y `email` no se pueden cambiar desde el navegador.
 
 Reemplaza el flujo viejo de aprobación: se eliminaron `profiles.status` y `approve_alumno`.
+
+## Contexto energético y antropometría (`20261006120000_contexto_y_antropometria.sql`)
+
+Cada carga es una fila nueva (historial); la vigente es la más reciente.
+Cada fila guarda los datos cargados **y** los resultados que calcula el
+frontend en JavaScript (`version_calculo` indica con qué versión de las fórmulas).
+Las etiquetas Bajo / Normal / Alto no se guardan: las calcula el frontend.
+
+| Tabla | Qué guarda |
+|---|---|
+| `profiles.sexo`, `profiles.fecha_nacimiento` | Datos fijos. Se cambian con `rpc('actualizar_datos_personales', { p_alumno_id, p_sexo, p_fecha_nacimiento })`. |
+| `contextos_energeticos` | Peso, altura, edad, pasos, entrenamiento, tipo de dieta → BMR, NEAT, TDEE, calorías objetivo. |
+| `antropometrias` | Peso, talla, 9 perímetros, 8 pliegues, 3 diámetros → IMC, índices, % y kg de grasa, músculo, hueso y residual. |
+| `permisos_alumno` | Secciones que el coach habilita al alumno: `contexto`, `antropometria`, `plan`. |
+
+**Quién carga y edita.**
+- Alumno sin coach: él mismo.
+- Alumno con coach: su coach. El alumno, solo en las secciones habilitadas en `permisos_alumno`.
+- `cargado_por` y las fechas los pone la base; no se pueden falsificar desde el navegador.
+
+**Quién ve.** El alumno y su coach. Al desvincular, el coach deja de ver,
+los permisos se borran y el alumno vuelve a poder cargar todo; los registros quedan.
+
+```js
+// Contexto vigente de un alumno
+const { data } = await supabase.from('contextos_energeticos')
+  .select('*').eq('alumno_id', alumnoId)
+  .order('created_at', { ascending: false }).limit(1).maybeSingle();
+
+// El coach habilita la antropometría al alumno
+await supabase.from('permisos_alumno')
+  .insert({ alumno_id: alumnoId, seccion: 'antropometria', habilitado_por: coachId });
+```

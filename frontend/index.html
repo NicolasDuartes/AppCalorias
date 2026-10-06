@@ -58,6 +58,18 @@
             <span class="campo__etiqueta campo__etiqueta--fuerte">Correo electrónico</span>
             <span class="input input--alto"><input type="email" name="correo" autocomplete="email" placeholder="nombre@correo.com" required></span>
           </label>
+          <!-- Solo alumnos (se oculta con CSS si se elige Coach): se usan en los cálculos -->
+          <div class="campo solo-alumno">
+            <span class="campo__etiqueta campo__etiqueta--fuerte" id="etiqueta-sexo">Sexo</span>
+            <div class="segmentado" role="group" aria-labelledby="etiqueta-sexo" id="sexo">
+              <button type="button" data-sexo="M" aria-pressed="false">Masculino</button>
+              <button type="button" data-sexo="F" aria-pressed="false">Femenino</button>
+            </div>
+          </div>
+          <label class="campo solo-alumno">
+            <span class="campo__etiqueta campo__etiqueta--fuerte">Fecha de nacimiento</span>
+            <span class="input input--alto"><input type="date" name="nacimiento" autocomplete="bday" min="1900-01-01"></span>
+          </label>
           <div class="campo">
             <label class="campo__etiqueta campo__etiqueta--fuerte" for="clave">Contraseña</label>
             <span class="input input--alto" style="padding-right: 4px">

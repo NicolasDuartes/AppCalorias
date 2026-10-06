@@ -21,6 +21,8 @@ const ayudaUsuario = document.getElementById('usuario-ayuda');
 const mensaje = document.getElementById('mensaje-cuenta');
 const fuerza = form.querySelector('.fuerza');
 const botonVerClave = document.getElementById('ver-clave');
+const botonesSexo = document.querySelectorAll('#sexo [data-sexo]');
+const campoNacimiento = form.elements.nacimiento;
 
 function tipoElegido() {
   return form.elements.tipo.value === 'coach' ? 'coach' : 'alumno';
@@ -62,6 +64,30 @@ campoUsuario.addEventListener('blur', async () => {
   if (libre === true) avisoUsuario(`@${usuario} está disponible.`, 'ok');
   if (libre === false) avisoUsuario(`@${usuario} ya está en uso. Probá con otro.`, 'error');
 });
+
+// ---------- Sexo y fecha de nacimiento (solo alumnos) ----------
+function sexoElegido() {
+  const elegido = document.querySelector('#sexo [aria-pressed="true"]');
+  return elegido ? elegido.dataset.sexo : null;
+}
+
+botonesSexo.forEach((boton) => {
+  boton.addEventListener('click', () => {
+    botonesSexo.forEach((b) => b.setAttribute('aria-pressed', String(b === boton)));
+  });
+});
+
+// Hoy en formato AAAA-MM-DD (hora local): no se puede nacer en el futuro
+const hoy = new Date();
+campoNacimiento.max = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`;
+
+function edadEnAnios(fechaTexto) {
+  const nacimiento = new Date(`${fechaTexto}T00:00:00`);
+  const edad = hoy.getFullYear() - nacimiento.getFullYear();
+  const yaCumplio = hoy.getMonth() > nacimiento.getMonth()
+    || (hoy.getMonth() === nacimiento.getMonth() && hoy.getDate() >= nacimiento.getDate());
+  return yaCumplio ? edad : edad - 1;
+}
 
 // ---------- Contraseña: mostrar y fuerza ----------
 botonVerClave.addEventListener('click', () => {
@@ -118,6 +144,30 @@ form.addEventListener('submit', async (evento) => {
   }
 
   const rol = tipoElegido();
+  const datosRegistro = { role: rol, username: usuario };
+  if (rol === 'alumno') {
+    const sexo = sexoElegido();
+    const nacimiento = campoNacimiento.value;
+    if (!sexo) {
+      mostrarMensaje('Elegí tu sexo: se usa para calcular tus calorías.');
+      botonesSexo[0].focus();
+      return;
+    }
+    if (!nacimiento) {
+      mostrarMensaje('Completá tu fecha de nacimiento: se usa para calcular tus calorías.');
+      campoNacimiento.focus();
+      return;
+    }
+    const edad = edadEnAnios(nacimiento);
+    if (!(edad >= 10 && edad <= 110)) {
+      mostrarMensaje('Revisá tu fecha de nacimiento: tenés que tener entre 10 y 110 años.');
+      campoNacimiento.focus();
+      return;
+    }
+    datosRegistro.sexo = sexo;
+    datosRegistro.fecha_nacimiento = nacimiento;
+  }
+
   const boton = form.querySelector(`.cta-crear.solo-${rol}`);
   const textoBoton = boton.textContent;
   boton.disabled = true;
@@ -135,7 +185,7 @@ form.addEventListener('submit', async (evento) => {
     const { data, error } = await supabase.auth.signUp({
       email: correo,
       password: campoClave.value,
-      options: { data: { role: rol, username: usuario } },
+      options: { data: datosRegistro },
     });
     if (error) throw error;
 
@@ -153,6 +203,7 @@ form.addEventListener('submit', async (evento) => {
 
     form.reset();
     form.elements.tipo.value = rol;
+    botonesSexo.forEach((b) => b.setAttribute('aria-pressed', 'false'));
     fuerza.dataset.nivel = 0;
     avisoUsuario('', '');
     mostrarMensaje(`Te enviamos un correo a ${correo}. Abrí el enlace para confirmar tu cuenta y después iniciá sesión.`, 'ok');
