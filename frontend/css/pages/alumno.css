@@ -261,8 +261,8 @@
   scrollbar-width: none;
   cursor: grab;
   /* Las marcas se desvanecen hacia los bordes */
-  -webkit-mask-image: linear-gradient(to right, transparent, #000 22%, #000 78%, transparent);
-  mask-image: linear-gradient(to right, transparent, #000 22%, #000 78%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 22%, black 78%, transparent);
+  mask-image: linear-gradient(to right, transparent, black 22%, black 78%, transparent);
 }
 
 .regla__ventana::-webkit-scrollbar { display: none; }

@@ -61,7 +61,17 @@
   --radio-medio: 16px;
   --radio-lista: 20px;
   --radio-tarjeta: 24px;
-  --sombra-flotante: 0 10px 24px rgba(23, 33, 28, 0.22);
+
+  /* Sombras y velos: todos salen de la tinta (--tinta en RGB, para usar con opacidad) */
+  --tinta-rgb: 23, 33, 28;
+  --sombra-sutil: 0 1px 3px rgba(var(--tinta-rgb), 0.12);       /* opción elegida del segmentado */
+  --sombra-fija: 0 6px 18px rgba(var(--tinta-rgb), 0.08);        /* tarjeta que queda fija al scrollear */
+  --sombra-flotante: 0 10px 24px rgba(var(--tinta-rgb), 0.22);   /* botón flotante */
+  --sombra-marco: 0 20px 60px rgba(var(--tinta-rgb), 0.18);      /* marco del teléfono en pantallas grandes */
+  --sombra-modal: 0 24px 48px rgba(var(--tinta-rgb), 0.25);
+  --sombra-hoja: 0 -10px 30px rgba(var(--tinta-rgb), 0.2);       /* hoja que sube desde abajo */
+  --velo: rgba(var(--tinta-rgb), 0.5);                           /* fondo detrás de un modal */
+  --blanco-translucido: rgba(255, 255, 255, 0.14);               /* botón sobre tarjeta oscura */
 
   /* Medidas */
   --pad-contenido: 20px;
@@ -170,7 +180,7 @@ svg {
 @media (min-width: 500px) {
   .pantalla {
     border-radius: 36px;
-    box-shadow: 0 20px 60px rgba(23, 33, 28, 0.18);
+    box-shadow: var(--sombra-marco);
   }
 }
 
