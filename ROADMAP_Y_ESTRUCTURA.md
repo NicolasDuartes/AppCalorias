@@ -1,57 +1,79 @@
-# Roadmap y Estructura Arquitectónica
+# Roadmap y estructura
 
-## 1. Objetivo y Estado Actual
-Hemos migrado exitosamente de un modelo de "archivos planos en la raíz" a una arquitectura estructurada de **Frontend y Backend lógicos**, aplicando principios de Separation of Concerns (SoC) para facilitar el mantenimiento y escalabilidad del proyecto "AppCalorias".
+Dónde está cada cosa en el repositorio, qué decisiones ya se tomaron y qué
+sigue. Para el detalle de cada parte, ver los documentos de la tabla.
 
-## 2. Nueva Estructura del Proyecto
+## 1. Cómo está organizado
 
-El proyecto está dividido en dos dominios principales:
+| Carpeta / archivo | Qué tiene | Documento |
+|---|---|---|
+| `frontend/` | La app: HTML, CSS y JS sin frameworks ni build | [Leemewacho.md](Leemewacho.md) (árbol de archivos) |
+| `frontend/css/` | Tokens, componentes y estilos por sección | [DESIGN.md](DESIGN.md) |
+| `frontend/js/ui/` | Un archivo por pantalla que maneja su interacción | Comentario al principio de cada archivo |
+| `frontend/js/data/supabase.js` | Cliente de Supabase que usan las pantallas | — |
+| `supabase/` | Migraciones, tests y reversiones de la base | [supabase/README.md](supabase/README.md), [supabase/ESQUEMA.md](supabase/ESQUEMA.md) |
+| `tests/` | Pruebas del frontend | — |
+| `backend/` | Servicios viejos que hoy **no usa nadie** (ver pendientes) | — |
+| `docs/`, `md entendimiento/` | Informes y explicaciones anteriores | — |
 
-### A. Frontend (`/frontend`)
-Contiene todo lo relacionado con la Interfaz de Usuario, interacción del cliente y lógica de cálculo en el navegador (offline/local).
+**Para levantar la app:** `cd frontend` y `npx serve`, y abrir
+`http://localhost:3000/`. Tiene que servirse desde `frontend/`, porque las
+rutas de las páginas son relativas a esa carpeta.
 
-*   **`index.html`**: Punto de entrada de la aplicación. Maneja el login y el registro.
-*   **`/pages`**:
-    *   `alumno.html`: Interfaz del alumno, buscador de alimentos, porciones y diario.
-    *   `coach-dashboard.html`: Panel de control del coach para aprobar ingresos y ver métricas.
-*   **`/css`**:
-    *   `styles.css`: Estilos Tailwind compilados y custom CSS.
-*   **`/js`**:
-    *   **`/ui`**: *NUEVO*. Scripts que controlan estrictamente el DOM de cada página. 
-        *   `auth-ui.js`: Controla los modales y formularios de `index.html`.
-        *   `alumno-ui.js`: Controla el DOM y la reactividad de `alumno.html`.
-        *   `coach-ui.js`: Renderiza la lista de alumnos en el panel del coach.
-    *   **`/utils`**: Librerías de cálculo matemático y manejo de estado.
-        *   `calculator.js`: Fórmulas BMR, NEAT, TDEE y Macros.
-        *   `equivalences.js`: Conversiones gramo a porción.
-        *   `storage.js`: Guardado en LocalStorage.
-    *   **`/data`**:
-        *   `food-catalog.js`: Base de datos cruda de los alimentos.
-    *   `app.js`: Integración pesada (legacy refactorizado).
+## 2. Decisiones tomadas
 
-### B. Backend (`/backend`)
-Contiene la configuración de conexión externa, reglas de negocio centralizadas y la API de Supabase.
+- **Entrada:** la app arranca en "Iniciar sesión". El registro pide solo
+  rol, @usuario, correo y contraseña; sexo y fecha de nacimiento se van a
+  completar dentro de la app (onboarding).
+- **Para quién:** el alumno típico quiere que le digan qué hacer. Ve
+  acciones y su meta, no fórmulas ni datos técnicos (ver DESIGN.md §1).
+- **Sin antropometría:** se quitó de la app, para coach y alumno. Son datos
+  complejos que no mejoran la experiencia.
+- **Supabase intacto en esta etapa:** se trabaja el frontend; la base no se
+  toca hasta retomar el backend.
+- **Estilos:** solo tokens, sin `style=""`, escala única de espacios y zona
+  táctil de 44 px (ver DESIGN.md §3).
 
-*   **`/config`**:
-    *   `supabase.js`: Inicialización del cliente de BD con las credenciales maestras.
-*   **`/services`**:
-    *   *(En proceso de migración de lógica RPC/Supabase desde los archivos UI hacia servicios puros).*
+## 3. Hecho
 
-## 3. RoadMap Semanal (Próximos Pasos)
+- Login como pantalla de inicio y registro corto.
+- Dashboard del alumno: título que cambia con el día (Hoy, Ayer o la fecha),
+  rueda de días con el elegido al centro, calendario y tarjeta de calorías
+  compacta.
+- Perfil del alumno: "Mi objetivo" arriba con registro de peso en una regla
+  deslizable; sin antropometría.
+- Sistema de diseño: tokens de color, sombras y espacios; sin `style=""` en
+  el HTML; DESIGN.md reescrito; borrado el JS que no se usaba.
 
-Según el `learning-roadmap-generator`, aquí está la hoja de ruta para continuar mejorando:
+## 4. Pendiente
 
-*   **Semana 1: Refinamiento de UI/UX**
-    *   *Objetivo:* Asegurar que todos los modales (`auth-ui.js`, `alumno-ui.js`) manejen errores de red de forma fluida usando notificaciones (Toast).
-*   **Semana 2: Backend Services Extraction**
-    *   *Objetivo:* Mover los llamados `supabase.auth` y `supabase.from()` que residen en `/ui/*.js` hacia la carpeta `/backend/services/`.
-*   **Semana 3: Bundling & Vite (Opcional)**
-    *   *Objetivo:* Implementar un bundler para minificar el CSS/JS y hacer que el uso de los ESM (`import/export`) sea compatible con navegadores antiguos.
+### Frontend
 
-## 4. Notas Técnicas y Edge Cases (`code-documenter`)
+1. **Responsive:** sacar el marco fijo de teléfono y armar la vista de PC
+   (corte en 768 px, menú lateral).
+2. **Onboarding del alumno:** 5 pasos (sexo, fecha de nacimiento, peso y
+   altura, actividad, objetivo) que arman el contexto energético.
+3. **Dashboard:** "Ahora toca" con "Lo comí" en un toque, Snack como espacio
+   libre y la pantalla para cargar alimentos (los botones "+" apuntan a
+   `agregar.html`, que todavía no existe).
+4. **Perfil:** ID de cliente como chip, nombre en solo lectura y
+   preferencias guardadas.
+5. **Coach:** ficha de solo lectura del cliente, con "Editar" por bloque.
+6. **Contexto energético:** el alumno ve solo su meta diaria; el desglose
+   (BMR, NEAT, TDEE) queda para el coach.
+7. **Paleta:** decidir si se adopta la de PROPUESTADESIGN.md (Inter y
+   emerald) o se queda la actual.
 
-Al revisar el código (Code Review Skill), se establecieron los siguientes comportamientos:
-*   **Rutas y Botoneras**: Todos los botones de redirección usan rutas relativas al archivo HTML en ejecución (Ej: `../index.html` o `./pages/coach-dashboard.html`).
-*   **Estados de Cuenta**: 
-    *   `pendiente`: Usuario bloqueado en `auth-ui.js` hasta que el coach cambie el estatus a `aprobado` vía RPC (`approve_alumno`).
-    *   `rechazado`: Usuario es desconectado forzosamente.
+### Base de datos (cuando se retome)
+
+- Migración que quite la tabla `antropometrias` y lo relacionado.
+- Preferencias del alumno en una tabla propia, visibles para el coach.
+- Criterios del coach (rangos, ajustes) en una tabla que solo él lea.
+- Restringir el alta de cuentas de coach (invitación o aprobación).
+
+### Limpieza
+
+- `backend/`: el frontend usa Supabase directo; decidir si se borra o si se
+  mueven ahí las llamadas a la base.
+- `frontend/js/utils/equivalences.js` y `storage.js` no los usa ninguna
+  pantalla; quedan por si sirven para la carga de alimentos.

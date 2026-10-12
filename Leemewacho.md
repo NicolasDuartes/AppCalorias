@@ -17,7 +17,9 @@ frontend/
 │   └── utils/
 └── pages/
     ├── alumno/
-    │   └── dashboard.html
+    │   ├── dashboard.html
+    │   ├── perfil.html
+    │   └── plan.html
     ├── coach/
     │   ├── clientes.html
     │   ├── cliente.html
