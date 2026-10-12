@@ -14,7 +14,7 @@
 
   /* Neutros */
   --fondo: #F3F5F1;
-  --fondo-app: #DDE3DC;          /* fuera del marco del teléfono; líneas de pestañas */
+  --fondo-app: #DDE3DC;          /* línea debajo de las pestañas */
   --fondo-subida: #F7F8F5;
   --fondo-oscurecido: #7E8781;
   --blanco: #FFFFFF;
@@ -67,7 +67,6 @@
   --sombra-sutil: 0 1px 3px rgba(var(--tinta-rgb), 0.12);       /* opción elegida del segmentado */
   --sombra-fija: 0 6px 18px rgba(var(--tinta-rgb), 0.08);        /* tarjeta que queda fija al scrollear */
   --sombra-flotante: 0 10px 24px rgba(var(--tinta-rgb), 0.22);   /* botón flotante */
-  --sombra-marco: 0 20px 60px rgba(var(--tinta-rgb), 0.18);      /* marco del teléfono en pantallas grandes */
   --sombra-modal: 0 24px 48px rgba(var(--tinta-rgb), 0.25);
   --sombra-hoja: 0 -10px 30px rgba(var(--tinta-rgb), 0.2);       /* hoja que sube desde abajo */
   --velo: rgba(var(--tinta-rgb), 0.5);                           /* fondo detrás de un modal */
@@ -85,7 +84,10 @@
 
   /* Medidas */
   --pad-contenido: var(--espacio-xl);
-  --alto-tactil: 44px; /* mínimo para tocar con el dedo */
+  --alto-tactil: 44px;        /* mínimo para tocar con el dedo */
+  --ancho-lectura: 720px;     /* columna de contenido en pantallas anchas */
+  --ancho-formulario: 440px;  /* login y registro */
+  --ancho-menu: 240px;        /* menú lateral desde 768 px */
 }
 
 /* ---------- Reseteo y elementos HTML ---------- */
@@ -109,7 +111,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--fondo-app);
+  background: var(--fondo);
   font-family: var(--fuente-texto);
   font-size: 16px;
   color: var(--tinta);
@@ -192,28 +194,26 @@ fieldset {
   }
 }
 
-/* ---------- Marco de pantalla y contenedor ---------- */
+/* ---------- Pantalla y contenedor ----------
+   Celular primero: la pantalla ocupa toda la ventana y la navegación va abajo.
+   Desde 768 px (ver components.css) la navegación pasa a un menú lateral.
+   El contenido nunca pasa de --ancho-lectura: en pantallas anchas queda una
+   columna centrada y el scroll sigue en el borde de la ventana. */
 .pantalla {
   position: relative;
-  width: min(100vw, 390px);
-  height: min(100dvh, 844px);
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   background: var(--fondo);
 }
 
-@media (min-width: 500px) {
-  .pantalla {
-    border-radius: 36px;
-    box-shadow: var(--sombra-marco);
-  }
-}
-
 .contenido {
   flex: 1;
   overflow-y: auto;
-  padding: var(--pad-contenido) var(--pad-contenido) var(--espacio-2xl);
+  padding: var(--pad-contenido) max(var(--pad-contenido), calc((100% - var(--ancho-lectura)) / 2)) var(--espacio-2xl);
   display: flex;
   flex-direction: column;
   gap: var(--espacio-l);

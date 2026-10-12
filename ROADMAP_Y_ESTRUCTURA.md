@@ -44,24 +44,24 @@ rutas de las páginas son relativas a esa carpeta.
   deslizable; sin antropometría.
 - Sistema de diseño: tokens de color, sombras y espacios; sin `style=""` en
   el HTML; DESIGN.md reescrito; borrado el JS que no se usaba.
+- Responsive: sin marco de teléfono; desde 768 px menú lateral y contenido
+  en una columna centrada.
 
 ## 4. Pendiente
 
 ### Frontend
 
-1. **Responsive:** sacar el marco fijo de teléfono y armar la vista de PC
-   (corte en 768 px, menú lateral).
-2. **Onboarding del alumno:** 5 pasos (sexo, fecha de nacimiento, peso y
+1. **Onboarding del alumno:** 5 pasos (sexo, fecha de nacimiento, peso y
    altura, actividad, objetivo) que arman el contexto energético.
-3. **Dashboard:** "Ahora toca" con "Lo comí" en un toque, Snack como espacio
+2. **Dashboard:** "Ahora toca" con "Lo comí" en un toque, Snack como espacio
    libre y la pantalla para cargar alimentos (los botones "+" apuntan a
    `agregar.html`, que todavía no existe).
-4. **Perfil:** ID de cliente como chip, nombre en solo lectura y
+3. **Perfil:** ID de cliente como chip, nombre en solo lectura y
    preferencias guardadas.
-5. **Coach:** ficha de solo lectura del cliente, con "Editar" por bloque.
-6. **Contexto energético:** el alumno ve solo su meta diaria; el desglose
+4. **Coach:** ficha de solo lectura del cliente, con "Editar" por bloque.
+5. **Contexto energético:** el alumno ve solo su meta diaria; el desglose
    (BMR, NEAT, TDEE) queda para el coach.
-7. **Paleta:** decidir si se adopta la de PROPUESTADESIGN.md (Inter y
+6. **Paleta:** decidir si se adopta la de PROPUESTADESIGN.md (Inter y
    emerald) o se queda la actual.
 
 ### Base de datos (cuando se retome)

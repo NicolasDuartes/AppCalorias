@@ -68,7 +68,7 @@ dos, en `components.css`.
 | Token | Valor | Uso |
 |---|---|---|
 | `--fondo` | `#F3F5F1` | Fondo de la pantalla |
-| `--fondo-app` | `#DDE3DC` | Fuera del marco del teléfono |
+| `--fondo-app` | `#DDE3DC` | Línea debajo de las pestañas |
 | `--blanco` | `#FFFFFF` | Tarjetas, inputs, barra inferior |
 | `--tinta` | `#17211C` | Texto principal y tarjeta oscura |
 | `--gris-oscuro` / `--gris` / `--gris-medio` / `--gris-claro` | `#4A554E` / `#5B665F` / `#8A948D` / `#B9C4BD` | Texto secundario, de más a menos importante |
@@ -144,10 +144,12 @@ negrita.
 | `--sombra-fija` | | Tarjeta que queda fija al scrollear (`.card--fija`) |
 | `--sombra-flotante` | | Botón flotante |
 | `--sombra-modal` / `--sombra-hoja` | | Modal / hoja que sube desde abajo |
-| `--sombra-marco` | | Marco del teléfono en pantallas grandes |
 | `--velo` | | Fondo oscuro detrás de un modal |
 | `--blanco-translucido` | | Botón sobre tarjeta oscura |
 | `--alto-tactil` | 44 px | Alto mínimo de lo que se toca |
+| `--ancho-lectura` | 720 px | Ancho máximo del contenido en pantallas anchas |
+| `--ancho-formulario` | 440 px | Ancho máximo de login y registro |
+| `--ancho-menu` | 240 px | Menú lateral desde 768 px |
 
 Todas las sombras y el velo se arman con `--tinta-rgb` (la tinta en RGB),
 así cambian juntas si cambia la tinta.
@@ -155,11 +157,22 @@ así cambian juntas si cambia la tinta.
 ## 5. Estructura de una pantalla
 
 ```html
-<div class="pantalla">                <!-- marco: 390 × 844 como máximo -->
-  <main class="contenido">…</main>     <!-- scroll interno, margen --pad-contenido -->
-  <nav class="barra-inferior">…</nav>  <!-- navegación fija abajo -->
+<div class="pantalla">                <!-- ocupa toda la ventana -->
+  <main class="contenido">…</main>     <!-- scroll interno; columna de hasta --ancho-lectura -->
+  <nav class="barra-inferior">…</nav>  <!-- abajo en celular; menú lateral desde 768 px -->
 </div>
 ```
+
+**Responsive (celular primero, un solo corte en 768 px):**
+
+| Ancho | Navegación | Contenido |
+|---|---|---|
+| Menos de 768 px | Barra inferior | Ancho completo con margen `--pad-contenido` |
+| 768 px o más | Menú lateral de `--ancho-menu`, con ícono y texto en fila; el "+" del coach queda primero y muestra su acción | Columna centrada de hasta `--ancho-lectura` (`--ancho-formulario` en login y registro); el scroll queda en el borde de la ventana |
+
+La hoja que sube desde abajo (`.hoja`) queda centrada con 560 px de ancho
+máximo desde 768 px. El corte se escribe como `@media (min-width: 768px)`:
+las variables CSS no funcionan dentro de un media query.
 
 - `.contenido--holgado`: más aire arriba (pantallas principales).
 - `.contenido--compacto`: menos aire (dashboard del alumno).
@@ -208,9 +221,9 @@ Van al final de `components.css` para ganarle a lo anterior.
 
 ## 8. Pendiente
 
-- **Responsive.** Hoy `.pantalla` es un marco fijo de 390 × 844 y en PC se
-  ve un teléfono en el medio. Propuesta: un solo corte en 768 px, con la
-  barra inferior convertida en menú lateral y contenido en 2 columnas.
+- **Dos columnas en PC.** Pantallas como el dashboard o la ficha del
+  cliente podrían usar el ancho sobrante (por ejemplo, el resumen a la
+  izquierda y la lista a la derecha).
 - **Estados de los componentes.** Definir para todos default, hover
   (solo con `@media (hover: hover)`), foco, activo y deshabilitado.
 - **Paleta de PROPUESTADESIGN.md.** Decidir si se adopta Inter y la paleta

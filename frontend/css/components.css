@@ -1003,6 +1003,62 @@ summary.opcion::-webkit-details-marker { display: none; }
 
 .pie > .btn { flex: 1; }
 
+/* ---------- Menú lateral (desde 768 px) ----------
+   La misma <nav class="barra-inferior"> pasa a la izquierda, con ícono y
+   texto en fila. El botón "+" del coach queda primero, a lo ancho. */
+@media (min-width: 768px) {
+  .pantalla:has(> .barra-inferior) {
+    display: grid;
+    grid-template-columns: var(--ancho-menu) minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+  }
+
+  .pantalla > .barra-inferior { grid-column: 1; grid-row: 1; }
+
+  .pantalla > .contenido { grid-column: 2; grid-row: 1; }
+
+  .barra-inferior {
+    height: auto;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: var(--espacio-xs);
+    padding: var(--espacio-2xl) var(--espacio-m);
+    border-top: none;
+    border-right: 1px solid var(--borde);
+  }
+
+  .barra-inferior__item {
+    min-height: var(--alto-tactil);
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: var(--espacio-m);
+    padding: 0 var(--espacio-m);
+    border-radius: var(--radio-chico);
+    font-size: 15px;
+  }
+
+  .barra-inferior__item:hover { background: var(--gris-suave); }
+
+  .barra-inferior__item[aria-current="page"] { background: var(--verde-claro); }
+
+  .barra-inferior__mas {
+    order: -1;
+    width: 100%;
+    height: var(--alto-tactil);
+    gap: var(--espacio-s);
+    margin: 0 0 var(--espacio-l);
+    border-radius: var(--radio-chico);
+    box-shadow: none;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  /* Con espacio de sobra, el "+" muestra su acción ("Añadir cliente") */
+  .barra-inferior__mas::after { content: attr(aria-label); }
+}
+
 /* ---------- Modal y hoja inferior ---------- */
 .modal-fondo {
   position: absolute;
@@ -1049,6 +1105,15 @@ summary.opcion::-webkit-details-marker { display: none; }
   border-radius: 28px 28px 0 0;
   background: var(--fondo);
   box-shadow: var(--sombra-hoja);
+}
+
+/* En pantallas anchas la hoja no ocupa todo el ancho: queda centrada */
+@media (min-width: 768px) {
+  .hoja {
+    left: 50%;
+    width: min(560px, 100%);
+    transform: translateX(-50%);
+  }
 }
 
 .hoja__agarre {

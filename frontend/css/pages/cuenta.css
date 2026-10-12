@@ -91,7 +91,7 @@
 
 /* Login y registro: más aire arriba que el resto de las pantallas */
 .contenido--cuenta {
-  padding: var(--espacio-3xl) var(--espacio-2xl) var(--espacio-2xl);
+  padding: var(--espacio-3xl) max(var(--espacio-2xl), calc((100% - var(--ancho-formulario)) / 2)) var(--espacio-2xl);
   gap: var(--espacio-xl);
 }
 
