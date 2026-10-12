@@ -1,7 +1,7 @@
 /* ==========================================================
    cliente-ui.js — ficha de un cliente del coach (cliente.html)
    Recibe el cliente en el enlace (cliente.html#id=...) y lo recuerda en la
-   pestaña, así al volver de Contexto o Antropometría sigue siendo el mismo.
+   pestaña, así al volver de Contexto sigue siendo el mismo.
    "Eliminar cliente" desvincula al alumno (rpc desvincular_alumno): su
    cuenta no se borra.
    Es un módulo: necesita abrirse con servidor (localhost), no desde el disco.

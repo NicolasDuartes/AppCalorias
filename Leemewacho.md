@@ -31,7 +31,6 @@ frontend/
     │   ├── historial-vacio.html
     │   └── buscar-alimento.html
     └── shared/                # Pantallas usadas por más de un rol
-        ├── contexto.html
-        └── antropometria.html
+        └── contexto.html
 ```
 
