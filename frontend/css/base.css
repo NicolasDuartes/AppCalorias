@@ -213,10 +213,10 @@ fieldset {
 .contenido {
   flex: 1;
   overflow-y: auto;
-  padding: var(--pad-contenido) var(--pad-contenido) 24px;
+  padding: var(--pad-contenido) var(--pad-contenido) var(--espacio-2xl);
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--espacio-l);
 }
 
 .contenido > * {
@@ -224,8 +224,8 @@ fieldset {
 }
 
 .contenido--holgado {
-  padding-top: 28px;
-  gap: 20px;
+  padding-top: var(--espacio-2xl);
+  gap: var(--espacio-xl);
 }
 
 /* ---------- Tipografía ---------- */

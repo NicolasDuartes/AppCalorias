@@ -5,8 +5,8 @@
 
 /* ---------- Dashboard: encabezado, semana y resumen ---------- */
 .contenido--compacto {
-  padding-top: 16px;
-  gap: 12px;
+  padding-top: var(--espacio-l);
+  gap: var(--espacio-m);
 }
 
 .encabezado-dia { position: relative; }
@@ -16,8 +16,8 @@
   min-height: 44px;
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  padding: 0 8px 0 0;
+  gap: var(--espacio-s);
+  padding: 0 var(--espacio-s) 0 0;
   border: none;
   background: transparent;
   color: inherit;
@@ -73,7 +73,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: var(--espacio-2xs);
   border: 1px solid transparent;
   border-radius: var(--radio-fila);
   background: transparent;
@@ -94,8 +94,8 @@
 .resumen-kcal {
   flex-direction: row;
   align-items: stretch;
-  gap: 16px;
-  padding: 14px 16px;
+  gap: var(--espacio-l);
+  padding: var(--espacio-m) var(--espacio-l);
 }
 
 .anillo { position: relative; width: 104px; height: 104px; flex-shrink: 0; }
@@ -109,7 +109,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: var(--espacio-2xs);
 }
 
 .anillo__numero { font-size: 22px; line-height: 1; }
@@ -122,14 +122,14 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 8px;
+  gap: var(--espacio-s);
 }
 
 .dato-linea {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  gap: 8px;
+  gap: var(--espacio-s);
 }
 
 .dato-linea__nombre { font-size: 12px; line-height: 1.2; color: var(--gris); }
@@ -145,7 +145,7 @@
 .macro-linea {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--espacio-xs);
 }
 
 .barra--fina { height: 5px; border-radius: 3px; }
@@ -153,8 +153,8 @@
 .comida {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 16px;
+  gap: var(--espacio-s);
+  padding: var(--espacio-l);
   border-radius: var(--radio-lista);
   background: var(--blanco);
 }
@@ -166,14 +166,14 @@
 .renglones {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding-top: 10px;
+  gap: var(--espacio-xs);
+  padding-top: var(--espacio-s);
   border-top: 1px solid var(--gris-suave);
   font-size: 14px;
 }
 
 .renglones--caja {
-  padding: 10px 12px;
+  padding: var(--espacio-s) var(--espacio-m);
   border-top: none;
   border-radius: var(--radio-fila);
   background: var(--fondo);
@@ -204,8 +204,8 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 10px;
-  padding: 14px;
+  gap: var(--espacio-s);
+  padding: var(--espacio-m);
   border: 1px solid var(--borde);
   border-radius: 18px;
   background: var(--blanco);
@@ -224,7 +224,7 @@
 .btn-icono--favorito[aria-pressed="true"] svg { fill: currentColor; }
 
 .mensaje-perfil {
-  padding: 12px 14px;
+  padding: var(--espacio-m) var(--espacio-m);
   border: 1px solid var(--rojo-borde);
   border-radius: var(--radio-fila);
   background: var(--blanco);
@@ -243,8 +243,8 @@
 .pesaje {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding-top: 12px;
+  gap: var(--espacio-s);
+  padding-top: var(--espacio-m);
   border-top: 1px solid var(--borde);
 }
 
