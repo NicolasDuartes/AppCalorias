@@ -443,6 +443,11 @@
 
 .input--derecha input { text-align: right; }
 
+/* Input con un botón adentro (ej. ver contraseña): menos aire a la derecha */
+.input--con-accion { padding-right: var(--espacio-xs); }
+
+.input--con-accion .btn-accion { color: var(--gris); }
+
 .input--fuerte { border: 1.5px solid var(--tinta); }
 
 .buscador {
@@ -1096,11 +1101,31 @@ summary.opcion::-webkit-details-marker { display: none; }
 
 .columna { display: flex; flex-direction: column; gap: 4px; }
 
+.fila--arriba { align-items: flex-start; }
+
 .crece { flex: 1; min-width: 0; }
+
+/* Separación entre hijos, con la escala de --espacio-* */
+.gap-2xs { gap: var(--espacio-2xs); }
+
+.gap-xs { gap: var(--espacio-xs); }
+
+.gap-s { gap: var(--espacio-s); }
+
+.gap-m { gap: var(--espacio-m); }
+
+.gap-l { gap: var(--espacio-l); }
+
+.gap-xl { gap: var(--espacio-xl); }
+
+/* Zona tocable mínima para links de texto */
+.tactil { min-height: var(--alto-tactil); }
 
 .derecha { text-align: right; }
 
 .negrita { font-weight: 600; }
+
+.texto-12 { font-size: 12px; }
 
 .texto-14 { font-size: 14px; }
 

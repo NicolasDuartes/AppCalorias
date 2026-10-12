@@ -73,8 +73,19 @@
   --velo: rgba(var(--tinta-rgb), 0.5);                           /* fondo detrás de un modal */
   --blanco-translucido: rgba(255, 255, 255, 0.14);               /* botón sobre tarjeta oscura */
 
+  /* Espacios: única escala para gap, padding y márgenes */
+  --espacio-2xs: 2px;
+  --espacio-xs: 4px;
+  --espacio-s: 8px;
+  --espacio-m: 12px;
+  --espacio-l: 16px;
+  --espacio-xl: 20px;
+  --espacio-2xl: 24px;
+  --espacio-3xl: 32px;
+
   /* Medidas */
-  --pad-contenido: 20px;
+  --pad-contenido: var(--espacio-xl);
+  --alto-tactil: 44px; /* mínimo para tocar con el dedo */
 }
 
 /* ---------- Reseteo y elementos HTML ---------- */
@@ -141,6 +152,21 @@ ol {
 
 svg {
   flex-shrink: 0;
+}
+
+fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+/* Hoja de íconos (<symbol>) al principio de cada página: no ocupa lugar */
+.sprite {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
 }
 
 :focus-visible {

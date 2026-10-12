@@ -88,3 +88,20 @@
 .aviso-terminos { display: none; }
 
 .form-cuenta:not(:has(#acepta:checked)) .aviso-terminos { display: block; }
+
+/* Login y registro: más aire arriba que el resto de las pantallas */
+.contenido--cuenta {
+  padding: var(--espacio-3xl) var(--espacio-2xl) var(--espacio-2xl);
+  gap: var(--espacio-xl);
+}
+
+.form-cuenta legend { margin-bottom: var(--espacio-s); }
+
+.tipo-cuenta__nombre { font-weight: 700; }
+
+/* "¿No tenés cuenta? Creá una" al pie del formulario */
+.pie-cuenta {
+  text-align: center;
+  font-size: 14px;
+  color: var(--gris-oscuro);
+}

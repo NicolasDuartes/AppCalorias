@@ -13,7 +13,7 @@
 </head>
 <body>
   <!-- Iconos de esta página: se dibujan con <svg class="icono"><use href="#nombre"/></svg> -->
-  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <svg class="sprite" aria-hidden="true">
     <symbol id="flecha-derecha" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
     <symbol id="mas" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
     <symbol id="cerrar" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></symbol>
@@ -76,11 +76,11 @@
           <h2 class="titulo" id="titulo-anadir">Añadir cliente</h2>
           <a class="btn-icono" href="#" aria-label="Cerrar"><svg class="icono" width="20" height="20" aria-hidden="true"><use href="#cerrar"/></svg></a>
         </div>
-        <form class="columna" id="form-anadir" style="gap: 16px" novalidate>
+        <form class="columna gap-l" id="form-anadir" novalidate>
           <label class="campo">
             <span class="campo__etiqueta">ID de cliente</span>
             <span class="input"><input type="text" name="idCliente" id="id-cliente" placeholder="Ej.: NF-1234-AB" autocomplete="off" autocapitalize="characters" spellcheck="false" required aria-describedby="ayuda-id"></span>
-            <span class="sub" id="ayuda-id" style="font-size: 12px">Tu alumno lo encuentra en su perfil.</span>
+            <span class="sub texto-12" id="ayuda-id">Tu alumno lo encuentra en su perfil.</span>
           </label>
           <p class="mensaje" id="mensaje-anadir" role="alert" hidden></p>
           <button class="btn btn--primario" type="submit" id="boton-anadir">Agregar cliente</button>
