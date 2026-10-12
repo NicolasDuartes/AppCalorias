@@ -12,7 +12,6 @@ frontend/
 │       ├── coach.css
 │       └── cuenta.css
 ├── js/
-│   ├── app.js
 │   ├── data/
 │   ├── ui/
 │   └── utils/
