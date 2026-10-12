@@ -13,55 +13,41 @@
 </head>
 <body>
   <div class="pantalla">
-    <main class="contenido contenido--holgado">
-      <header class="fila fila--entre">
-        <div class="columna">
-          <span class="sub negrita texto-14">Jueves 1 de octubre</span>
-          <h1 class="titulo titulo--grande">Hoy</h1>
-        </div>
-        <button class="btn-icono" type="button" aria-label="Elegir fecha"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></button>
+    <main class="contenido contenido--compacto">
+      <!-- Encabezado: el título cambia según el día elegido (Hoy, Ayer o la fecha); lo maneja js/ui/dashboard-ui.js -->
+      <header class="encabezado-dia">
+        <h1 class="titulo titulo--grande">
+          <button class="selector-fecha" type="button" id="selector-fecha" aria-label="Elegir fecha. Mostrando hoy">
+            <span class="selector-fecha__icono"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></span>
+            <span class="selector-fecha__texto" id="titulo-dia">Hoy</span>
+          </button>
+        </h1>
+        <input class="encabezado-dia__calendario" type="date" id="calendario" tabindex="-1" aria-hidden="true">
       </header>
 
-      <div class="dias" aria-label="Semana">
-        <button class="dia" type="button" aria-label="lunes 28" aria-pressed="false"><span class="dia__letra">L</span><span class="dia__numero">28</span></button>
-        <button class="dia" type="button" aria-label="martes 29" aria-pressed="false"><span class="dia__letra">M</span><span class="dia__numero">29</span></button>
-        <button class="dia" type="button" aria-label="miércoles 30" aria-pressed="false"><span class="dia__letra">M</span><span class="dia__numero">30</span></button>
-        <button class="dia" type="button" aria-label="jueves 1" aria-current="date" aria-pressed="true"><span class="dia__letra">J</span><span class="dia__numero">1</span></button>
-        <button class="dia dia--futuro" type="button" aria-label="viernes 2" aria-pressed="false"><span class="dia__letra">V</span><span class="dia__numero">2</span></button>
-        <button class="dia dia--futuro" type="button" aria-label="sábado 3" aria-pressed="false"><span class="dia__letra">S</span><span class="dia__numero">3</span></button>
-        <button class="dia dia--futuro" type="button" aria-label="domingo 4" aria-pressed="false"><span class="dia__letra">D</span><span class="dia__numero">4</span></button>
-      </div>
+      <!-- Rueda de días: el día elegido queda siempre al centro (js/ui/dashboard-ui.js) -->
+      <div class="dias" id="dias" aria-label="Días"></div>
 
-      <section class="card" aria-label="Resumen de calorías">
-        <div class="fila" style="gap: 20px">
-          <div class="anillo">
-            <svg width="148" height="148" viewBox="0 0 148 148" aria-hidden="true">
-              <circle cx="74" cy="74" r="62" fill="none" stroke="var(--pista)" stroke-width="12"/>
-              <circle cx="74" cy="74" r="62" fill="none" stroke="var(--verde)" stroke-width="12" stroke-linecap="round" stroke-dasharray="226.5 389.6"/>
-            </svg>
-            <div class="anillo__centro"><span class="num num--l">837</span><span class="sub">kcal restantes</span></div>
-          </div>
-          <div class="crece columna" style="gap: 14px">
-            <div class="columna"><span class="sub">Objetivo</span><span class="num num--m">2.000 <span class="unidad">kcal</span></span></div>
-            <div class="separador"></div>
-            <div class="columna"><span class="sub">Consumido</span><span class="num num--m">1.163 <span class="unidad">kcal</span></span></div>
-          </div>
+      <section class="card resumen-kcal" aria-label="Resumen de calorías: comiste 1.163 de 2.000 kcal">
+        <div class="anillo">
+          <svg width="104" height="104" viewBox="0 0 104 104" aria-hidden="true">
+            <circle cx="52" cy="52" r="46" fill="none" stroke="var(--pista)" stroke-width="9"/>
+            <circle cx="52" cy="52" r="46" fill="none" stroke="var(--verde)" stroke-width="9" stroke-linecap="round" stroke-dasharray="168 289"/>
+          </svg>
+          <div class="anillo__centro"><span class="num anillo__numero">1.163</span><span class="anillo__texto">de 2.000 kcal</span></div>
         </div>
-        <div class="macros macros--borde">
-          <div class="columna">
-            <span class="sub negrita">Proteínas</span>
+        <div class="resumen-kcal__datos">
+          <div class="macro-linea">
+            <div class="dato-linea"><span class="dato-linea__nombre">Proteínas</span><span class="dato-linea__valor">68 / 120 g</span></div>
             <div class="barra barra--fina"><span class="p" style="width: 57%"></span></div>
-            <span class="negrita texto-14">68 / 120 g</span>
           </div>
-          <div class="columna">
-            <span class="sub negrita">Carbohidratos</span>
+          <div class="macro-linea">
+            <div class="dato-linea"><span class="dato-linea__nombre">Carbohidratos</span><span class="dato-linea__valor">142 / 230 g</span></div>
             <div class="barra barra--fina"><span class="c" style="width: 62%"></span></div>
-            <span class="negrita texto-14">142 / 230 g</span>
           </div>
-          <div class="columna">
-            <span class="sub negrita">Grasas</span>
+          <div class="macro-linea">
+            <div class="dato-linea"><span class="dato-linea__nombre">Grasas</span><span class="dato-linea__valor">41 / 65 g</span></div>
             <div class="barra barra--fina"><span class="g" style="width: 63%"></span></div>
-            <span class="negrita texto-14">41 / 65 g</span>
           </div>
         </div>
       </section>
@@ -148,5 +134,6 @@
       <button class="barra-inferior__item" type="button"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span>Ajustes</span></button>
     </nav>
   </div>
+  <script type="module" src="../../js/ui/dashboard-ui.js"></script>
 </body>
 </html>

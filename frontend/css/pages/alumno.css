@@ -1,27 +1,88 @@
 /* ==========================================================
-   alumno.css — solo pantallas del alumno (semana, anillo, comidas, agua)
+   alumno.css — solo pantallas del alumno (encabezado del día, semana, anillo, comidas, agua)
    Se carga TERCERO en pages/alumno/*.
    ========================================================== */
 
-.dias { display: flex; justify-content: space-between; }
+/* ---------- Dashboard: encabezado, semana y resumen ---------- */
+.contenido--compacto {
+  padding-top: 16px;
+  gap: 12px;
+}
+
+.encabezado-dia { position: relative; }
+
+/* Ícono + título forman un solo botón que abre el calendario */
+.selector-fecha {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 8px 0 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+}
+
+.selector-fecha__icono {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radio-chico);
+  background: var(--verde-claro);
+  color: var(--verde);
+}
+
+.selector-fecha:hover .selector-fecha__icono { background: var(--verde-texto-claro); }
+
+.selector-fecha__texto { white-space: nowrap; }
+
+/* Una fecha ("Miércoles 31 dic 2025") es más larga que "Hoy": va más chica para entrar en un renglón */
+.selector-fecha__texto--fecha { font-size: 24px; }
+
+/* Input nativo invisible: solo da el calendario del sistema (showPicker) */
+.encabezado-dia__calendario {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Rueda de días: se puede deslizar; overflow oculto para la animación al girar */
+.dias {
+  display: flex;
+  justify-content: space-between;
+  overflow: hidden;
+  touch-action: pan-y;
+}
 
 .dia {
   width: 44px;
-  height: 62px;
+  height: 50px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 2px;
   border: 1px solid transparent;
   border-radius: var(--radio-fila);
   background: transparent;
   color: var(--tinta);
 }
 
-.dia__letra { font-size: 12px; font-weight: 500; opacity: 0.8; }
+.dia__letra { font-size: 11px; font-weight: 500; line-height: 1.2; opacity: 0.8; }
 
-.dia__numero { font-family: var(--fuente-titulos); font-size: 18px; font-weight: 600; }
+.dia__numero { font-family: var(--fuente-titulos); font-size: 17px; font-weight: 600; line-height: 1.1; }
 
 .dia--futuro { color: var(--gris-medio); }
 
@@ -29,9 +90,17 @@
 
 .dia[aria-pressed="true"] { background: var(--verde); border-color: var(--verde); color: var(--blanco); }
 
-.anillo { position: relative; width: 148px; height: 148px; flex-shrink: 0; }
+/* Tarjeta de calorías: anillo arriba a la izquierda, los 3 macros a la derecha */
+.resumen-kcal {
+  flex-direction: row;
+  align-items: stretch;
+  gap: 16px;
+  padding: 14px 16px;
+}
 
-.anillo svg { transform: rotate(-90deg); }
+.anillo { position: relative; width: 104px; height: 104px; flex-shrink: 0; }
+
+.anillo svg { display: block; transform: rotate(-90deg); }
 
 .anillo__centro {
   position: absolute;
@@ -40,12 +109,46 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 2px;
+}
+
+.anillo__numero { font-size: 22px; line-height: 1; }
+
+.anillo__texto { font-size: 11px; line-height: 1.2; color: var(--gris); }
+
+.resumen-kcal__datos {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.dato-linea {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.dato-linea__nombre { font-size: 12px; line-height: 1.2; color: var(--gris); }
+
+.dato-linea__valor {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.macro-linea {
+  display: flex;
+  flex-direction: column;
   gap: 4px;
 }
 
-.barra--fina { height: 6px; border-radius: 3px; }
-
-.macros--borde { padding-top: 18px; border-top: 1px solid var(--borde); }
+.barra--fina { height: 5px; border-radius: 3px; }
 
 .comida {
   display: flex;
