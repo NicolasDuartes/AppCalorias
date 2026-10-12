@@ -5,9 +5,11 @@
    ========================================================== */
 import { supabase } from '../data/supabase.js';
 
+// Rutas armadas desde este archivo (js/ui/), no desde la URL de la página:
+// así funcionan aunque el servidor abra el login desde otra ruta
 const DESTINO = {
-  alumno: 'pages/alumno/dashboard.html',
-  coach: 'pages/coach/clientes.html',
+  alumno: new URL('../../pages/alumno/dashboard.html', import.meta.url).href,
+  coach: new URL('../../pages/coach/clientes.html', import.meta.url).href,
 };
 
 const form = document.querySelector('.form-login');
