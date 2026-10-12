@@ -1142,7 +1142,7 @@ summary.opcion::-webkit-details-marker { display: none; }
 .link-claro:hover { color: var(--blanco); }
 
 
-/* ---------- Lista de lectura, resultados de alimento y subida de archivo (los usan coach y alumno) ---------- */
+/* ---------- Lista de lectura y resultados de alimento (los usan coach y alumno) ---------- */
 .resultado-alimento {
   width: 100%;
   display: flex;
@@ -1185,7 +1185,7 @@ summary.opcion::-webkit-details-marker { display: none; }
   gap: var(--espacio-2xs);
 }
 
-/* ---------- Iconos (se dibujan desde iconos/iconos.svg con <use>) ---------- */
+/* ---------- Iconos (cada página trae su hoja <svg class="sprite"> y los usa con <use>) ---------- */
 .icono {
   fill: none;
   stroke: currentColor;
