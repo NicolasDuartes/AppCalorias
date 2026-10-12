@@ -2,7 +2,8 @@
 
 ```
 frontend/
-├── index.html                 # Crear cuenta (punto de entrada)
+├── index.html                 # Iniciar sesión (punto de entrada)
+├── registro.html              # Crear cuenta
 ├── css/
 │   ├── base.css               # Variables, reseteo, marco de pantalla, tipografía (se carga 1º)
 │   ├── components.css         # Componentes reutilizables: botones, cards, inputs, listas (se carga 2º)

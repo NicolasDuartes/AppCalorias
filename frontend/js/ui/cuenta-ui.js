@@ -1,5 +1,5 @@
 /* ==========================================================
-   cuenta-ui.js — formulario de crear cuenta (index.html)
+   cuenta-ui.js — formulario de crear cuenta (registro.html)
    Crea el usuario en Supabase con su tipo de cuenta y @usuario. El perfil
    (rol, @usuario, correo e ID de cliente) lo arma el trigger handle_new_user.
    Es un módulo: necesita abrirse con servidor (localhost), no desde el disco.

@@ -6,7 +6,7 @@
    ========================================================== */
 import { supabase } from '../data/supabase.js';
 
-const LOGIN = '../../login.html';
+const LOGIN = '../../index.html';
 const PANTALLA_ALUMNO = '../alumno/dashboard.html';
 const FORMATO_ID = /^NF-\d{4}-[A-Z]{2}$/;
 const COLORES_AVATAR = ['avatar--azul', 'avatar--naranja'];

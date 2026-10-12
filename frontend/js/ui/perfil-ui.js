@@ -7,7 +7,7 @@
    ========================================================== */
 import { supabase } from '../data/supabase.js';
 
-const LOGIN = '../../login.html';
+const LOGIN = '../../index.html';
 const PANTALLA_COACH = '../coach/clientes.html';
 
 const el = (id) => document.getElementById(id);

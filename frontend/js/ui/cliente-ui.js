@@ -8,7 +8,7 @@
    ========================================================== */
 import { supabase } from '../data/supabase.js';
 
-const LOGIN = '../../login.html';
+const LOGIN = '../../index.html';
 const LISTA = 'clientes.html';
 const PANTALLA_ALUMNO = '../alumno/dashboard.html';
 const CLAVE_GUARDADA = 'clienteActual';

@@ -1,5 +1,5 @@
 /* ==========================================================
-   login-ui.js — formulario de iniciar sesión (login.html)
+   login-ui.js — formulario de iniciar sesión (index.html, punto de entrada)
    Entra con correo y contraseña y lleva a la pantalla de cada rol.
    Es un módulo: necesita abrirse con servidor (localhost), no desde el disco.
    ========================================================== */
