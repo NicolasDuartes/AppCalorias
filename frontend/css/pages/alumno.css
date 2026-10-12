@@ -232,3 +232,93 @@
   font-size: 14px;
   line-height: 1.4;
 }
+
+/* ---------- Perfil: objetivo y registro de peso ---------- */
+.objetivo__pesos { align-items: flex-end; }
+
+.objetivo__pesos .columna { gap: 2px; }
+
+.btn--pesaje { gap: 6px; padding: 0 12px; }
+
+.pesaje {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--borde);
+}
+
+/* Regla de peso: la pista se desliza bajo una aguja fija al centro */
+.regla__valor { text-align: center; }
+
+.regla__valor .num { font-size: 28px; font-variant-numeric: tabular-nums; }
+
+.regla { position: relative; border-radius: var(--radio-chico); }
+
+.regla__ventana {
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  cursor: grab;
+  /* Las marcas se desvanecen hacia los bordes */
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 22%, #000 78%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 22%, #000 78%, transparent);
+}
+
+.regla__ventana::-webkit-scrollbar { display: none; }
+
+.regla__ventana--arrastrando { cursor: grabbing; scroll-snap-type: none; }
+
+/* El relleno de media ventana a cada lado deja centrar la primera y la última marca */
+.regla__pista {
+  width: max-content;
+  display: flex;
+  align-items: flex-end;
+  padding: 0 calc(50% - 5px);
+}
+
+.marca {
+  position: relative;
+  width: 10px;
+  height: 52px;
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  scroll-snap-align: center;
+}
+
+.marca::before {
+  content: "";
+  width: 1px;
+  height: 12px;
+  border-radius: 1px;
+  background: var(--trazo);
+}
+
+.marca--media::before { height: 18px; }
+
+.marca--entera::before { width: 1.5px; height: 26px; background: var(--gris-medio); }
+
+.marca__numero {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  line-height: 1.2;
+  color: var(--gris);
+  font-variant-numeric: tabular-nums;
+}
+
+.regla__aguja {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 3px;
+  height: 36px;
+  border-radius: 2px;
+  background: var(--verde);
+  transform: translateX(-50%);
+  pointer-events: none;
+}

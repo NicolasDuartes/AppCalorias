@@ -18,7 +18,7 @@
         <span class="avatar avatar--perfil avatar--azul" id="perfil-iniciales" role="img" aria-label="Foto de perfil"></span>
         <div class="encabezado__textos" style="gap: 2px">
           <h1 class="titulo" id="perfil-usuario">Cargando…</h1>
-          <!-- Edad, altura y sexo: se completan cuando se guarde la antropometría -->
+          <!-- Edad, altura y sexo: se completan cuando se carguen los datos personales -->
           <p class="sub" id="perfil-datos" hidden></p>
         </div>
         <button class="btn-icono" type="button" aria-label="Editar perfil"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/></svg></button>
@@ -44,6 +44,35 @@
       </section>
       <p class="mensaje-perfil" id="mensaje-perfil" role="alert" hidden></p>
 
+      <!-- Objetivo: "Registrar peso" abre la regla y actualiza el peso actual y la barra (js/ui/objetivo-ui.js) -->
+      <section class="card" id="objetivo" data-inicio="78" data-actual="72.4" data-meta="70" aria-labelledby="t-objetivo">
+        <div class="card__fila">
+          <div class="columna">
+            <h2 class="seccion-titulo" id="t-objetivo">Mi objetivo</h2>
+            <span class="sub">Descenso de peso</span>
+          </div>
+          <button class="btn btn--chico btn--secundario btn--pesaje" type="button" id="abrir-pesaje" aria-expanded="false" aria-controls="form-pesaje"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Registrar peso</button>
+        </div>
+        <div class="fila fila--entre objetivo__pesos">
+          <div class="columna"><span class="sub">Inicio</span><span class="negrita texto-15" id="peso-inicio">78 kg</span></div>
+          <div class="columna columna--centro"><span class="sub">Actual</span><span class="num num--m" id="peso-actual">72,4 kg</span></div>
+          <div class="columna derecha"><span class="sub">Meta</span><span class="negrita texto-15" id="peso-meta">70 kg</span></div>
+        </div>
+        <div class="barra" id="barra-objetivo" role="progressbar" aria-label="Avance hacia la meta" aria-valuemin="0" aria-valuemax="100" aria-valuenow="70"><span style="width: 70%"></span></div>
+        <!-- Regla deslizable: 1 marca = 100 g; la aguja del centro marca el peso elegido -->
+        <form class="pesaje" id="form-pesaje" hidden>
+          <p class="regla__valor"><span class="num" id="regla-valor">72,4</span> <span class="unidad">kg</span></p>
+          <div class="regla" id="regla" role="slider" tabindex="0" aria-label="Peso" aria-valuemin="30" aria-valuemax="200" aria-valuenow="72.4" aria-valuetext="72,4 kg">
+            <div class="regla__ventana" id="regla-ventana"><div class="regla__pista" id="regla-pista"></div></div>
+            <span class="regla__aguja" aria-hidden="true"></span>
+          </div>
+          <div class="grilla-2">
+            <button class="btn btn--chico btn--secundario" type="button" id="cancelar-pesaje">Cancelar</button>
+            <button class="btn btn--chico btn--primario" type="submit">Guardar</button>
+          </div>
+        </form>
+      </section>
+
       <section class="lista" aria-labelledby="t-alimentacion">
         <h2 class="seccion-titulo" id="t-alimentacion">Mi alimentación</h2>
         <a class="fila-link" href="../shared/contexto.html#rol=alumno">
@@ -62,31 +91,6 @@
           </span>
           <span class="chevron"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span>
         </a>
-        <div class="grupo">
-        <a class="fila-link" href="../shared/antropometria.html#rol=alumno">
-          <span class="tile"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="12" r="6"/><circle cx="9" cy="12" r="2"/><path d="M9 18h12v-4M15 18v-2M18 18v-2"/></svg></span>
-          <span class="fila-link__textos">
-            <span class="fila-link__linea"><span class="fila-link__nombre">Antropometría</span><span class="tag tag--naranja">Coach</span></span>
-            <span class="sub">Última: 12 Sep 2026 · 72,4 kg · 19,9 % grasa</span>
-          </span>
-          <span class="chevron"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span>
-        </a>
-          <a class="grupo__extra" href="../shared/antropometria.html#rol=alumno"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Cargar una antropometría propia</a>
-        </div>
-      </section>
-
-      <section class="card" aria-labelledby="t-objetivo">
-        <div class="card__fila fila--base">
-          <h2 class="seccion-titulo" id="t-objetivo">Mi objetivo</h2>
-          <span class="sub">Descenso de peso</span>
-        </div>
-        <div class="fila fila--entre" style="align-items: flex-end">
-          <div class="columna" style="gap: 2px"><span class="sub">Inicio</span><span class="negrita texto-15">78 kg</span></div>
-          <div class="columna columna--centro" style="gap: 2px"><span class="sub">Actual</span><span class="num num--m">72,4 kg</span></div>
-          <div class="columna derecha" style="gap: 2px"><span class="sub">Meta</span><span class="negrita texto-15">70 kg</span></div>
-        </div>
-        <div class="barra" role="progressbar" aria-label="Avance hacia la meta" aria-valuemin="0" aria-valuemax="100" aria-valuenow="70"><span style="width: 70%"></span></div>
-        <p class="sub">Te faltan 2,4 kg · 70 % del camino</p>
       </section>
 
       <section class="card" aria-labelledby="t-preferencias">
@@ -113,5 +117,6 @@
     </nav>
   </div>
   <script type="module" src="../../js/ui/perfil-ui.js"></script>
+  <script type="module" src="../../js/ui/objetivo-ui.js"></script>
 </body>
 </html>
