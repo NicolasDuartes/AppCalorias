@@ -206,7 +206,7 @@ las variables CSS no funcionan dentro de un media query.
 | Día | `.selector-fecha`, `.dias` / `.dia`, `.resumen-kcal` + `.anillo`, `.vasos` | Encabezado, rueda de días, calorías y agua |
 | Comidas | `.comidas`, `.comida` (`<details name="comidas">` con `data-estado="hecha"` o `"pendiente"`), `.alimento-fila`, `.btn-reemplazar`, `.btn-agregar` (`aria-pressed`), `.aviso-flotante` | Tarjetas del dashboard; una sola abierta a la vez |
 | Cantidad | `.input--cantidad`, `.aporte` / `.aporte__celda`, `.referencia` | Escribir la cantidad y ver lo que aporta |
-| Reemplazos | `.reemplazos`, `.reemplazo` (`role="radio"`, `data-nivel="equivalente"`, `"parcial"` o `"no"`) | Opciones para cambiar un alimento |
+| Reemplazos | `.reemplazos`, `.reemplazo` (`role="radio"`, `data-nivel="equivalente"`, `"parcial"` o `"no"`) | Resultados de buscar con qué cambiar un alimento (no hay sugerencias automáticas) |
 | Alimento | `.valor-campo`, `.interruptor` (`role="switch"`) | Crear o corregir un alimento |
 | Pantallas con pie | `.pie--centrado`, `.pie--columna`, `.btn-icono--primario` | El pie sigue a la columna centrada |
 | Perfil | `.regla` / `.marca` | Selector de peso deslizable |

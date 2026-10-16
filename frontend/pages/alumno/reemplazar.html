@@ -33,18 +33,25 @@
 
       <label class="buscador">
         <span class="texto-gris"><svg class="icono" width="20" height="20" aria-hidden="true"><use href="#buscar"/></svg></span>
-        <span class="sr-only">Buscar cualquier alimento</span>
-        <input type="search" name="buscar" placeholder="Buscar cualquier alimento">
+        <span class="sr-only">Buscar un alimento para reemplazar</span>
+        <input type="search" name="buscar" placeholder="Buscar un alimento" enterkeyhint="search">
       </label>
 
-      <div class="columna gap-2xs">
-        <!-- Sin búsqueda: "Los 5 con mayor adherencia". Con búsqueda: "Resultados · N" -->
-        <h2 class="antetitulo">Los 5 con mayor adherencia</h2>
+      <!-- Antes de buscar: invita a buscar (no hay sugerencias automáticas) -->
+      <section class="vacio">
+        <span class="vacio__icono"><svg class="icono" width="32" height="32" aria-hidden="true"><use href="#buscar"/></svg></span>
+        <h2 class="titulo">Buscá con qué reemplazarlo</h2>
+        <p class="sub texto-14">Te mostramos cuánto comer y qué tan parecido es a lo de tu plan.</p>
+      </section>
+
+      <!-- Después de buscar: se oculta el bloque de arriba y se muestran los resultados -->
+      <div class="columna gap-2xs" hidden>
+        <h2 class="antetitulo">Resultados · —</h2>
         <p class="sub texto-12">Cantidad calculada para tu plan. El % es la adherencia: qué tan bien reproduce lo planificado.</p>
       </div>
 
       <!-- Opciones: vienen del algoritmo de equivalencia (pendiente). data-nivel="equivalente" | "parcial" | "no" -->
-      <div class="reemplazos" role="radiogroup" aria-label="Opciones para reemplazar">
+      <div class="reemplazos" role="radiogroup" aria-label="Opciones para reemplazar" hidden>
         <button class="reemplazo" type="button" role="radio" aria-checked="false" data-nivel="equivalente">
           <span class="radio"></span>
           <span class="crece columna gap-2xs">
