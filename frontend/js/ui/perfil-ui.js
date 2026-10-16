@@ -6,18 +6,10 @@
    Es un módulo: necesita abrirse con servidor (localhost), no desde el disco.
    ========================================================== */
 import { supabase } from '../data/supabase.js';
-
-const LOGIN = '../../index.html';
-const PANTALLA_COACH = '../coach/clientes.html';
+import { cerrarSesion, exigirRol } from '../data/sesion.js';
+import { iniciales, nombreDe } from '../utils/texto.js';
 
 const el = (id) => document.getElementById(id);
-
-// "benja.blason" → "BB"; "martina" → "MA"
-function iniciales(usuario) {
-  const partes = usuario.split(/[._]+/).filter(Boolean);
-  const letras = partes.length > 1 ? partes[0][0] + partes[1][0] : usuario.slice(0, 2);
-  return letras.toUpperCase();
-}
 
 function mostrarError(texto) {
   el('perfil-usuario').textContent = 'Tu perfil';
@@ -26,7 +18,7 @@ function mostrarError(texto) {
 }
 
 function mostrarCuenta(perfil) {
-  const usuario = perfil.username || perfil.email.split('@')[0];
+  const usuario = nombreDe(perfil);
   el('perfil-usuario').textContent = usuario;
   el('perfil-iniciales').textContent = iniciales(usuario);
   el('codigo-cliente').textContent = perfil.client_code;
@@ -47,7 +39,7 @@ async function mostrarCoach(coachId) {
     mostrarError('No se pudo cargar el coach. Volvé a abrir la pantalla.');
     return;
   }
-  const usuario = coach.username || coach.email.split('@')[0];
+  const usuario = nombreDe(coach);
   el('coach-usuario').textContent = usuario;
   el('coach-iniciales').textContent = iniciales(usuario);
   el('coach-vinculado').hidden = false;
@@ -67,30 +59,14 @@ el('copiar-codigo').addEventListener('click', async () => {
   setTimeout(() => { el('copiar-texto').textContent = 'Copiar'; }, 2000);
 });
 
-el('cerrar-sesion').addEventListener('click', async () => {
-  await supabase.auth.signOut();
-  window.location.href = LOGIN;
-});
+el('cerrar-sesion').addEventListener('click', cerrarSesion);
 
 async function cargar() {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) {
-    window.location.href = LOGIN;
-    return;
-  }
-
-  const { data: perfil, error } = await supabase
-    .from('profiles')
-    .select('username, email, role, client_code, coach_id')
-    .eq('id', session.user.id)
-    .single();
-
-  if (error || !perfil) {
+  const cuenta = await exigirRol('alumno', 'username, email, client_code, coach_id');
+  if (!cuenta) return;
+  const { perfil } = cuenta;
+  if (!perfil) {
     mostrarError('No se pudo cargar tu perfil. Revisá tu conexión y volvé a abrir la pantalla.');
-    return;
-  }
-  if (perfil.role !== 'alumno') {
-    window.location.href = PANTALLA_COACH;
     return;
   }
 

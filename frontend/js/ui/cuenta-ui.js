@@ -5,13 +5,8 @@
    Es un módulo: necesita abrirse con servidor (localhost), no desde el disco.
    ========================================================== */
 import { supabase } from '../data/supabase.js';
+import { PANTALLAS } from '../data/sesion.js';
 
-// Rutas armadas desde este archivo (js/ui/), no desde la URL de la página:
-// así funcionan aunque el servidor abra el login desde otra ruta
-const DESTINO = {
-  alumno: new URL('../../pages/alumno/dashboard.html', import.meta.url).href,
-  coach: new URL('../../pages/coach/clientes.html', import.meta.url).href,
-};
 const FORMATO_USUARIO = /^[a-z0-9._]{3,30}$/;
 
 const form = document.querySelector('.form-cuenta');
@@ -150,7 +145,7 @@ form.addEventListener('submit', async (evento) => {
     }
 
     if (data.session) {
-      window.location.href = DESTINO[rol];
+      window.location.href = PANTALLAS[rol];
       return;
     }
 

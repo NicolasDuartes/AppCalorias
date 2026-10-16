@@ -4,13 +4,7 @@
    Es un módulo: necesita abrirse con servidor (localhost), no desde el disco.
    ========================================================== */
 import { supabase } from '../data/supabase.js';
-
-// Rutas armadas desde este archivo (js/ui/), no desde la URL de la página:
-// así funcionan aunque el servidor abra el login desde otra ruta
-const DESTINO = {
-  alumno: new URL('../../pages/alumno/dashboard.html', import.meta.url).href,
-  coach: new URL('../../pages/coach/clientes.html', import.meta.url).href,
-};
+import { PANTALLAS } from '../data/sesion.js';
 
 const form = document.querySelector('.form-login');
 const campoCorreo = form.elements.correo;
@@ -42,7 +36,7 @@ async function irSegunRol(userId) {
     mostrarMensaje('Entraste, pero no se pudo cargar tu perfil. Volvé a probar en unos minutos.');
     return;
   }
-  window.location.href = DESTINO[perfil.role] || DESTINO.alumno;
+  window.location.href = PANTALLAS[perfil.role] || PANTALLAS.alumno;
 }
 
 function textoDeError(error) {

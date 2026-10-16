@@ -13,7 +13,10 @@ frontend/
 │       └── cuenta.css         # Login y registro
 ├── js/
 │   ├── data/
-│   │   └── supabase.js        # Cliente de Supabase
+│   │   ├── supabase.js        # Cliente de Supabase
+│   │   └── sesion.js          # Quién está logueado: exigirRol(), cerrarSesion() y rutas de cada rol
+│   ├── utils/
+│   │   └── texto.js           # nombreDe() e iniciales() de una cuenta
 │   └── ui/                    # Un archivo por pantalla
 │       ├── login-ui.js        # index.html
 │       ├── cuenta-ui.js       # registro.html

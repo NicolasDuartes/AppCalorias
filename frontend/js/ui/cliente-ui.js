@@ -7,20 +7,13 @@
    Es un módulo: necesita abrirse con servidor (localhost), no desde el disco.
    ========================================================== */
 import { supabase } from '../data/supabase.js';
+import { exigirRol } from '../data/sesion.js';
+import { iniciales, nombreDe } from '../utils/texto.js';
 
-const LOGIN = '../../index.html';
 const LISTA = 'clientes.html';
-const PANTALLA_ALUMNO = '../alumno/dashboard.html';
 const CLAVE_GUARDADA = 'clienteActual';
 
 const el = (id) => document.getElementById(id);
-
-// "benja.blason" → "BB"; "martina" → "MA"
-function iniciales(usuario) {
-  const partes = usuario.split(/[._]+/).filter(Boolean);
-  const letras = partes.length > 1 ? partes[0][0] + partes[1][0] : usuario.slice(0, 2);
-  return letras.toUpperCase();
-}
 
 function mostrarMensaje(nodo, texto) {
   nodo.textContent = texto;
@@ -46,14 +39,11 @@ function clienteNoDisponible() {
 }
 
 async function iniciar() {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) {
-    window.location.href = LOGIN;
-    return;
-  }
-  const { data: yo } = await supabase.from('profiles').select('role').eq('id', session.user.id).single();
-  if (yo?.role !== 'coach') {
-    window.location.href = PANTALLA_ALUMNO;
+  const cuenta = await exigirRol('coach');
+  if (!cuenta) return;
+  if (!cuenta.perfil) {
+    el('cliente-usuario').textContent = 'Cliente';
+    mostrarMensaje(el('mensaje-cliente'), 'No se pudo cargar tu cuenta. Revisá tu conexión y volvé a abrir la pantalla.');
     return;
   }
 
@@ -68,7 +58,7 @@ async function iniciar() {
     .from('profiles')
     .select('id, username, email, client_code')
     .eq('id', id)
-    .eq('coach_id', session.user.id)
+    .eq('coach_id', cuenta.usuarioId)
     .maybeSingle();
   if (error) {
     el('cliente-usuario').textContent = 'Cliente';
@@ -80,7 +70,7 @@ async function iniciar() {
     return;
   }
 
-  const usuario = cliente.username || cliente.email.split('@')[0];
+  const usuario = nombreDe(cliente);
   document.title = `${usuario} · Coach`;
   el('cliente-usuario').textContent = usuario;
   el('cliente-iniciales').textContent = iniciales(usuario);

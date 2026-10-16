@@ -4,6 +4,10 @@
    (Hoy, Ayer o la fecha) y abre el calendario del sistema desde el título.
    Por ahora solo cambia la fecha: los datos del día todavía son de ejemplo.
    ========================================================== */
+import { exigirRol } from '../data/sesion.js';
+
+// Solo para alumnos: sin sesión va al login y un coach va a su panel
+exigirRol('alumno');
 
 const DIAS = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
 const MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];

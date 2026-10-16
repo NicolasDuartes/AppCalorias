@@ -10,7 +10,8 @@ sigue. Para el detalle de cada parte, ver los documentos de la tabla.
 | `frontend/` | La app: HTML, CSS y JS sin frameworks ni build | [Leemewacho.md](Leemewacho.md) (árbol de archivos) |
 | `frontend/css/` | Tokens, componentes y estilos por sección | [DESIGN.md](DESIGN.md) |
 | `frontend/js/ui/` | Un archivo por pantalla que maneja su interacción | Comentario al principio de cada archivo |
-| `frontend/js/data/supabase.js` | Cliente de Supabase que usan las pantallas | — |
+| `frontend/js/data/` | Cliente de Supabase y `sesion.js` (sesión y rol de cada pantalla) | — |
+| `frontend/js/utils/` | Funciones chicas que comparten las pantallas | — |
 | `supabase/` | Migraciones, tests y reversiones de la base | [supabase/README.md](supabase/README.md), [supabase/ESQUEMA.md](supabase/ESQUEMA.md) |
 | `docs/database/` | Explicación de las tablas del plan y del registro diario | [EXPLICACION_TABLAS_SUPABASE.md](docs/database/EXPLICACION_TABLAS_SUPABASE.md) |
 
@@ -41,6 +42,9 @@ rutas de las páginas son relativas a esa carpeta.
 - Limpieza: fuera `backend/`, `md entendimiento/`, las maquetas viejas de
   `docs/design/`, el JS que ninguna pantalla cargaba (calculadora, tabla de
   porciones, equivalencias viejas) y su test roto, y el CSS sin usar.
+- Código ordenado: la sesión y el rol se verifican en un solo lugar
+  (`sesion.js`); el dashboard del alumno ya pide sesión; los íconos de todas
+  las pantallas salen de la hoja de íconos de cada página.
 - Perfil del coach: @usuario, email, cantidad de clientes y "Cerrar
   sesión"; el botón "Perfil" de la barra del coach ya lleva ahí.
 - Comidas del alumno (solo diseño): 4 tarjetas que se abren de a una, con

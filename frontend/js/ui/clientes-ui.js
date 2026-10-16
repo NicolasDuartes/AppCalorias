@@ -5,9 +5,9 @@
    Es un módulo: necesita abrirse con servidor (localhost), no desde el disco.
    ========================================================== */
 import { supabase } from '../data/supabase.js';
+import { exigirRol } from '../data/sesion.js';
+import { iniciales, nombreDe } from '../utils/texto.js';
 
-const LOGIN = '../../index.html';
-const PANTALLA_ALUMNO = '../alumno/dashboard.html';
 const FORMATO_ID = /^NF-\d{4}-[A-Z]{2}$/;
 const COLORES_AVATAR = ['avatar--azul', 'avatar--naranja'];
 
@@ -19,17 +19,6 @@ const campoId = el('id-cliente');
 const botonAnadir = el('boton-anadir');
 
 let clientes = [];
-
-// "benja.blason" → "BB"; "martina" → "MA"
-function iniciales(usuario) {
-  const partes = usuario.split(/[._]+/).filter(Boolean);
-  const letras = partes.length > 1 ? partes[0][0] + partes[1][0] : usuario.slice(0, 2);
-  return letras.toUpperCase();
-}
-
-function nombreDe(perfil) {
-  return perfil.username || perfil.email.split('@')[0];
-}
 
 function mostrarMensaje(nodo, texto, tipo = 'error') {
   nodo.textContent = texto;
@@ -142,21 +131,14 @@ formAnadir.addEventListener('submit', async (evento) => {
 
 // ---------- Inicio ----------
 async function iniciar() {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) {
-    window.location.href = LOGIN;
+  const cuenta = await exigirRol('coach');
+  if (!cuenta) return;
+  if (!cuenta.perfil) {
+    el('cargando-clientes').hidden = true;
+    mostrarMensaje(el('mensaje-clientes'), 'No se pudo cargar tu cuenta. Revisá tu conexión y volvé a abrir la pantalla.');
     return;
   }
-  const { data: perfil } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', session.user.id)
-    .single();
-  if (perfil?.role !== 'coach') {
-    window.location.href = PANTALLA_ALUMNO;
-    return;
-  }
-  await cargarClientes(session.user.id);
+  await cargarClientes(cuenta.usuarioId);
 
   // Al volver de eliminar un cliente (cliente.html manda #eliminado=usuario)
   const eliminado = new URLSearchParams(window.location.hash.slice(1)).get('eliminado');

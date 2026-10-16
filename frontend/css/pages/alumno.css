@@ -516,9 +516,10 @@
   background: transparent;
 }
 
-.vaso path { fill: var(--blanco); stroke: var(--trazo); }
+/* El vaso se dibuja con <use>: el relleno y el borde se heredan del <svg> */
+.vaso svg { fill: var(--blanco); stroke: var(--trazo); }
 
-.vaso[aria-pressed="true"] path { fill: var(--agua); stroke: var(--agua-borde); }
+.vaso[aria-pressed="true"] svg { fill: var(--agua); stroke: var(--agua-borde); }
 
 .mensaje-perfil {
   padding: var(--espacio-m) var(--espacio-m);
