@@ -53,12 +53,6 @@
 
 .btn--secundario:hover { color: var(--tinta); }
 
-.btn--contorno {
-  background: transparent;
-  color: var(--tinta);
-  border: 1.5px solid var(--borde-fuerte);
-}
-
 .btn--suave { background: var(--verde-claro); color: var(--verde); }
 
 .btn--punteado {
@@ -107,21 +101,6 @@
 
 .btn-accion--peligro { color: var(--rojo); }
 
-.btn-cuadrado {
-  width: 44px;
-  height: 44px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--borde-fuerte);
-  border-radius: var(--radio-fila);
-  background: var(--blanco);
-  color: var(--tinta);
-}
-
-.btn-cuadrado[aria-pressed="true"] { border-color: var(--verde); background: var(--verde); color: var(--blanco); }
-
 .btn-translucido {
   min-height: 44px;
   flex-shrink: 0;
@@ -159,10 +138,6 @@
 
 .card--borde-verde {
   border: 2px solid var(--verde);
-}
-
-.card--punteada {
-  border: 1.5px dashed var(--borde-punteado);
 }
 
 .card--fija {
@@ -307,8 +282,6 @@
 
 .tag--naranja { background: var(--naranja-claro); color: var(--naranja-oscuro); }
 
-.tag--azul { background: var(--azul-claro); color: var(--azul-oscuro); }
-
 .nota {
   padding: var(--espacio-s) var(--espacio-m);
   border-radius: var(--radio-chico);
@@ -339,47 +312,6 @@
   color: var(--verde);
 }
 
-.lista-blanca {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  border-radius: var(--radio-lista);
-  background: var(--blanco);
-}
-
-.lista-blanca > li {
-  display: flex;
-  align-items: center;
-  gap: var(--espacio-m);
-  padding: var(--espacio-m) var(--espacio-m) var(--espacio-m) var(--espacio-l);
-}
-
-.lista-blanca > li + li { border-top: 1px solid var(--gris-suave); }
-
-.lista-blanca__link {
-  flex: 1;
-  min-width: 0;
-  min-height: 44px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: var(--espacio-2xs);
-  color: var(--tinta);
-  text-decoration: none;
-}
-
-.lista-blanca__link:hover { color: var(--tinta); }
-
-.lista-datos > div {
-  display: flex;
-  justify-content: space-between;
-  padding: var(--espacio-m) 0;
-  border-top: 1px solid var(--gris-suave);
-  font-size: 15px;
-}
-
-.lista-datos > div > span:last-child { font-weight: 600; }
-
 .avatar--perfil { width: 72px; height: 72px; font-size: 26px; }
 
 .avatar--chico { width: 48px; height: 48px; font-size: 17px; }
@@ -389,18 +321,6 @@
 .fila-link--punteada { border: 1.5px dashed var(--borde-punteado); }
 
 .grupo { overflow: hidden; border-radius: var(--radio-lista); background: var(--blanco); }
-
-.grupo__extra {
-  min-height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--espacio-s);
-  border-top: 1px solid var(--gris-suave);
-  font-size: 14px;
-  font-weight: 600;
-  text-decoration: none;
-}
 
 /* ---------- Formularios: campos, buscador, segmentado, chips, pestañas ---------- */
 .campo {
@@ -447,8 +367,6 @@
 .input--con-accion { padding-right: var(--espacio-xs); }
 
 .input--con-accion .btn-accion { color: var(--gris); }
-
-.input--fuerte { border: 1.5px solid var(--tinta); }
 
 .buscador {
   height: 52px;
@@ -575,32 +493,6 @@
 }
 
 .input--angosto { width: 110px; flex-shrink: 0; }
-
-.segmentado--pista { background: var(--pista); }
-
-.contador {
-  display: flex;
-  align-items: center;
-  gap: var(--espacio-xs);
-  padding: var(--espacio-xs);
-  border-radius: var(--radio-medio);
-  background: var(--fondo);
-}
-
-.contador button {
-  width: 44px;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  border-radius: var(--radio-chico);
-  background: var(--blanco);
-}
-
-.contador output { min-width: 40px; text-align: center; font-family: var(--fuente-titulos); font-size: 20px; font-weight: 600; }
-
-.chip--ancho { flex: 1; height: 44px; padding: 0 6px; border-radius: var(--radio-chico); }
 
 .chip--punteado { border: 1.5px dashed var(--borde-punteado); background: transparent; color: var(--verde); }
 
@@ -1205,31 +1097,7 @@ summary.opcion::-webkit-details-marker { display: none; }
 .link-claro { color: var(--verde-brillante); font-size: 14px; font-weight: 600; }
 
 .link-claro:hover { color: var(--blanco); }
-
-
-/* ---------- Lista de lectura y resultados de alimento (los usan coach y alumno) ---------- */
-.resultado-alimento {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: var(--espacio-xs);
-  padding: var(--espacio-m) var(--espacio-m);
-  border: 2px solid transparent;
-  border-radius: var(--radio-medio);
-  background: var(--blanco);
-  text-align: left;
-}
-
-.resultado-alimento[aria-selected="true"] {
-  border-color: var(--verde);
-}
-
-.resultado-alimento__linea {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--espacio-s);
-}
+/* ---------- Lista de lectura (la usan coach y alumno) ---------- */
 
 .item-lectura {
   display: flex;

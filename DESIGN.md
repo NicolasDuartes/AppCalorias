@@ -74,16 +74,16 @@ dos, en `components.css`.
 | `--gris-oscuro` / `--gris` / `--gris-medio` / `--gris-claro` | `#4A554E` / `#5B665F` / `#8A948D` / `#B9C4BD` | Texto secundario, de más a menos importante |
 | `--borde` / `--borde-fuerte` / `--borde-punteado` | `#E3E7E1` / `#D6DDD7` / `#AEB8B1` | Bordes de tarjeta, de input y punteados |
 | `--pista` / `--trazo` | `#E6EBE5` / `#C5CEC6` | Fondo de barras y anillos; marcas y vasos vacíos |
-| `--gris-suave`, `--gris-tag`, `--fondo-subida`, `--fondo-oscurecido`, `--deshabilitado` | | Separadores, tags grises, zonas y estados apagados |
+| `--gris-suave`, `--gris-tag`, `--fondo-oscurecido`, `--deshabilitado` | | Separadores, tags grises, zonas y estados apagados |
 
 **Semánticos**
 
 | Token | Uso |
 |---|---|
-| `--azul`, `--azul-claro`, `--azul-oscuro` | Información, tags azules |
+| `--azul`, `--azul-claro`, `--azul-oscuro` | Información, avatares azules |
 | `--naranja`, `--naranja-claro`, `--naranja-oscuro` | Avisos y restricciones ("Sin lactosa") |
 | `--violeta` | Grasas |
-| `--rojo`, `--rojo-borde`, `--terracota` | Errores y acciones de borrar |
+| `--rojo`, `--rojo-borde` | Errores y acciones de borrar |
 | `--agua`, `--agua-borde` | Vasos de agua |
 
 **Macronutrientes**: siempre por su token, nunca por el color directo.
@@ -186,12 +186,12 @@ las variables CSS no funcionan dentro de un media query.
 
 | Grupo | Clases | Para qué |
 |---|---|---|
-| Botones | `.btn` + `--primario`, `--secundario`, `--suave`, `--contorno`, `--punteado`, `--texto`, `--peligro`, `--peligro-texto`; tamaños `--chico` (44 px) y `--alto` (56 px) | Acciones. Uno solo `--primario` por pantalla |
-| Botones de ícono | `.btn-icono` (44 × 44 con borde), `.btn-accion` (dentro de inputs y filas), `.btn-cuadrado`, `.btn-translucido` | Acciones sin texto |
-| Tarjetas | `.card` + `--oscura`, `--punteada`, `--borde-verde`, `--fija`; `.card__fila` | Bloques de contenido |
-| Filas y listas | `.fila-link` (+ `--punteada`, `--borde`), `.lista`, `.lista-blanca`, `.grupo`, `.tile`, `.chevron` | Ítems que llevan a otra pantalla |
-| Avatares y etiquetas | `.avatar` (+ color y tamaño), `.tag` (+ `--verde`, `--naranja`, `--azul`, `--gris`), `.chip`, `.preferencia` | Personas, estados y filtros |
-| Formularios | `.campo`, `.campo__etiqueta`, `.input` (+ `--alto`, `--derecha`, `--con-accion`, `--angosto`, `--fuerte`), `.buscador`, `.casilla`, `.textarea` | Carga de datos |
+| Botones | `.btn` + `--primario`, `--secundario`, `--suave`, `--punteado`, `--texto`, `--peligro`, `--peligro-texto`; tamaños `--chico` (44 px) y `--alto` (56 px) | Acciones. Uno solo `--primario` por pantalla |
+| Botones de ícono | `.btn-icono` (44 × 44 con borde), `.btn-accion` (dentro de inputs y filas), `.btn-translucido` | Acciones sin texto |
+| Tarjetas | `.card` + `--oscura`, `--borde-verde`, `--fija`; `.card__fila` | Bloques de contenido |
+| Filas y listas | `.fila-link` (+ `--punteada`, `--borde`), `.lista`, `.grupo`, `.tile`, `.chevron` | Ítems que llevan a otra pantalla |
+| Avatares y etiquetas | `.avatar` (+ color y tamaño), `.tag` (+ `--verde`, `--naranja`, `--gris`), `.chip`, `.preferencia` | Personas, estados y filtros |
+| Formularios | `.campo`, `.campo__etiqueta`, `.input` (+ `--alto`, `--derecha`, `--con-accion`, `--angosto`, `--cantidad`), `.buscador`, `.casilla`, `.textarea` | Carga de datos |
 | Selección | `.segmentado`, `.pestanas`, `.opcion` / `.opciones`, `.radio`, `.desplegable`, `.rango` | Elegir entre opciones |
 | Acordeón | `.acordeon` (`<details>` / `<summary>`, sin JS) | Contenido que se abre y se cierra |
 | Datos | `.macros`, `.macro`, `.barra` (+ `.p`, `.c`, `.g`), `.punto--*`, `.reparto`, `.resultado`, `.mini-dato` | Kcal, macros y avance |

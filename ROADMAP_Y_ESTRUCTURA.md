@@ -12,9 +12,7 @@ sigue. Para el detalle de cada parte, ver los documentos de la tabla.
 | `frontend/js/ui/` | Un archivo por pantalla que maneja su interacción | Comentario al principio de cada archivo |
 | `frontend/js/data/supabase.js` | Cliente de Supabase que usan las pantallas | — |
 | `supabase/` | Migraciones, tests y reversiones de la base | [supabase/README.md](supabase/README.md), [supabase/ESQUEMA.md](supabase/ESQUEMA.md) |
-| `tests/` | Pruebas del frontend | — |
-| `backend/` | Servicios viejos que hoy **no usa nadie** (ver pendientes) | — |
-| `docs/`, `md entendimiento/` | Informes y explicaciones anteriores | — |
+| `docs/database/` | Explicación de las tablas del plan y del registro diario | [EXPLICACION_TABLAS_SUPABASE.md](docs/database/EXPLICACION_TABLAS_SUPABASE.md) |
 
 **Para levantar la app:** `cd frontend` y `npx serve`, y abrir
 `http://localhost:3000/`. Tiene que servirse desde `frontend/`, porque las
@@ -40,6 +38,9 @@ rutas de las páginas son relativas a esa carpeta.
 - Dashboard del alumno: título que cambia con el día (Hoy, Ayer o la fecha),
   rueda de días con el elegido al centro, calendario y tarjeta de calorías
   compacta.
+- Limpieza: fuera `backend/`, `md entendimiento/`, las maquetas viejas de
+  `docs/design/`, el JS que ninguna pantalla cargaba (calculadora, tabla de
+  porciones, equivalencias viejas) y su test roto, y el CSS sin usar.
 - Perfil del coach: @usuario, email, cantidad de clientes y "Cerrar
   sesión"; el botón "Perfil" de la barra del coach ya lleva ahí.
 - Comidas del alumno (solo diseño): 4 tarjetas que se abren de a una, con
@@ -77,10 +78,3 @@ rutas de las páginas son relativas a esa carpeta.
 - Preferencias del alumno en una tabla propia, visibles para el coach.
 - Criterios del coach (rangos, ajustes) en una tabla que solo él lea.
 - Restringir el alta de cuentas de coach (invitación o aprobación).
-
-### Limpieza
-
-- `backend/`: el frontend usa Supabase directo; decidir si se borra o si se
-  mueven ahí las llamadas a la base.
-- `frontend/js/utils/equivalences.js` y `storage.js` no los usa ninguna
-  pantalla; quedan por si sirven para la carga de alimentos.

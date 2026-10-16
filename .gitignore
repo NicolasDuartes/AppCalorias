@@ -1,32 +1,14 @@
-# OS files
+# Sistema operativo
 .DS_Store
 Thumbs.db
 desktop.ini
 
-# IDE files
+# Editores
 .vscode/
 .idea/
 *.swp
 *.swo
 
-# Logs
-*.log
-
-# Python cache
-__pycache__/
-*.pyc
-*.pyo
-
-# Temporary / legacy directories (no son parte del producto)
-.agents/
-scratch/
-
-# Legacy source directories (reemplazadas por src/)
-# Mantener como referencia pero no trackear en git
-# html interfases/
-# md entendimiento/
-# js/
-# css/
-# pages/
+# Dependencias y logs
 node_modules/
-frontend_backup/
+*.log

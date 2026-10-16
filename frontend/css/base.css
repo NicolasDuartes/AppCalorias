@@ -15,7 +15,6 @@
   /* Neutros */
   --fondo: #F3F5F1;
   --fondo-app: #DDE3DC;          /* línea debajo de las pestañas */
-  --fondo-subida: #F7F8F5;
   --fondo-oscurecido: #7E8781;
   --blanco: #FFFFFF;
   --tinta: #17211C;
@@ -42,7 +41,6 @@
   --violeta: #A8467F;
   --rojo: #8A3B2E;
   --rojo-borde: #E7C9C2;
-  --terracota: #B4461A;
   --agua: #7FB3E8;
   --agua-borde: #2F6FB5;
 
@@ -288,8 +286,6 @@ legend { padding: 0; }
 }
 
 .antetitulo--verde { color: var(--verde); font-size: 13px; }
-
-.separador { height: 1px; background: var(--borde); }
 
 .codigo-id { font-family: var(--fuente-titulos); font-size: 26px; font-weight: 700; letter-spacing: 0.06em; }
 

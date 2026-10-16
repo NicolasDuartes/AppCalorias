@@ -520,29 +520,6 @@
 
 .vaso[aria-pressed="true"] path { fill: var(--agua); stroke: var(--agua-borde); }
 
-.accion-rapida {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--espacio-s);
-  padding: var(--espacio-m);
-  border: 1px solid var(--borde);
-  border-radius: 18px;
-  background: var(--blanco);
-  text-align: left;
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 1.25;
-}
-
-.accion-rapida--oscura { border-color: var(--tinta); background: var(--tinta); color: var(--blanco); }
-
-.btn-icono--favorito { color: var(--terracota); }
-
-.btn-icono--favorito:hover { color: var(--terracota); }
-
-.btn-icono--favorito[aria-pressed="true"] svg { fill: currentColor; }
-
 .mensaje-perfil {
   padding: var(--espacio-m) var(--espacio-m);
   border: 1px solid var(--rojo-borde);
