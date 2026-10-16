@@ -40,6 +40,8 @@ rutas de las páginas son relativas a esa carpeta.
 - Dashboard del alumno: título que cambia con el día (Hoy, Ayer o la fecha),
   rueda de días con el elegido al centro, calendario y tarjeta de calorías
   compacta.
+- Perfil del coach: @usuario, email, cantidad de clientes y "Cerrar
+  sesión"; el botón "Perfil" de la barra del coach ya lleva ahí.
 - Comidas del alumno (solo diseño): 4 tarjetas que se abren de a una, con
   reemplazo por alimento, y las pantallas de cantidad, reemplazo, agregar,
   crear y editar alimento.
