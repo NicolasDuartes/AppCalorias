@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Editar alimento · Alumno</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../../css/base.css">
+  <link rel="stylesheet" href="../../css/components.css">
+  <link rel="stylesheet" href="../../css/pages/alumno.css">
+</head>
+<body>
+  <!-- Iconos de esta página: se dibujan con <svg class="icono"><use href="#nombre"/></svg> -->
+  <svg class="sprite" aria-hidden="true">
+    <symbol id="volver" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></symbol>
+    <symbol id="hecho" viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></symbol>
+    <symbol id="alerta" viewBox="0 0 24 24"><path d="M12 4 2.5 20h19z"/><path d="M12 10v4M12 17h.01"/></symbol>
+  </svg>
+  <!-- Se abre con "Editar alimento" en la pantalla de cantidad, para corregir un alimento mal cargado. Los campos vienen llenos con los datos del alimento -->
+  <div class="pantalla">
+    <main class="contenido">
+      <header class="encabezado">
+        <a class="btn-icono" href="cantidad.html" aria-label="Volver"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#volver"/></svg></a>
+        <div class="encabezado__textos">
+          <span class="antetitulo antetitulo--verde">Editar alimento</span>
+          <h1 class="titulo">Alimento</h1>
+        </div>
+      </header>
+
+      <form class="columna gap-l" id="form-alimento" novalidate>
+        <label class="campo">
+          <span class="campo__etiqueta campo__etiqueta--fuerte">Nombre</span>
+          <span class="input"><input type="text" name="nombre" autocomplete="off" placeholder="Ej.: Galletitas de avena" required></span>
+        </label>
+
+        <label class="campo">
+          <span class="campo__etiqueta campo__etiqueta--fuerte">Marca <span class="texto-gris">(opcional)</span></span>
+          <span class="input"><input type="text" name="marca" autocomplete="off" placeholder="Ej.: La Serenísima"></span>
+        </label>
+
+        <!-- Importa para las equivalencias: se compara crudo con crudo y cocido con cocido -->
+        <fieldset class="campo">
+          <legend class="campo__etiqueta campo__etiqueta--fuerte">Cómo se pesa</legend>
+          <div class="segmentado" role="radiogroup" aria-label="Cómo se pesa">
+            <button type="button" role="radio" aria-checked="false">Crudo</button>
+            <button type="button" role="radio" aria-checked="false">Cocido</button>
+            <button type="button" role="radio" aria-checked="true">Listo para comer</button>
+          </div>
+        </fieldset>
+
+        <fieldset class="campo">
+          <legend class="campo__etiqueta campo__etiqueta--fuerte">Valores cada 100 g</legend>
+          <p class="sub texto-12">Copialos de la etiqueta, de la columna “por 100 g”.</p>
+          <div class="grilla-2 gap-s">
+            <label class="valor-campo">
+              <span class="valor-campo__nombre"><span class="punto punto--kcal"></span>Calorías</span>
+              <span class="valor-campo__dato"><input type="text" inputmode="decimal" name="kcal" placeholder="0" required><span class="unidad">kcal</span></span>
+            </label>
+            <label class="valor-campo">
+              <span class="valor-campo__nombre"><span class="punto punto--p"></span>Proteínas</span>
+              <span class="valor-campo__dato"><input type="text" inputmode="decimal" name="p" placeholder="0" required><span class="unidad">g</span></span>
+            </label>
+            <label class="valor-campo">
+              <span class="valor-campo__nombre"><span class="punto punto--c"></span>Carbohidratos</span>
+              <span class="valor-campo__dato"><input type="text" inputmode="decimal" name="c" placeholder="0" required><span class="unidad">g</span></span>
+            </label>
+            <label class="valor-campo">
+              <span class="valor-campo__nombre"><span class="punto punto--g"></span>Grasas</span>
+              <span class="valor-campo__dato"><input type="text" inputmode="decimal" name="g" placeholder="0" required><span class="unidad">g</span></span>
+            </label>
+          </div>
+          <!-- Control: los macros (4, 4 y 9 kcal por gramo) contra las calorías cargadas. Se muestra uno de los dos -->
+          <p class="mensaje fila gap-s texto-12" data-tipo="ok" role="status" hidden><svg class="icono icono--grueso" width="16" height="16" aria-hidden="true"><use href="#hecho"/></svg><span>Los macros suman — kcal: coincide con las calorías.</span></p>
+          <p class="aviso texto-12" role="status" hidden><svg class="icono" width="16" height="16" aria-hidden="true"><use href="#alerta"/></svg><span>Los macros suman — kcal y cargaste —. Revisá que los valores sean cada 100 g.</span></p>
+        </fieldset>
+
+        <div class="grupo grupo--filas">
+          <button class="interruptor" type="button" role="switch" aria-checked="false" aria-controls="peso-unidad">
+            <span class="crece columna gap-2xs">
+              <span class="texto-15">Se cuenta por unidades</span>
+              <span class="sub texto-12">Huevos, galletitas, frutas…</span>
+            </span>
+            <span class="interruptor__pista" aria-hidden="true"></span>
+          </button>
+          <!-- Visible solo con el interruptor activado -->
+          <label class="fila fila--entre tactil" id="peso-unidad" hidden>
+            <span class="texto-14 texto-gris">Peso de 1 unidad</span>
+            <span class="input input--derecha input--angosto"><input type="text" inputmode="decimal" name="gramosUnidad" placeholder="0"><span class="unidad">g</span></span>
+          </label>
+        </div>
+      </form>
+    </main>
+
+    <div class="pie pie--centrado pie--columna">
+      <!-- Dice qué falta mientras el botón está deshabilitado -->
+      <p class="nota-centrada">Revisá los datos y guardá los cambios.</p>
+      <button class="btn btn--primario" type="submit" form="form-alimento" disabled>Guardar cambios</button>
+    </div>
+  </div>
+</body>
+</html>

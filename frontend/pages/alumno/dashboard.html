@@ -12,6 +12,14 @@
   <link rel="stylesheet" href="../../css/pages/alumno.css">
 </head>
 <body>
+  <!-- Iconos de las tarjetas de comidas: se dibujan con <svg class="icono"><use href="#nombre"/></svg> -->
+  <svg class="sprite" aria-hidden="true">
+    <symbol id="hecho" viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></symbol>
+    <symbol id="reloj" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l2.5 2"/></symbol>
+    <symbol id="flecha-abajo" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="reemplazar" viewBox="0 0 24 24"><path d="M4 8h14M15 5l3 3-3 3M20 16H6M9 13l-3 3 3 3"/></symbol>
+    <symbol id="mas" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  </svg>
   <div class="pantalla">
     <main class="contenido contenido--compacto">
       <!-- Encabezado: el título cambia según el día elegido (Hoy, Ayer o la fecha); lo maneja js/ui/dashboard-ui.js -->
@@ -28,103 +36,193 @@
       <!-- Rueda de días: el día elegido queda siempre al centro (js/ui/dashboard-ui.js) -->
       <div class="dias" id="dias" aria-label="Días"></div>
 
-      <section class="card resumen-kcal" aria-label="Resumen de calorías: comiste 1.163 de 2.000 kcal">
+      <!-- Consumido vs. objetivo del día: los números y el anillo salen del plan y de lo registrado -->
+      <section class="card resumen-kcal" aria-label="Resumen de calorías del día">
         <div class="anillo">
           <svg width="104" height="104" viewBox="0 0 104 104" aria-hidden="true">
             <circle cx="52" cy="52" r="46" fill="none" stroke="var(--pista)" stroke-width="9"/>
-            <circle cx="52" cy="52" r="46" fill="none" stroke="var(--verde)" stroke-width="9" stroke-linecap="round" stroke-dasharray="168 289"/>
+            <!-- Avance: stroke-dasharray="<kcal comidas / objetivo × 289> 289"; queda oculto hasta que hay datos -->
+            <circle cx="52" cy="52" r="46" fill="none" stroke="var(--verde)" stroke-width="9" stroke-linecap="round" stroke-dasharray="0 289" hidden/>
           </svg>
-          <div class="anillo__centro"><span class="num anillo__numero">1.163</span><span class="anillo__texto">de 2.000 kcal</span></div>
+          <div class="anillo__centro"><span class="num anillo__numero">—</span><span class="anillo__texto">de — kcal</span></div>
         </div>
         <div class="resumen-kcal__datos">
           <div class="macro-linea">
-            <div class="dato-linea"><span class="dato-linea__nombre">Proteínas</span><span class="dato-linea__valor">68 / 120 g</span></div>
-            <div class="barra barra--fina"><span class="p" style="width: 57%"></span></div>
+            <div class="dato-linea"><span class="dato-linea__nombre">Proteínas</span><span class="dato-linea__valor">— / — g</span></div>
+            <div class="barra barra--fina"><span class="p" style="width: 0%"></span></div>
           </div>
           <div class="macro-linea">
-            <div class="dato-linea"><span class="dato-linea__nombre">Carbohidratos</span><span class="dato-linea__valor">142 / 230 g</span></div>
-            <div class="barra barra--fina"><span class="c" style="width: 62%"></span></div>
+            <div class="dato-linea"><span class="dato-linea__nombre">Carbohidratos</span><span class="dato-linea__valor">— / — g</span></div>
+            <div class="barra barra--fina"><span class="c" style="width: 0%"></span></div>
           </div>
           <div class="macro-linea">
-            <div class="dato-linea"><span class="dato-linea__nombre">Grasas</span><span class="dato-linea__valor">41 / 65 g</span></div>
-            <div class="barra barra--fina"><span class="g" style="width: 63%"></span></div>
+            <div class="dato-linea"><span class="dato-linea__nombre">Grasas</span><span class="dato-linea__valor">— / — g</span></div>
+            <div class="barra barra--fina"><span class="g" style="width: 0%"></span></div>
           </div>
         </div>
       </section>
 
-      <section class="columna gap-m" aria-labelledby="t-comidas">
+      <section class="columna gap-s" aria-labelledby="t-comidas">
         <div class="fila fila--entre fila--base">
           <h2 class="titulo" id="t-comidas">Comidas</h2>
-          <a class="fila gap-xs tactil negrita texto-14 sin-subrayado" href="plan.html">Ver mi plan<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></a>
+          <span class="sub">— de 4 hechas</span>
         </div>
 
-      <article class="comida">
-        <div class="fila">
-          <div class="crece columna"><h3 class="comida__titulo">Desayuno</h3><span class="sub">305 kcal · 8:10</span></div>
-          <a class="tile" href="agregar.html" aria-label="Agregar al desayuno"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></a>
+        <!-- Las 4 comidas del día. data-estado="hecha" muestra el ✓ y oculta "Lo comí" -->
+        <div class="comidas">
+        <details class="comida" name="comidas" data-estado="pendiente">
+          <summary class="comida__cabecera">
+            <span class="comida__estado">
+              <svg class="icono icono--grueso comida__icono-hecha" width="18" height="18" aria-hidden="true"><use href="#hecho"/></svg>
+              <svg class="icono comida__icono-pendiente" width="18" height="18" aria-hidden="true"><use href="#reloj"/></svg>
+            </span>
+            <span class="comida__textos">
+              <span class="comida__titulo">Desayuno</span>
+              <span class="comida__detalle">Plan · — · — alimentos</span>
+            </span>
+            <span class="comida__kcal">—<span class="unidad"> kcal</span></span>
+            <span class="comida__flecha"><svg class="icono" width="18" height="18" aria-hidden="true"><use href="#flecha-abajo"/></svg></span>
+          </summary>
+          <div class="comida__cuerpo">
+            <div class="reparto reparto--fino" aria-hidden="true"><span class="p"></span><span class="c"></span><span class="g"></span></div>
+            <span class="comida__macros">P — g · C — g · G — g</span>
+            <!-- Alimentos de la comida: una fila por alimento (vienen del plan y de la API de alimentos) -->
+            <div class="alimento-fila">
+              <a class="alimento-fila__nombre" href="cantidad.html" aria-label="Cambiar la cantidad del alimento">
+                <span class="alimento-fila__titulo">Alimento</span>
+                <span class="alimento-fila__linea">— kcal · P — · C — · G —</span>
+              </a>
+              <span class="alimento-fila__cantidad">—</span>
+              <a class="btn-reemplazar" href="reemplazar.html" aria-label="Reemplazar el alimento"><svg class="icono icono--grueso" width="20" height="20" aria-hidden="true"><use href="#reemplazar"/></svg></a>
+            </div>
+            <div class="comida__acciones">
+              <button class="btn btn--chico btn--primario comida__lo-comi" type="button">Lo comí</button>
+              <a class="btn btn--chico btn--secundario btn--verde" href="agregar.html"><svg class="icono icono--grueso" width="16" height="16" aria-hidden="true"><use href="#mas"/></svg>Agregar alimento</a>
+            </div>
+          </div>
+        </details>
+        <details class="comida" name="comidas" data-estado="pendiente">
+          <summary class="comida__cabecera">
+            <span class="comida__estado">
+              <svg class="icono icono--grueso comida__icono-hecha" width="18" height="18" aria-hidden="true"><use href="#hecho"/></svg>
+              <svg class="icono comida__icono-pendiente" width="18" height="18" aria-hidden="true"><use href="#reloj"/></svg>
+            </span>
+            <span class="comida__textos">
+              <span class="comida__titulo">Almuerzo</span>
+              <span class="comida__detalle">Plan · — · — alimentos</span>
+            </span>
+            <span class="comida__kcal">—<span class="unidad"> kcal</span></span>
+            <span class="comida__flecha"><svg class="icono" width="18" height="18" aria-hidden="true"><use href="#flecha-abajo"/></svg></span>
+          </summary>
+          <div class="comida__cuerpo">
+            <div class="reparto reparto--fino" aria-hidden="true"><span class="p"></span><span class="c"></span><span class="g"></span></div>
+            <span class="comida__macros">P — g · C — g · G — g</span>
+            <!-- Alimentos de la comida: una fila por alimento (vienen del plan y de la API de alimentos) -->
+            <div class="alimento-fila">
+              <a class="alimento-fila__nombre" href="cantidad.html" aria-label="Cambiar la cantidad del alimento">
+                <span class="alimento-fila__titulo">Alimento</span>
+                <span class="alimento-fila__linea">— kcal · P — · C — · G —</span>
+              </a>
+              <span class="alimento-fila__cantidad">—</span>
+              <a class="btn-reemplazar" href="reemplazar.html" aria-label="Reemplazar el alimento"><svg class="icono icono--grueso" width="20" height="20" aria-hidden="true"><use href="#reemplazar"/></svg></a>
+            </div>
+            <div class="comida__acciones">
+              <button class="btn btn--chico btn--primario comida__lo-comi" type="button">Lo comí</button>
+              <a class="btn btn--chico btn--secundario btn--verde" href="agregar.html"><svg class="icono icono--grueso" width="16" height="16" aria-hidden="true"><use href="#mas"/></svg>Agregar alimento</a>
+            </div>
+          </div>
+        </details>
+        <details class="comida" name="comidas" data-estado="pendiente">
+          <summary class="comida__cabecera">
+            <span class="comida__estado">
+              <svg class="icono icono--grueso comida__icono-hecha" width="18" height="18" aria-hidden="true"><use href="#hecho"/></svg>
+              <svg class="icono comida__icono-pendiente" width="18" height="18" aria-hidden="true"><use href="#reloj"/></svg>
+            </span>
+            <span class="comida__textos">
+              <span class="comida__titulo">Merienda</span>
+              <span class="comida__detalle">Plan · — · — alimentos</span>
+            </span>
+            <span class="comida__kcal">—<span class="unidad"> kcal</span></span>
+            <span class="comida__flecha"><svg class="icono" width="18" height="18" aria-hidden="true"><use href="#flecha-abajo"/></svg></span>
+          </summary>
+          <div class="comida__cuerpo">
+            <div class="reparto reparto--fino" aria-hidden="true"><span class="p"></span><span class="c"></span><span class="g"></span></div>
+            <span class="comida__macros">P — g · C — g · G — g</span>
+            <!-- Alimentos de la comida: una fila por alimento (vienen del plan y de la API de alimentos) -->
+            <div class="alimento-fila">
+              <a class="alimento-fila__nombre" href="cantidad.html" aria-label="Cambiar la cantidad del alimento">
+                <span class="alimento-fila__titulo">Alimento</span>
+                <span class="alimento-fila__linea">— kcal · P — · C — · G —</span>
+              </a>
+              <span class="alimento-fila__cantidad">—</span>
+              <a class="btn-reemplazar" href="reemplazar.html" aria-label="Reemplazar el alimento"><svg class="icono icono--grueso" width="20" height="20" aria-hidden="true"><use href="#reemplazar"/></svg></a>
+            </div>
+            <div class="comida__acciones">
+              <button class="btn btn--chico btn--primario comida__lo-comi" type="button">Lo comí</button>
+              <a class="btn btn--chico btn--secundario btn--verde" href="agregar.html"><svg class="icono icono--grueso" width="16" height="16" aria-hidden="true"><use href="#mas"/></svg>Agregar alimento</a>
+            </div>
+          </div>
+        </details>
+        <details class="comida" name="comidas" data-estado="pendiente">
+          <summary class="comida__cabecera">
+            <span class="comida__estado">
+              <svg class="icono icono--grueso comida__icono-hecha" width="18" height="18" aria-hidden="true"><use href="#hecho"/></svg>
+              <svg class="icono comida__icono-pendiente" width="18" height="18" aria-hidden="true"><use href="#reloj"/></svg>
+            </span>
+            <span class="comida__textos">
+              <span class="comida__titulo">Cena</span>
+              <span class="comida__detalle">Plan · — · — alimentos</span>
+            </span>
+            <span class="comida__kcal">—<span class="unidad"> kcal</span></span>
+            <span class="comida__flecha"><svg class="icono" width="18" height="18" aria-hidden="true"><use href="#flecha-abajo"/></svg></span>
+          </summary>
+          <div class="comida__cuerpo">
+            <div class="reparto reparto--fino" aria-hidden="true"><span class="p"></span><span class="c"></span><span class="g"></span></div>
+            <span class="comida__macros">P — g · C — g · G — g</span>
+            <!-- Alimentos de la comida: una fila por alimento (vienen del plan y de la API de alimentos) -->
+            <div class="alimento-fila">
+              <a class="alimento-fila__nombre" href="cantidad.html" aria-label="Cambiar la cantidad del alimento">
+                <span class="alimento-fila__titulo">Alimento</span>
+                <span class="alimento-fila__linea">— kcal · P — · C — · G —</span>
+              </a>
+              <span class="alimento-fila__cantidad">—</span>
+              <a class="btn-reemplazar" href="reemplazar.html" aria-label="Reemplazar el alimento"><svg class="icono icono--grueso" width="20" height="20" aria-hidden="true"><use href="#reemplazar"/></svg></a>
+            </div>
+            <div class="comida__acciones">
+              <button class="btn btn--chico btn--primario comida__lo-comi" type="button">Lo comí</button>
+              <a class="btn btn--chico btn--secundario btn--verde" href="agregar.html"><svg class="icono icono--grueso" width="16" height="16" aria-hidden="true"><use href="#mas"/></svg>Agregar alimento</a>
+            </div>
+          </div>
+        </details>
         </div>
-        <div class="renglones">
-          <!-- Alimentos: vienen de la API de alimentos (pendiente) -->
-          <div class="renglon"><span>Alimento</span><span>—</span></div>
-        </div>
-      </article>
-
-      <article class="comida">
-        <div class="fila">
-          <div class="crece columna"><h3 class="comida__titulo">Almuerzo</h3><span class="sub">541 kcal · 13:20</span></div>
-          <a class="tile" href="agregar.html" aria-label="Agregar al almuerzo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></a>
-        </div>
-        <div class="renglones">
-          <!-- Alimentos: vienen de la API de alimentos (pendiente) -->
-          <div class="renglon"><span>Alimento</span><span>—</span></div>
-        </div>
-      </article>
-
-      <article class="comida">
-        <div class="fila">
-          <div class="crece columna"><h3 class="comida__titulo">Merienda</h3><span class="sub">317 kcal · 17:45</span></div>
-          <a class="tile" href="agregar.html" aria-label="Agregar a la merienda"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></a>
-        </div>
-        <div class="renglones">
-          <!-- Alimentos: vienen de la API de alimentos (pendiente) -->
-          <div class="renglon"><span>Alimento</span><span>—</span></div>
-        </div>
-      </article>
-
-      <article class="comida comida--pendiente">
-        <div class="fila">
-          <div class="crece columna"><h3 class="comida__titulo">Cena</h3><span class="sub">Te quedan 837 kcal para hoy</span></div>
-          <span class="tag tag--verde">Plan · 545 kcal</span>
-        </div>
-        <div class="renglones renglones--caja">
-          <span class="antetitulo">Según tu plan</span>
-          <!-- Alimentos: vienen de la API de alimentos (pendiente) -->
-          <div class="renglon"><span>Alimento</span><span>—</span></div>
-        </div>
-        <div class="grilla-2 gap-s">
-          <button class="btn btn--chico btn--primario" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>Comí esto</button>
-          <a class="btn btn--chico btn--secundario" href="agregar.html">Comí otra cosa</a>
-        </div>
-      </article>
+        <a class="fila gap-xs tactil negrita texto-14 sin-subrayado" href="plan.html">Ver mi plan<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></a>
       </section>
 
       <section class="card" aria-labelledby="t-agua">
         <div class="fila fila--entre fila--base">
           <h2 class="seccion-titulo" id="t-agua">Agua</h2>
-          <span class="sub texto-14">1,25 de 2 L</span>
+          <span class="sub texto-14">— de — L</span>
         </div>
+        <!-- Vasos tomados: aria-pressed="true" -->
         <div class="vasos">
-        <button class="vaso" type="button" aria-pressed="true" aria-label="Vaso 1"><svg width="28" height="36" viewBox="0 0 28 36" aria-hidden="true"><path d="M3 3h22l-2.6 28.2A3 3 0 0 1 19.4 34H8.6a3 3 0 0 1-3-2.8z" stroke-width="2" stroke-linejoin="round"/></svg></button>
-        <button class="vaso" type="button" aria-pressed="true" aria-label="Vaso 2"><svg width="28" height="36" viewBox="0 0 28 36" aria-hidden="true"><path d="M3 3h22l-2.6 28.2A3 3 0 0 1 19.4 34H8.6a3 3 0 0 1-3-2.8z" stroke-width="2" stroke-linejoin="round"/></svg></button>
-        <button class="vaso" type="button" aria-pressed="true" aria-label="Vaso 3"><svg width="28" height="36" viewBox="0 0 28 36" aria-hidden="true"><path d="M3 3h22l-2.6 28.2A3 3 0 0 1 19.4 34H8.6a3 3 0 0 1-3-2.8z" stroke-width="2" stroke-linejoin="round"/></svg></button>
-        <button class="vaso" type="button" aria-pressed="true" aria-label="Vaso 4"><svg width="28" height="36" viewBox="0 0 28 36" aria-hidden="true"><path d="M3 3h22l-2.6 28.2A3 3 0 0 1 19.4 34H8.6a3 3 0 0 1-3-2.8z" stroke-width="2" stroke-linejoin="round"/></svg></button>
-        <button class="vaso" type="button" aria-pressed="true" aria-label="Vaso 5"><svg width="28" height="36" viewBox="0 0 28 36" aria-hidden="true"><path d="M3 3h22l-2.6 28.2A3 3 0 0 1 19.4 34H8.6a3 3 0 0 1-3-2.8z" stroke-width="2" stroke-linejoin="round"/></svg></button>
+        <button class="vaso" type="button" aria-pressed="false" aria-label="Vaso 1"><svg width="28" height="36" viewBox="0 0 28 36" aria-hidden="true"><path d="M3 3h22l-2.6 28.2A3 3 0 0 1 19.4 34H8.6a3 3 0 0 1-3-2.8z" stroke-width="2" stroke-linejoin="round"/></svg></button>
+        <button class="vaso" type="button" aria-pressed="false" aria-label="Vaso 2"><svg width="28" height="36" viewBox="0 0 28 36" aria-hidden="true"><path d="M3 3h22l-2.6 28.2A3 3 0 0 1 19.4 34H8.6a3 3 0 0 1-3-2.8z" stroke-width="2" stroke-linejoin="round"/></svg></button>
+        <button class="vaso" type="button" aria-pressed="false" aria-label="Vaso 3"><svg width="28" height="36" viewBox="0 0 28 36" aria-hidden="true"><path d="M3 3h22l-2.6 28.2A3 3 0 0 1 19.4 34H8.6a3 3 0 0 1-3-2.8z" stroke-width="2" stroke-linejoin="round"/></svg></button>
+        <button class="vaso" type="button" aria-pressed="false" aria-label="Vaso 4"><svg width="28" height="36" viewBox="0 0 28 36" aria-hidden="true"><path d="M3 3h22l-2.6 28.2A3 3 0 0 1 19.4 34H8.6a3 3 0 0 1-3-2.8z" stroke-width="2" stroke-linejoin="round"/></svg></button>
+        <button class="vaso" type="button" aria-pressed="false" aria-label="Vaso 5"><svg width="28" height="36" viewBox="0 0 28 36" aria-hidden="true"><path d="M3 3h22l-2.6 28.2A3 3 0 0 1 19.4 34H8.6a3 3 0 0 1-3-2.8z" stroke-width="2" stroke-linejoin="round"/></svg></button>
         <button class="vaso" type="button" aria-pressed="false" aria-label="Vaso 6"><svg width="28" height="36" viewBox="0 0 28 36" aria-hidden="true"><path d="M3 3h22l-2.6 28.2A3 3 0 0 1 19.4 34H8.6a3 3 0 0 1-3-2.8z" stroke-width="2" stroke-linejoin="round"/></svg></button>
         <button class="vaso" type="button" aria-pressed="false" aria-label="Vaso 7"><svg width="28" height="36" viewBox="0 0 28 36" aria-hidden="true"><path d="M3 3h22l-2.6 28.2A3 3 0 0 1 19.4 34H8.6a3 3 0 0 1-3-2.8z" stroke-width="2" stroke-linejoin="round"/></svg></button>
         <button class="vaso" type="button" aria-pressed="false" aria-label="Vaso 8"><svg width="28" height="36" viewBox="0 0 28 36" aria-hidden="true"><path d="M3 3h22l-2.6 28.2A3 3 0 0 1 19.4 34H8.6a3 3 0 0 1-3-2.8z" stroke-width="2" stroke-linejoin="round"/></svg></button>
         </div>
       </section>
     </main>
+
+    <!-- Aparece al tocar "Lo comí" y se va solo; "Deshacer" vuelve la comida a pendiente -->
+    <div class="aviso-flotante" role="status" hidden>
+      <svg class="icono icono--grueso" width="18" height="18" aria-hidden="true"><use href="#hecho"/></svg>
+      <span class="crece">Comida registrada · — kcal</span>
+      <button class="aviso-flotante__accion" type="button">Deshacer</button>
+    </div>
 
     <nav class="barra-inferior" aria-label="Navegación principal">
       <a class="barra-inferior__item" href="perfil.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg><span>Perfil</span></a>

@@ -40,6 +40,9 @@ rutas de las páginas son relativas a esa carpeta.
 - Dashboard del alumno: título que cambia con el día (Hoy, Ayer o la fecha),
   rueda de días con el elegido al centro, calendario y tarjeta de calorías
   compacta.
+- Comidas del alumno (solo diseño): 4 tarjetas que se abren de a una, con
+  reemplazo por alimento, y las pantallas de cantidad, reemplazo, agregar,
+  crear y editar alimento.
 - Perfil del alumno: "Mi objetivo" arriba con registro de peso en una regla
   deslizable; sin antropometría.
 - Sistema de diseño: tokens de color, sombras y espacios; sin `style=""` en
@@ -53,9 +56,11 @@ rutas de las páginas son relativas a esa carpeta.
 
 1. **Onboarding del alumno:** 5 pasos (sexo, fecha de nacimiento, peso y
    altura, actividad, objetivo) que arman el contexto energético.
-2. **Dashboard:** "Ahora toca" con "Lo comí" en un toque, Snack como espacio
-   libre y la pantalla para cargar alimentos (los botones "+" apuntan a
-   `agregar.html`, que todavía no existe).
+2. **Comidas (falta conectar datos):** las plantillas ya están (tarjetas del
+   dashboard, `cantidad.html`, `reemplazar.html`, `agregar.html`,
+   `crear-alimento.html` y `editar-alimento.html`), con "—" donde van los
+   datos. Falta la API de alimentos, el algoritmo de equivalencias y el JS
+   que llena las pantallas y guarda los cambios.
 3. **Perfil:** ID de cliente como chip, nombre en solo lectura y
    preferencias guardadas.
 4. **Coach:** ficha de solo lectura del cliente, con "Editar" por bloque.

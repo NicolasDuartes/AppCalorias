@@ -199,9 +199,26 @@ las variables CSS no funcionan dentro de un media query.
 | Navegación | `.encabezado`, `.barra-inferior` (+ `__item`, `__mas`), `.pie` | Arriba y abajo de la pantalla |
 | Capas | `.modal-fondo` + `.modal` (se abre con `:target`, ej. `href="#eliminar"`), `.hoja` (sube desde abajo) | Confirmaciones y selectores |
 
-**Del alumno** (`alumno.css`): `.selector-fecha` (título + calendario),
-`.dias` / `.dia` (rueda de días), `.resumen-kcal` + `.anillo`, `.comida`,
-`.vasos`, `.regla` / `.marca` (selector de peso deslizable).
+**Del alumno** (`alumno.css`):
+
+| Pieza | Clases | Para qué |
+|---|---|---|
+| Día | `.selector-fecha`, `.dias` / `.dia`, `.resumen-kcal` + `.anillo`, `.vasos` | Encabezado, rueda de días, calorías y agua |
+| Comidas | `.comidas`, `.comida` (`<details name="comidas">` con `data-estado="hecha"` o `"pendiente"`), `.alimento-fila`, `.btn-reemplazar`, `.btn-agregar` (`aria-pressed`), `.aviso-flotante` | Tarjetas del dashboard; una sola abierta a la vez |
+| Cantidad | `.input--cantidad`, `.aporte` / `.aporte__celda`, `.referencia` | Escribir la cantidad y ver lo que aporta |
+| Reemplazos | `.reemplazos`, `.reemplazo` (`role="radio"`, `data-nivel="equivalente"`, `"parcial"` o `"no"`) | Opciones para cambiar un alimento |
+| Alimento | `.valor-campo`, `.interruptor` (`role="switch"`) | Crear o corregir un alimento |
+| Pantallas con pie | `.pie--centrado`, `.pie--columna`, `.btn-icono--primario` | El pie sigue a la columna centrada |
+| Perfil | `.regla` / `.marca` | Selector de peso deslizable |
+
+**Flujo de comidas** (`pages/alumno/`): en `dashboard.html`, el nombre de un
+alimento abre `cantidad.html`, el ⇄ abre `reemplazar.html` y "Agregar
+alimento" abre `agregar.html`. En `agregar.html`, el "+" de arriba abre
+`crear-alimento.html` y cada alimento abre `cantidad.html`, que tiene el
+acceso a `editar-alimento.html`. Todas son pantallas completas, no hojas
+emergentes. Los datos (alimentos, cantidades, adherencia) se completan
+cuando se conecten la API de alimentos y el algoritmo de equivalencias:
+hasta entonces muestran "—".
 
 ## 7. Utilidades
 

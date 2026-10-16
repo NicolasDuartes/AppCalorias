@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reemplazar alimento · Alumno</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../../css/base.css">
+  <link rel="stylesheet" href="../../css/components.css">
+  <link rel="stylesheet" href="../../css/pages/alumno.css">
+</head>
+<body>
+  <!-- Iconos de esta página: se dibujan con <svg class="icono"><use href="#nombre"/></svg> -->
+  <svg class="sprite" aria-hidden="true">
+    <symbol id="volver" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></symbol>
+    <symbol id="buscar" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.3-4.3"/></symbol>
+    <symbol id="reemplazar" viewBox="0 0 24 24"><path d="M4 8h14M15 5l3 3-3 3M20 16H6M9 13l-3 3 3 3"/></symbol>
+    <symbol id="info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></symbol>
+  </svg>
+  <!-- Se abre con el botón ⇄ de un alimento en el dashboard -->
+  <div class="pantalla">
+    <main class="contenido">
+      <header class="encabezado">
+        <a class="btn-icono" href="dashboard.html" aria-label="Volver"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#volver"/></svg></a>
+        <div class="encabezado__textos">
+          <span class="antetitulo antetitulo--verde">Reemplazar · Comida</span>
+          <h1 class="titulo">Alimento <span class="texto-gris">— g</span></h1>
+          <span class="sub">— kcal · P — · C — · G —</span>
+        </div>
+      </header>
+
+      <label class="buscador">
+        <span class="texto-gris"><svg class="icono" width="20" height="20" aria-hidden="true"><use href="#buscar"/></svg></span>
+        <span class="sr-only">Buscar cualquier alimento</span>
+        <input type="search" name="buscar" placeholder="Buscar cualquier alimento">
+      </label>
+
+      <div class="columna gap-2xs">
+        <!-- Sin búsqueda: "Los 5 con mayor adherencia". Con búsqueda: "Resultados · N" -->
+        <h2 class="antetitulo">Los 5 con mayor adherencia</h2>
+        <p class="sub texto-12">Cantidad calculada para tu plan. El % es la adherencia: qué tan bien reproduce lo planificado.</p>
+      </div>
+
+      <!-- Opciones: vienen del algoritmo de equivalencia (pendiente). data-nivel="equivalente" | "parcial" | "no" -->
+      <div class="reemplazos" role="radiogroup" aria-label="Opciones para reemplazar">
+        <button class="reemplazo" type="button" role="radio" aria-checked="false" data-nivel="equivalente">
+          <span class="radio"></span>
+          <span class="crece columna gap-2xs">
+            <span class="alimento-fila__titulo">Alimento</span>
+            <span class="reemplazo__nivel">Equivalente</span>
+            <span class="alimento-fila__linea">— kcal · P — · C — · G —</span>
+          </span>
+          <span class="reemplazo__lado">
+            <span class="alimento-fila__cantidad">—</span>
+            <span class="tag tag--verde">— %</span>
+          </span>
+        </button>
+      </div>
+
+      <!-- Sin resultados para la búsqueda -->
+      <p class="nota-centrada" hidden>No encontramos ese alimento. Probá con otro nombre.</p>
+    </main>
+
+    <div class="pie pie--centrado pie--columna">
+      <!-- Solo si la opción elegida es "No equivalente": explica por qué y el botón pasa a btn--secundario ("Cambiar igual por …") -->
+      <p class="nota fila fila--arriba gap-s" hidden><svg class="icono" width="18" height="18" aria-hidden="true"><use href="#info"/></svg><span>Son alimentos de otro tipo. Para seguir tu plan, conviene elegir uno parecido.</span></p>
+      <button class="btn btn--primario" type="button" disabled><svg class="icono icono--grueso" width="18" height="18" aria-hidden="true"><use href="#reemplazar"/></svg>Cambiar</button>
+    </div>
+  </div>
+</body>
+</html>

@@ -163,6 +163,8 @@ fieldset {
   border: 0;
 }
 
+legend { padding: 0; }
+
 /* Hoja de íconos (<symbol>) al principio de cada página: no ocupa lugar */
 .sprite {
   position: absolute;

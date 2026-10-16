@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Agregar alimento · Alumno</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../../css/base.css">
+  <link rel="stylesheet" href="../../css/components.css">
+  <link rel="stylesheet" href="../../css/pages/alumno.css">
+</head>
+<body>
+  <!-- Iconos de esta página: se dibujan con <svg class="icono"><use href="#nombre"/></svg> -->
+  <svg class="sprite" aria-hidden="true">
+    <symbol id="volver" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></symbol>
+    <symbol id="buscar" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.3-4.3"/></symbol>
+    <symbol id="mas" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="hecho" viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></symbol>
+  </svg>
+  <!-- Se abre con "Agregar alimento" de una comida del dashboard -->
+  <div class="pantalla">
+    <main class="contenido">
+      <header class="encabezado">
+        <a class="btn-icono" href="dashboard.html" aria-label="Volver"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#volver"/></svg></a>
+        <div class="encabezado__textos">
+          <span class="antetitulo antetitulo--verde">Comida</span>
+          <h1 class="titulo">Agregar alimento</h1>
+        </div>
+        <a class="btn-icono btn-icono--primario" href="crear-alimento.html" aria-label="Crear un alimento nuevo" title="Crear un alimento nuevo"><svg class="icono icono--grueso" width="22" height="22" aria-hidden="true"><use href="#mas"/></svg></a>
+      </header>
+
+      <label class="buscador">
+        <span class="texto-gris"><svg class="icono" width="20" height="20" aria-hidden="true"><use href="#buscar"/></svg></span>
+        <span class="sr-only">Buscar alimento</span>
+        <input type="search" name="buscar" placeholder="Buscar alimento">
+      </label>
+
+      <!-- Con búsqueda, estas dos secciones se cambian por "Resultados" -->
+      <section class="columna gap-s" aria-labelledby="t-plan">
+        <h2 class="antetitulo" id="t-plan">De tu plan para esta comida</h2>
+        <div class="grupo grupo--filas">
+          <!-- Alimentos del plan: aria-pressed="true" si ya están en la comida -->
+          <div class="alimento-fila">
+            <a class="alimento-fila__nombre" href="cantidad.html" aria-label="Elegir la cantidad del alimento">
+              <span class="alimento-fila__titulo">Alimento</span>
+              <span class="alimento-fila__linea">— kcal · P — · C — · G —</span>
+            </a>
+            <span class="alimento-fila__cantidad">—</span>
+            <button class="btn-agregar" type="button" aria-pressed="false" aria-label="Agregar el alimento">
+              <svg class="icono icono--grueso btn-agregar__mas" width="20" height="20" aria-hidden="true"><use href="#mas"/></svg>
+              <svg class="icono icono--grueso btn-agregar__hecho" width="20" height="20" aria-hidden="true"><use href="#hecho"/></svg>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="columna gap-s" aria-labelledby="t-recientes">
+        <h2 class="antetitulo" id="t-recientes">Recientes</h2>
+        <div class="grupo grupo--filas">
+          <!-- Últimos alimentos registrados -->
+          <div class="alimento-fila">
+            <a class="alimento-fila__nombre" href="cantidad.html" aria-label="Elegir la cantidad del alimento">
+              <span class="alimento-fila__titulo">Alimento</span>
+              <span class="alimento-fila__linea">— kcal · P — · C — · G —</span>
+            </a>
+            <span class="alimento-fila__cantidad">—</span>
+            <button class="btn-agregar" type="button" aria-pressed="false" aria-label="Agregar el alimento">
+              <svg class="icono icono--grueso btn-agregar__mas" width="20" height="20" aria-hidden="true"><use href="#mas"/></svg>
+              <svg class="icono icono--grueso btn-agregar__hecho" width="20" height="20" aria-hidden="true"><use href="#hecho"/></svg>
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div class="pie pie--centrado">
+      <span class="crece sub">— alimentos · <span class="negrita">— kcal</span></span>
+      <a class="btn btn--chico btn--primario" href="dashboard.html">Listo</a>
+    </div>
+  </div>
+</body>
+</html>

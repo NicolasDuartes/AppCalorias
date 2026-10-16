@@ -1,5 +1,5 @@
 /* ==========================================================
-   alumno.css — solo pantallas del alumno (encabezado del día, semana, anillo, comidas, agua)
+   alumno.css — solo pantallas del alumno (día, anillo, comidas, agua, cantidad, reemplazos, alimentos, perfil)
    Se carga TERCERO en pages/alumno/*.
    ========================================================== */
 
@@ -150,38 +150,358 @@
 
 .barra--fina { height: 5px; border-radius: 3px; }
 
+/* ---------- Dashboard: tarjetas de comidas ----------
+   Cada comida es un <details> (se abre y se cierra sin JS; con name="comidas"
+   queda abierta una sola). El estado va en data-estado="hecha" | "pendiente":
+   de ahí salen el ícono, su color y si se muestra "Lo comí". */
+.comidas { display: flex; flex-direction: column; gap: var(--espacio-s); }
+
 .comida {
-  display: flex;
-  flex-direction: column;
-  gap: var(--espacio-s);
-  padding: var(--espacio-l);
-  border-radius: var(--radio-lista);
+  overflow: hidden;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-medio);
   background: var(--blanco);
 }
 
-.comida--pendiente { gap: 12px; border: 1.5px dashed var(--trazo); }
+.comida[open] { border-color: var(--verde-texto-claro); }
+
+.comida__cabecera {
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-m);
+  padding: var(--espacio-m) var(--espacio-m) var(--espacio-m) var(--espacio-l);
+  list-style: none;
+  cursor: pointer;
+}
+
+.comida__cabecera::-webkit-details-marker { display: none; }
+
+.comida__estado {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radio-chico);
+  background: var(--gris-suave);
+  color: var(--gris);
+}
+
+.comida[data-estado="hecha"] .comida__estado { background: var(--verde-claro); color: var(--verde); }
+
+.comida[data-estado="hecha"] .comida__icono-pendiente,
+.comida[data-estado="pendiente"] .comida__icono-hecha,
+.comida[data-estado="hecha"] .comida__lo-comi { display: none; }
+
+.comida__textos {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2xs);
+}
 
 .comida__titulo { font-size: 16px; font-weight: 600; }
 
-.renglones {
+.comida__detalle { font-size: 12px; line-height: 1.2; color: var(--gris); }
+
+.comida__kcal { font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.comida__kcal .unidad { font-size: 12px; }
+
+.comida__flecha { display: flex; color: var(--gris); transition: transform 0.15s; }
+
+.comida[open] .comida__flecha { transform: rotate(180deg); }
+
+.comida__cuerpo {
   display: flex;
   flex-direction: column;
-  gap: var(--espacio-xs);
-  padding-top: var(--espacio-s);
-  border-top: 1px solid var(--gris-suave);
+  padding: 0 var(--espacio-s) var(--espacio-s) var(--espacio-l);
+}
+
+.reparto--fino { height: 4px; margin-right: var(--espacio-s); border-radius: 2px; background: var(--pista); }
+
+.comida__macros {
+  padding: var(--espacio-xs) 0;
+  font-size: 12px;
+  color: var(--gris);
+  font-variant-numeric: tabular-nums;
+}
+
+.comida__acciones {
+  display: flex;
+  gap: var(--espacio-l);
+  padding: var(--espacio-s) var(--espacio-s) 0 0;
+}
+
+/* Cada botón crece desde su texto: "Agregar alimento" no se corta en dos renglones */
+.comida__acciones > .btn { flex: 1 1 auto; white-space: nowrap; }
+
+.btn--verde { color: var(--verde); }
+
+/* Fila de un alimento: nombre y aporte a la izquierda, cantidad destacada y una acción a la derecha */
+.alimento-fila {
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-m);
+  padding: var(--espacio-xs) 0;
+}
+
+.alimento-fila + .alimento-fila,
+.comida__macros + .alimento-fila { border-top: 1px solid var(--gris-suave); }
+
+.alimento-fila__nombre {
+  flex: 1;
+  min-width: 0;
+  min-height: var(--alto-tactil);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--espacio-2xs);
+  color: var(--tinta);
+  text-decoration: none;
+}
+
+.alimento-fila__nombre:hover { color: var(--tinta); }
+
+.alimento-fila__titulo { font-size: 15px; font-weight: 500; }
+
+.alimento-fila__linea { font-size: 12px; line-height: 1.2; color: var(--gris); font-variant-numeric: tabular-nums; }
+
+.alimento-fila__cantidad {
+  font-family: var(--fuente-titulos);
+  font-size: 17px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Reemplazar (⇄) y agregar (+): cuadrados de 44 px que resaltan sobre la fila */
+.btn-reemplazar,
+.btn-agregar {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1.5px solid var(--verde-brillante);
+  border-radius: var(--radio-chico);
+  background: var(--verde-claro);
+  color: var(--verde);
+}
+
+.btn-reemplazar:hover { color: var(--verde-oscuro); }
+
+.btn-agregar[aria-pressed="true"] { border-color: var(--verde); background: var(--verde); color: var(--blanco); }
+
+.btn-agregar[aria-pressed="true"] .btn-agregar__mas,
+.btn-agregar[aria-pressed="false"] .btn-agregar__hecho { display: none; }
+
+/* Aviso que aparece abajo después de "Lo comí", con "Deshacer" */
+.aviso-flotante {
+  position: absolute;
+  left: var(--pad-contenido);
+  right: var(--pad-contenido);
+  bottom: calc(80px + var(--espacio-l));
+  z-index: 20;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-s);
+  padding: var(--espacio-xs) var(--espacio-xs) var(--espacio-xs) var(--espacio-l);
+  border-radius: var(--radio-fila);
+  background: var(--verde-oscuro);
+  color: var(--blanco);
+  box-shadow: var(--sombra-flotante);
   font-size: 14px;
 }
 
-.renglones--caja {
-  padding: var(--espacio-s) var(--espacio-m);
-  border-top: none;
-  border-radius: var(--radio-fila);
-  background: var(--fondo);
+.aviso-flotante > .icono { color: var(--verde-brillante); }
+
+.aviso-flotante__accion {
+  min-height: var(--alto-tactil);
+  padding: 0 var(--espacio-m);
+  border: none;
+  background: transparent;
+  color: var(--verde-brillante);
+  font-weight: 700;
 }
 
-.renglon { display: flex; justify-content: space-between; gap: 10px; }
+@media (min-width: 768px) {
+  .aviso-flotante {
+    left: calc(var(--ancho-menu) + var(--pad-contenido));
+    bottom: var(--espacio-xl);
+    max-width: var(--ancho-lectura);
+  }
+}
 
-.renglon > span:last-child { color: var(--gris); }
+/* ---------- Pantallas de una comida: cantidad, reemplazar, agregar y alimento ---------- */
+/* El pie de estas pantallas acompaña a la columna centrada del contenido */
+.pie--centrado { padding-inline: max(var(--pad-contenido), calc((100% - var(--ancho-lectura)) / 2)); }
+
+.pie--columna { flex-direction: column; align-items: stretch; gap: var(--espacio-s); }
+
+.btn-icono--primario { border-color: var(--verde); background: var(--verde); color: var(--blanco); }
+
+.btn-icono--primario:hover { border-color: var(--verde-oscuro); background: var(--verde-oscuro); color: var(--blanco); }
+
+/* Cantidad: un número grande que se escribe */
+.input--cantidad {
+  height: 64px;
+  padding: 0 var(--espacio-l);
+  border: 2px solid var(--verde);
+  border-radius: var(--radio-fila);
+}
+
+.input--cantidad input {
+  font-family: var(--fuente-titulos);
+  font-size: 32px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.input--cantidad .unidad { font-size: 18px; font-weight: 600; }
+
+/* Lo que aporta la cantidad elegida: kcal y los 3 macros */
+.aporte {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--espacio-s);
+}
+
+.aporte__celda {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--espacio-xs);
+  padding: var(--espacio-s);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-chico);
+  background: var(--blanco);
+}
+
+.aporte__valor { font-family: var(--fuente-titulos); font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+.aporte__nombre { display: flex; align-items: center; gap: var(--espacio-xs); font-size: 11px; line-height: 1.2; color: var(--gris); }
+
+.punto--kcal { background: var(--verde); }
+
+/* Valores cada 100 g con el acceso a corregir el alimento */
+.referencia {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-s);
+  padding: var(--espacio-xs) var(--espacio-xs) var(--espacio-xs) var(--espacio-m);
+  border-radius: var(--radio-chico);
+  background: var(--gris-suave);
+}
+
+.referencia__texto { flex: 1; font-size: 12px; line-height: 1.3; color: var(--gris); font-variant-numeric: tabular-nums; }
+
+/* Reemplazar: cada opción con su cantidad y adherencia */
+.reemplazos { display: flex; flex-direction: column; gap: var(--espacio-s); }
+
+.reemplazo {
+  width: 100%;
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-m);
+  padding: var(--espacio-s) var(--espacio-m);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-fila);
+  background: var(--blanco);
+  text-align: left;
+}
+
+.reemplazo[aria-checked="true"] { border: 2px solid var(--verde); background: var(--verde-claro); }
+
+.reemplazo__lado { display: flex; flex-direction: column; align-items: flex-end; gap: var(--espacio-xs); }
+
+/* Nivel de equivalencia: data-nivel="equivalente" | "parcial" | "no" */
+.reemplazo__nivel { font-size: 12px; font-weight: 600; line-height: 1.2; color: var(--gris-oscuro); }
+
+[data-nivel="equivalente"] .reemplazo__nivel { color: var(--verde); }
+
+[data-nivel="parcial"] .reemplazo__nivel { color: var(--naranja-oscuro); }
+
+/* Agregar: grupos de alimentos */
+.grupo--filas { padding: 0 var(--espacio-s) 0 var(--espacio-l); border: 1px solid var(--borde); }
+
+/* Crear / editar alimento: los 4 valores cada 100 g */
+.valor-campo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2xs);
+  padding: var(--espacio-s) var(--espacio-m);
+  border: 1px solid var(--borde-fuerte);
+  border-radius: var(--radio-chico);
+  background: var(--blanco);
+}
+
+.valor-campo:focus-within { outline: 2px solid var(--verde); outline-offset: -1px; }
+
+.valor-campo__nombre { display: flex; align-items: center; gap: var(--espacio-xs); font-size: 12px; color: var(--gris); }
+
+.valor-campo__dato { display: flex; align-items: baseline; gap: var(--espacio-xs); }
+
+.valor-campo input {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: var(--fuente-titulos);
+  font-size: 22px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Interruptor (role="switch"): el estado sale de aria-checked */
+.interruptor {
+  width: 100%;
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-m);
+  padding: var(--espacio-s) 0;
+  border: none;
+  background: transparent;
+  text-align: left;
+}
+
+.interruptor__pista {
+  position: relative;
+  width: 44px;
+  height: 26px;
+  flex-shrink: 0;
+  border-radius: 13px;
+  background: var(--trazo);
+  transition: background 0.15s;
+}
+
+.interruptor__pista::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--blanco);
+  box-shadow: var(--sombra-sutil);
+  transition: transform 0.15s;
+}
+
+.interruptor[aria-checked="true"] .interruptor__pista { background: var(--verde); }
+
+.interruptor[aria-checked="true"] .interruptor__pista::after { transform: translateX(18px); }
 
 .vasos { display: flex; justify-content: space-between; }
 

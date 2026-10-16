@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cantidad · Alumno</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../../css/base.css">
+  <link rel="stylesheet" href="../../css/components.css">
+  <link rel="stylesheet" href="../../css/pages/alumno.css">
+</head>
+<body>
+  <!-- Iconos de esta página: se dibujan con <svg class="icono"><use href="#nombre"/></svg> -->
+  <svg class="sprite" aria-hidden="true">
+    <symbol id="volver" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></symbol>
+    <symbol id="lapiz" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/></symbol>
+    <symbol id="papelera" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></symbol>
+  </svg>
+  <!-- Se abre al tocar un alimento: en el dashboard (editar su cantidad) o en
+       "Agregar alimento" (elegir cuánto agregar; ahí el pie muestra solo
+       "Agregar a la comida" y no "Quitar") -->
+  <div class="pantalla">
+    <main class="contenido">
+      <header class="encabezado">
+        <a class="btn-icono" href="dashboard.html" aria-label="Volver"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#volver"/></svg></a>
+        <div class="encabezado__textos">
+          <span class="antetitulo antetitulo--verde">Comida</span>
+          <h1 class="titulo">Alimento</h1>
+        </div>
+      </header>
+
+      <label class="campo">
+        <span class="campo__etiqueta campo__etiqueta--fuerte">Cantidad</span>
+        <!-- En los alimentos que se cuentan por unidad, la unidad es "u" (o "taza", "plato"…) -->
+        <span class="input input--cantidad">
+          <input type="text" inputmode="decimal" name="cantidad" placeholder="0" aria-describedby="valores-100">
+          <span class="unidad">g</span>
+        </span>
+      </label>
+
+      <!-- Lo que aporta la cantidad escrita: se recalcula al escribir -->
+      <div class="aporte" aria-live="polite">
+        <div class="aporte__celda"><span class="aporte__valor">—</span><span class="aporte__nombre"><span class="punto punto--kcal"></span>kcal</span></div>
+        <div class="aporte__celda"><span class="aporte__valor">—</span><span class="aporte__nombre"><span class="punto punto--p"></span>Prot.</span></div>
+        <div class="aporte__celda"><span class="aporte__valor">—</span><span class="aporte__nombre"><span class="punto punto--c"></span>Carb.</span></div>
+        <div class="aporte__celda"><span class="aporte__valor">—</span><span class="aporte__nombre"><span class="punto punto--g"></span>Grasas</span></div>
+      </div>
+
+      <div class="referencia">
+        <span class="referencia__texto" id="valores-100">Cada 100 g: — kcal · P — · C — · G —</span>
+        <a class="btn btn--texto btn--chico" href="editar-alimento.html"><svg class="icono" width="16" height="16" aria-hidden="true"><use href="#lapiz"/></svg>Editar alimento</a>
+      </div>
+    </main>
+
+    <div class="pie pie--centrado">
+      <button class="btn btn--peligro-texto" type="button"><svg class="icono" width="18" height="18" aria-hidden="true"><use href="#papelera"/></svg>Quitar</button>
+      <button class="btn btn--primario" type="button">Guardar</button>
+    </div>
+  </div>
+</body>
+</html>
