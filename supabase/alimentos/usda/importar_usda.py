@@ -213,6 +213,15 @@ def mapear(fila, por_descripcion, variantes=None):
         'fuente_ref': str(alimento.get('fdcId', '')),
     }
     estado, detalle = 'OK', ''
+    # USDA cuenta la fibra dentro de los carbohidratos, pero la fibra casi no aporta
+    # calorías: en alimentos con mucha fibra (cacao, limón) las kcal medidas quedan
+    # bastante por debajo de 4·P + 4·C + 9·G. El dato de USDA es el correcto.
+    kcal_macros = 4 * valores['proteinas'] + 4 * valores['carbohidratos'] + 9 * valores['grasas']
+    nota_fibra = ''
+    if abs(kcal_macros - valores['kcal']) > max(0.2 * valores['kcal'], 15):
+        datos['excepcion_kcal'] = 'sí'
+        nota_fibra = (f'Las kcal de USDA ({valores["kcal"]:g}) no coinciden con los macros ({kcal_macros:.0f}) '
+                      'por la fibra: se marca excepcion_kcal.')
     if fila['unidad_nombre'].strip():
         # Si el alimento elegido no trae la porción por unidad, se busca en el
         # mismo alimento de la otra base (ej. kiwi: Foundation no la trae, SR Legacy sí)
@@ -229,6 +238,7 @@ def mapear(fila, por_descripcion, variantes=None):
             datos['porcion_texto'] = f'1 {fila["unidad_nombre"].strip()}'
         else:
             estado, detalle = 'Revisar', 'No se encontró el peso de 1 unidad en las porciones de USDA'
+    detalle = ' '.join(t for t in (detalle, nota_fibra) if t)
     return datos, estado, detalle
 
 
