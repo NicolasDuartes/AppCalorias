@@ -9,7 +9,11 @@ tildes ni mayúsculas) se actualiza en vez de duplicarse.
 
 Si alguna fila tiene errores, no genera nada y dice en qué hoja y fila están.
 
-Uso:  python planilla_a_sql.py [planilla.xlsx] [salida.sql]
+Con --prueba la carga va a la tabla de prueba (prueba.alimentos, la crea
+prueba_crear.sql) en vez de a la definitiva: sirve para revisar el primer
+mapeo antes de aplicar la migración.
+
+Uso:  python planilla_a_sql.py [--prueba] [planilla.xlsx] [salida.sql]
 Necesita: pip install openpyxl
 """
 import sys
@@ -160,7 +164,7 @@ def sql_lista(valores):
     return "'{}'::text[]" if not valores else 'array[' + ', '.join(sql_texto(v) for v in valores) + ']::text[]'
 
 
-def generar_sql(alimentos):
+def generar_sql(alimentos, prueba=False):
     columnas = ['nombre', 'categoria', 'coccion', 'marca', 'kcal', 'proteinas', 'carbohidratos', 'grasas',
                 'porcion_g', 'porcion_texto', 'unidad_nombre', 'unidad_g', 'sinonimos', 'fuente', 'fuente_ref']
     filas = []
@@ -170,8 +174,19 @@ def generar_sql(alimentos):
                    sql_numero(a['grasas']), sql_numero(a['porcion_g']), sql_texto(a['porcion_texto']),
                    sql_texto(a['unidad_nombre']), sql_numero(a['unidad_g']), sql_lista(a['sinonimos']),
                    sql_texto(a['fuente']), sql_texto(a['fuente_ref'])]
-        filas.append('  (' + ', '.join(valores) + ", 'aprobado')")
+        filas.append('  (' + ', '.join(valores) + ('' if prueba else ", 'aprobado'") + ')')
     actualizar = ',\n  '.join(f'{c} = excluded.{c}' for c in columnas if c != 'nombre')
+    if prueba:
+        return (
+            '-- Generado por planilla_a_sql.py --prueba: carga en la tabla de PRUEBA.\n'
+            '-- Pegar en Supabase → SQL Editor → Run (antes, correr prueba_crear.sql).\n\n'
+            'begin;\n\n'
+            f'insert into prueba.alimentos ({", ".join(columnas)})\nvalues\n'
+            + ',\n'.join(filas) +
+            '\non conflict (clave) do update set\n  ' + actualizar + ';\n\n'
+            'select count(*) as alimentos_en_prueba from prueba.alimentos;\n\n'
+            'commit;\n'
+        )
     return (
         '-- Generado por supabase/alimentos/planilla_a_sql.py: no editar a mano.\n'
         '-- Pegar en Supabase → SQL Editor → Run. Corre en una transacción.\n\n'
@@ -186,8 +201,11 @@ def generar_sql(alimentos):
 
 
 def main():
-    planilla = Path(sys.argv[1]) if len(sys.argv) > 1 else AQUI / 'planilla_alimentos.xlsx'
-    salida = Path(sys.argv[2]) if len(sys.argv) > 2 else AQUI / 'carga_alimentos.sql'
+    argumentos = [a for a in sys.argv[1:] if a != '--prueba']
+    prueba = '--prueba' in sys.argv[1:]
+    planilla = Path(argumentos[0]) if len(argumentos) > 0 else AQUI / 'planilla_alimentos.xlsx'
+    nombre_salida = 'carga_alimentos_prueba.sql' if prueba else 'carga_alimentos.sql'
+    salida = Path(argumentos[1]) if len(argumentos) > 1 else AQUI / nombre_salida
 
     alimentos, errores = leer_planilla(planilla)
     if errores:
@@ -198,11 +216,12 @@ def main():
         print('La planilla no tiene alimentos cargados.')
         sys.exit(1)
 
-    salida.write_text(generar_sql(alimentos), encoding='utf-8')
+    salida.write_text(generar_sql(alimentos, prueba), encoding='utf-8')
     por_categoria = {}
     for a in alimentos:
         por_categoria[CATEGORIAS[a['categoria']]] = por_categoria.get(CATEGORIAS[a['categoria']], 0) + 1
-    print(f'Listo: {len(alimentos)} alimento(s) en {salida.name}')
+    destino = 'la tabla de PRUEBA' if prueba else 'la tabla definitiva'
+    print(f'Listo: {len(alimentos)} alimento(s) para {destino} en {salida.name}')
     for nombre, cantidad in por_categoria.items():
         print(f'  {nombre}: {cantidad}')
 
