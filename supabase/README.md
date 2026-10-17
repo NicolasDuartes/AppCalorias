@@ -163,3 +163,28 @@ rojo si una fila tiene un error. La hoja "Instrucciones" explica cada columna.
 Se puede repetir cada vez que se actualice la planilla: los alimentos que ya
 están se actualizan en vez de duplicarse. Para empezar una planilla vacía:
 `python crear_planilla.py` (pisa la que haya).
+
+### Primera carga desde USDA, revisada en una tabla de prueba
+
+La primera carga sale de USDA FoodData Central y se revisa en una tabla
+aparte (`prueba.alimentos`) antes de tocar la definitiva. La app no ve esa
+tabla: Supabase no expone el esquema `prueba`.
+
+1. **Lista curada:** `supabase/alimentos/usda/mapeo_usda.csv` (se abre con
+   Excel). Una fila por alimento: nombre en español, categoría, cocción, la
+   descripción exacta en USDA y sinónimos. Para alimentos que se cuentan,
+   `unidad_nombre` y qué porción de USDA buscar (`large`, `medium`, `slice`…).
+2. **Bajar USDA:** de https://fdc.nal.usda.gov/download-datasets, los JSON de
+   "SR Legacy" y "Foundation Foods". Dejar los `.zip` en `supabase/alimentos/usda/datos/`.
+3. **Armar la planilla:** desde `supabase/alimentos/usda/`:
+   `python importar_usda.py` → genera `planilla_usda.xlsx` (valores cada
+   100 g) con la hoja "Mapeo USDA": qué alimento de USDA se usó y cuáles no se
+   encontraron (con los nombres parecidos, para corregir el mapeo).
+4. **Revisar la planilla** (columna `control` en OK) y generar la carga:
+   desde `supabase/alimentos/`: `python planilla_a_sql.py --prueba usda/planilla_usda.xlsx`
+5. **En Supabase (SQL Editor):** `prueba_crear.sql` → `carga_alimentos_prueba.sql`
+   → `prueba_verificar.sql` para revisar (calorías raras, posibles duplicados,
+   pesos por unidad, búsqueda).
+6. **Cuando está bien:** aplicar la migración `20261017120000_alimentos.sql`
+   y correr `prueba_pasar_y_borrar.sql`: pasa todo a la definitiva, aprobado,
+   y borra la prueba.

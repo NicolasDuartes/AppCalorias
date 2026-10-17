@@ -26,6 +26,8 @@ from columnas import CATEGORIAS, COCCIONES, COLUMNAS, FUENTES
 
 AQUI = Path(__file__).parent
 CLAVES = [c['clave'] for c in COLUMNAS]
+# Hojas que no son categorías: se saltean (la de mapeo la agrega usda/importar_usda.py)
+HOJAS_INFORMATIVAS = ('Instrucciones', 'Mapeo USDA')
 FUENTES_PLANILLA = [f for f in FUENTES if f not in ('coach', 'alumno')]
 
 
@@ -120,7 +122,7 @@ def leer_planilla(ruta):
     alimentos, errores, claves = [], [], {}
 
     for hoja in libro.worksheets:
-        if hoja.title == 'Instrucciones':
+        if hoja.title in HOJAS_INFORMATIVAS:
             continue
         if hoja.title not in codigo_de_hoja:
             errores.append(f'Hoja "{hoja.title}": no es una categoría conocida (no cambies los nombres de las hojas)')

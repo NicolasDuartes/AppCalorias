@@ -114,12 +114,17 @@ def hoja_categoria(libro, nombre):
         FormulaRule(formula=[f'AND(${control}2<>"",${control}2<>"OK")'], fill=ROJO))
 
 
-def main():
+def crear_libro():
+    """La planilla vacía, lista para llenar (la usa también usda/importar_usda.py)."""
     libro = Workbook()
     hoja_instrucciones(libro)
     for nombre in CATEGORIAS.values():
         hoja_categoria(libro, nombre)
-    libro.save(DESTINO)
+    return libro
+
+
+def main():
+    crear_libro().save(DESTINO)
     print(f'Planilla creada: {DESTINO}')
 
 
