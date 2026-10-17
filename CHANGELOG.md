@@ -4,16 +4,17 @@ Este documento registra los hitos de versiones **Mayores (Major)** y **Medianas 
 
 ---
 
-## [v0.4.0] — En Desarrollo
-- **Tipo:** Versión Menor (Estabilización de Navegación Inicial y Sesión)
-- **Fecha:** Octubre 2026 (En progreso)
+## [v0.4.0] — 17/10/2026
+- **Tipo:** Versión Menor (Estabilización de Navegación Inicial y Redirecciones)
+- **Fecha:** 17 de Octubre de 2026
 - **Resumen:**
-  1. Guardas de sesión resilientes con soporte de `redirect_to` para preservar la ruta original post-login.
-  2. Detección automática del rol (alumno/coach) en la pantalla compartida `contexto.html` vía Supabase Auth.
-  3. Retroalimentación visual accesible (toast/aviso flotante "Próximamente") en botones pendientes de la barra inferior.
-  4. Estandarización de botones de retorno ("Volver") con historial inteligente del navegador (`history.back`) y protección de anclajes modales.
-  5. Cobertura homogénea de sesiones en las subpáginas de carga y edición de alimentos.
-  6. Auditoría integral de redirecciones de botones entre pantallas HTML (acciones Cancelar/Guardar en editores, Crear primer plan en historial vacío, micro-interacciones accesibles para segmentados, switches y lista de alimentos).
+  1. Estandarización integral de navegación y redirecciones en los 23 archivos HTML del frontend.
+  2. Módulo centralizado `frontend/js/utils/navegacion.js` con historial inteligente (`history.back` y fallback seguro).
+  3. Feedback accesible con avisos flotantes (toasts) no intrusivos para opciones en desarrollo de la barra inferior.
+  4. Desacoplamiento dinámico de `contexto.html` con redirección contextual según rol (alumno/coach).
+  5. Blindaje de modales y botones de acción rápida (`#anadir-cliente`, Cancelar/Guardar) previniendo saltos de hash.
+  6. Verificación automatizada con suite de pruebas de integridad de enlaces y anclas (100% passed).
+  7. Guardas profundas con `redirect_to` pospuestas para fase Supabase cumpliendo directiva de no tocar backend.
 
 
 ---
