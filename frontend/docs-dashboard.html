@@ -1,0 +1,2641 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AppCalorias · Hub de Documentación Técnica y Arquitectura</title>
+  <meta name="description" content="Dashboard interactivo de arquitectura, base de datos Supabase, motor nutricional L1, integraciones OpenFDA y directrices estratégicas de AppCalorias.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+  <style>
+    /* ==========================================================
+       SISTEMA DE TOKENS Y ESTILOS BASE (según DESIGN_DASHBOARD.md)
+       ========================================================== */
+    :root {
+      --bg: #F5F7F4;
+      --bg-rgb: 245, 247, 244;
+      --surface: #FFFFFF;
+      --surface-rgb: 255, 255, 255;
+      --surface-alt: #EDF1EC;
+      --surface-alt-rgb: 237, 241, 236;
+      --surface-hover: #F8FAF8;
+
+      --border: #DDE4DB;
+      --border-subtle: #E8ECE6;
+      --border-hover: #B8C7B5;
+      --border-focus: #1E6847;
+
+      --text: #17211C;
+      --text-rgb: 23, 33, 28;
+      --text-secondary: #4A5750;
+      --text-tertiary: #75837B;
+      --text-inverse: #FFFFFF;
+
+      --accent: #1E6847;
+      --accent-rgb: 30, 104, 71;
+      --accent-hover: #134631;
+      --accent-light: #E4EFE8;
+      --accent-light-rgb: 228, 239, 232;
+
+      --macro-p: #2563EB;
+      --macro-p-light: #EFF6FF;
+      --macro-c: #EA580C;
+      --macro-c-light: #FFF7ED;
+      --macro-g: #9333EA;
+      --macro-g-light: #FAF5FF;
+      --macro-kcal: #16A34A;
+      --macro-kcal-light: #F0FDF4;
+
+      --success: #1E6847;
+      --warning: #D97706;
+      --warning-light: #FEF3C7;
+      --error: #DC2626;
+      --error-light: #FEE2E2;
+      --info: #0284C7;
+      --info-light: #E0F2FE;
+
+      --fuente-display: 'Bricolage Grotesque', system-ui, -apple-system, sans-serif;
+      --fuente-texto: 'Instrument Sans', system-ui, -apple-system, sans-serif;
+      --fuente-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+
+      --alto-tactil: 44px;
+      --radio-card: 1rem;
+      --sombra-sutil: 0 1px 3px rgba(23, 33, 28, 0.05);
+      --sombra-elevada: 0 6px 18px rgba(23, 33, 28, 0.08);
+      --sombra-flotante: 0 12px 32px rgba(23, 33, 28, 0.14);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      font-family: var(--fuente-texto);
+      color: var(--text);
+      background-color: var(--bg);
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .app-container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 1rem 1.5rem 4rem;
+      width: 100%;
+    }
+
+    @media (max-width: 640px) {
+      .app-container {
+        padding: 0.75rem 1rem 3rem;
+      }
+    }
+
+    /* HEADER HERO */
+    .hero-header {
+      background: linear-gradient(135deg, #FFFFFF 0%, #F1F6F2 100%);
+      border: 1px solid var(--border);
+      border-radius: 1.25rem;
+      padding: 2.25rem 2rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--sombra-sutil);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-header::before {
+      content: '';
+      position: absolute;
+      top: -40px;
+      right: -40px;
+      width: 260px;
+      height: 260px;
+      background: radial-gradient(circle, rgba(30, 104, 71, 0.12) 0%, rgba(30, 104, 71, 0) 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .hero-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.25rem;
+    }
+
+    .hero-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.875rem;
+    }
+
+    .hero-logo-box {
+      width: 48px;
+      height: 48px;
+      border-radius: 0.75rem;
+      background: var(--accent);
+      color: var(--text-inverse);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(30, 104, 71, 0.3);
+    }
+
+    .hero-title-group h1 {
+      font-family: var(--fuente-display);
+      font-size: 1.85rem;
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1.2;
+      letter-spacing: -0.025em;
+    }
+
+    .hero-tagline {
+      font-size: 0.9375rem;
+      color: var(--text-secondary);
+      margin-top: 0.25rem;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 0.875rem;
+      margin-top: 1.25rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .stat-pill {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      padding: 0.75rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+
+    .stat-label {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .stat-value {
+      font-family: var(--fuente-display);
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    /* BARRA DE PESTAÑAS (TABBED NAVIGATION) */
+    .tabs-wrapper {
+      position: sticky;
+      top: 0.5rem;
+      z-index: 100;
+      background: rgba(245, 247, 244, 0.94);
+      backdrop-filter: blur(12px);
+      border-radius: 1rem;
+      padding: 0.5rem;
+      margin-bottom: 1.75rem;
+      border: 1px solid rgba(221, 228, 219, 0.8);
+      box-shadow: 0 4px 16px rgba(23, 33, 28, 0.05);
+    }
+
+    .tabs-nav {
+      display: flex;
+      gap: 0.375rem;
+      overflow-x: auto;
+      scrollbar-width: thin;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 2px;
+    }
+
+    .tabs-nav::-webkit-scrollbar {
+      height: 4px;
+    }
+    .tabs-nav::-webkit-scrollbar-thumb {
+      background: var(--border-hover);
+      border-radius: 4px;
+    }
+
+    .tab-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      min-height: var(--alto-tactil);
+      padding: 0 1rem;
+      border-radius: 9999px;
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: var(--fuente-texto);
+      font-size: 0.875rem;
+      font-weight: 600;
+      border: 1px solid transparent;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+    }
+
+    .tab-btn:hover {
+      background: var(--surface);
+      color: var(--text);
+      border-color: var(--border);
+    }
+
+    .tab-btn[aria-selected="true"] {
+      background: var(--accent);
+      color: var(--text-inverse);
+      box-shadow: 0 2px 8px rgba(30, 104, 71, 0.28);
+    }
+
+    .tab-btn:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    /* PANELES DE CONTENIDO */
+    .tab-panel {
+      display: none;
+      animation: fadeInUp 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* COMPONENTES CARD */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radio-card);
+      padding: 1.75rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--sombra-sutil);
+      transition: box-shadow 0.2s ease;
+    }
+
+    .card:hover {
+      box-shadow: var(--sombra-elevada);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.875rem;
+      border-bottom: 1px solid var(--border-subtle);
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .card-title {
+      font-family: var(--fuente-display);
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    /* BADGES */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.25rem 0.65rem;
+      border-radius: 9999px;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .badge--green { background: #DCFCE7; color: #15803D; }
+    .badge--blue { background: #DBEAFE; color: #1D4ED8; }
+    .badge--amber { background: #FEF3C7; color: #B45309; }
+    .badge--red { background: #FEE2E2; color: #B91C1C; }
+    .badge--purple { background: #F3E8FF; color: #7E22CE; }
+    .badge--orange { background: #FFEDD5; color: #C2410C; }
+
+    /* BOTONES */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      min-height: var(--alto-tactil);
+      padding: 0 1.25rem;
+      font-family: var(--fuente-texto);
+      font-size: 0.875rem;
+      font-weight: 600;
+      border-radius: 0.625rem;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+      border: 1px solid transparent;
+      user-select: none;
+    }
+
+    .btn--primary {
+      background: var(--accent);
+      color: var(--text-inverse);
+    }
+    .btn--primary:hover {
+      background: var(--accent-hover);
+      box-shadow: 0 4px 12px rgba(30, 104, 71, 0.25);
+    }
+
+    .btn--secondary {
+      background: var(--surface);
+      color: var(--text);
+      border-color: var(--border);
+    }
+    .btn--secondary:hover {
+      background: var(--surface-alt);
+      border-color: var(--border-hover);
+    }
+
+    .btn--sm {
+      min-height: 36px;
+      padding: 0 0.875rem;
+      font-size: 0.8125rem;
+    }
+
+    /* GRID SYSTEM */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.25rem;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+    }
+
+    @media (max-width: 768px) {
+      .grid-2, .grid-3 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* TABLAS ESTILIZADAS */
+    .tech-table-wrapper {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      margin: 1rem 0;
+    }
+
+    .tech-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+      text-align: left;
+    }
+
+    .tech-table th {
+      background: var(--surface-alt);
+      color: var(--text);
+      font-weight: 700;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+      font-family: var(--fuente-display);
+    }
+
+    .tech-table td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .tech-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .tech-table tr:hover td {
+      background: var(--surface-hover);
+    }
+
+    /* BLOQUES DE CÓDIGO CON BOTÓN COPIAR */
+    .code-wrapper {
+      position: relative;
+      background: #111814;
+      border-radius: 0.75rem;
+      margin: 1rem 0;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .code-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 1rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      font-family: var(--fuente-mono);
+      font-size: 0.75rem;
+      color: #9CA3AF;
+    }
+
+    .code-copy-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #F3F4F6;
+      border-radius: 0.375rem;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      font-family: var(--fuente-texto);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      transition: all 0.15s ease;
+    }
+
+    .code-copy-btn:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    pre.code-block {
+      padding: 1.25rem;
+      overflow-x: auto;
+      font-family: var(--fuente-mono);
+      font-size: 0.8125rem;
+      line-height: 1.6;
+      color: #E2E8F0;
+    }
+
+    /* ACORDEONES TÉCNICOS */
+    .tech-accordion {
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      margin-bottom: 0.75rem;
+      background: var(--surface);
+      overflow: hidden;
+      transition: all 0.2s ease;
+    }
+
+    .tech-accordion[open] {
+      border-color: var(--border-hover);
+      box-shadow: var(--sombra-sutil);
+    }
+
+    .tech-summary {
+      padding: 1rem 1.25rem;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      list-style: none;
+      user-select: none;
+    }
+
+    .tech-summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .tech-summary:hover {
+      background: var(--surface-hover);
+    }
+
+    .accordion-body {
+      padding: 1rem 1.25rem 1.25rem;
+      border-top: 1px solid var(--border-subtle);
+      background: #FAFBF9;
+      font-size: 0.9375rem;
+      color: var(--text-secondary);
+    }
+
+    /* SIMULADOR EN VIVO L1 */
+    .sim-box {
+      background: linear-gradient(135deg, #FAFBF9 0%, #F0F4EF 100%);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+    }
+
+    .sim-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .sim-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .sim-food-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      padding: 1.25rem;
+    }
+
+    .sim-food-card h4 {
+      font-family: var(--fuente-display);
+      font-size: 1rem;
+      margin-bottom: 0.75rem;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .form-group {
+      margin-bottom: 0.75rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 0.25rem;
+    }
+
+    .form-control {
+      width: 100%;
+      min-height: 38px;
+      padding: 0.35rem 0.65rem;
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      font-family: var(--fuente-texto);
+      font-size: 0.875rem;
+      background: var(--surface);
+      color: var(--text);
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(30, 104, 71, 0.15);
+    }
+
+    .sim-results {
+      margin-top: 1.5rem;
+      background: #111814;
+      border-radius: 0.875rem;
+      padding: 1.5rem;
+      color: #FFFFFF;
+    }
+
+    .sim-res-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .sim-res-val {
+      font-family: var(--fuente-display);
+      font-size: 2rem;
+      font-weight: 800;
+      color: #4ADE80;
+    }
+
+    .sim-bars {
+      display: flex;
+      flex-direction: column;
+      gap: 0.875rem;
+    }
+
+    .sim-bar-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .sim-bar-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8125rem;
+      color: #CBD5E1;
+    }
+
+    .bar-track {
+      height: 8px;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.3s ease;
+    }
+
+    /* CALCULADORA DE HIDRATACIÓN OPENFDA */
+    .hydration-calc-box {
+      background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
+      border: 1px solid #BAE6FD;
+      border-radius: 1rem;
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .hydration-result-card {
+      background: #0C4A6E;
+      border-radius: 0.875rem;
+      padding: 1.5rem;
+      color: #FFFFFF;
+      margin-top: 1.25rem;
+    }
+
+    /* CHECKLIST SPRINT ROADMAP */
+    .sprint-progress-bar {
+      height: 10px;
+      background: var(--surface-alt);
+      border-radius: 5px;
+      overflow: hidden;
+      margin: 1rem 0 1.5rem;
+      border: 1px solid var(--border);
+    }
+
+    .sprint-progress-fill {
+      height: 100%;
+      background: var(--accent);
+      width: 0%;
+      transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* MODAL DE BÚSQUEDA RÁPIDA (Ctrl+K) */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(23, 33, 28, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 999;
+      display: none;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 10vh 1rem 2rem;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .search-modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      width: 100%;
+      max-width: 620px;
+      box-shadow: var(--sombra-flotante);
+      overflow: hidden;
+      animation: modalSlide 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes modalSlide {
+      from { opacity: 0; transform: translateY(-12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .search-input-box {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .search-input-box input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 1rem;
+      font-family: var(--fuente-texto);
+      color: var(--text);
+      background: transparent;
+    }
+
+    .search-results-list {
+      max-height: 380px;
+      overflow-y: auto;
+      padding: 0.5rem;
+    }
+
+    .search-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .search-item:hover, .search-item.highlighted {
+      background: var(--surface-alt);
+    }
+
+    .search-item-title {
+      font-weight: 600;
+      font-size: 0.875rem;
+      color: var(--text);
+    }
+
+    .search-item-cat {
+      font-size: 0.75rem;
+      color: var(--text-tertiary);
+    }
+
+    /* TOAST DE COPIADO */
+    .toast-msg {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: #17211C;
+      color: #FFFFFF;
+      padding: 0.75rem 1.25rem;
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+      display: none;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+      z-index: 1000;
+      animation: fadeIn 0.2s ease;
+    }
+
+    /* EFECTO DESTACADO TEMPORAL */
+    .target-highlight {
+      animation: targetPulse 2.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes targetPulse {
+      0% { box-shadow: 0 0 0 4px rgba(30, 104, 71, 0.5); }
+      70% { box-shadow: 0 0 0 8px rgba(30, 104, 71, 0.2); }
+      100% { box-shadow: none; }
+    }
+
+    footer.dashboard-footer {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      font-size: 0.8125rem;
+      color: var(--text-tertiary);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==========================================================
+       SVG SPRITE DE ICONOS
+       ========================================================== -->
+  <svg class="sprite" style="display:none;" aria-hidden="true">
+    <symbol id="icon-arch" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" d="M3 21h18M3 10h18M5 10v11M19 10v11M9 10v11M15 10v11M12 3L2 10h20L12 3z"/></symbol>
+    <symbol id="icon-db" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3" fill="none" stroke="currentColor" stroke-width="2"/><path fill="none" stroke="currentColor" stroke-width="2" d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></symbol>
+    <symbol id="icon-calc" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><line x1="8" y1="6" x2="16" y2="6" stroke="currentColor" stroke-width="2"/><line x1="16" y1="14" x2="16" y2="18" stroke="currentColor" stroke-width="2"/><path d="M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M8 18h.01M12 18h.01" stroke="currentColor" stroke-width="3"/></symbol>
+    <symbol id="icon-map" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6" fill="none" stroke="currentColor" stroke-width="2"/><line x1="8" y1="2" x2="8" y2="18" stroke="currentColor" stroke-width="2"/><line x1="16" y1="6" x2="16" y2="22" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="icon-bug" viewBox="0 0 24 24"><rect width="8" height="14" x="8" y="6" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="m19 7-3 2M5 7l3 2M19 19l-3-2M5 19l3-2M20 13h-4M4 13h4M10 4l1-2M14 4l-1-2" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="icon-pill" viewBox="0 0 24 24"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z" fill="none" stroke="currentColor" stroke-width="2"/><path d="m8.5 8.5 7 7" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="icon-bot" viewBox="0 0 24 24"><rect width="18" height="12" x="3" y="8" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v6M2 14h1M21 14h1M9 13v2M15 13v2" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="icon-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="icon-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" fill="none" stroke="currentColor" stroke-width="2"/><line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="icon-copy" viewBox="0 0 24 24"><rect width="13" height="13" x="9" y="9" rx="2" ry="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+  </svg>
+
+  <div class="app-container">
+
+    <!-- HERO SECTION -->
+    <header class="hero-header">
+      <div class="hero-top">
+        <div class="hero-brand">
+          <div class="hero-logo-box">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8.2c-1.6-1.2-5-1.4-6.5 1.3-1.5 2.8-.5 6.8 1.5 9.3 1.2 1.5 2.6 1.9 3.7 1.3.8-.4 1.8-.4 2.6 0 1.1.6 2.5.2 3.7-1.3 2-2.5 3-6.5 1.5-9.3-1.5-2.7-4.9-2.5-6.5-1.3z"/></svg>
+          </div>
+          <div class="hero-title-group">
+            <h1>AppCalorias · Hub Técnico & Arquitectura</h1>
+            <p class="hero-tagline">"Acciones, no datos" — Plataforma Web Nutricional Colaborativa Coach – Alumno</p>
+          </div>
+        </div>
+
+        <div class="hero-actions">
+          <button class="btn btn--secondary btn--sm" id="btn-quick-search" type="button">
+            <svg width="16" height="16"><use href="#icon-search"/></svg>
+            <span>Buscar (Ctrl+K)</span>
+          </button>
+          <a class="btn btn--primary btn--sm" href="https://docs.google.com/document/d/18s7zuFP1w0_MDb8nW-CmYZ0FsMx2IASV9H6AzQ2fqcU" target="_blank" rel="noopener">
+            <span>Abrir Google Doc</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Métricas rápidas -->
+      <div class="hero-stats">
+        <div class="stat-pill">
+          <span class="stat-label">Stack Base</span>
+          <span class="stat-value">ES Modules</span>
+        </div>
+        <div class="stat-pill">
+          <span class="stat-label">Backend</span>
+          <span class="stat-value">Supabase 15+</span>
+        </div>
+        <div class="stat-pill">
+          <span class="stat-label">Algoritmo</span>
+          <span class="stat-value">L1 Mediana</span>
+        </div>
+        <div class="stat-pill">
+          <span class="stat-label">Seguridad FDA</span>
+          <span class="stat-value">openFDA DSHEA</span>
+        </div>
+        <div class="stat-pill">
+          <span class="stat-label">AI Agents</span>
+          <span class="stat-value">5 Tools Schemas</span>
+        </div>
+        <div class="stat-pill">
+          <span class="stat-label">Preguntas Leads</span>
+          <span class="stat-value" id="hero-questions-count">25 Completas</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- BARRA DE NAVEGACIÓN POR PESTAÑAS (8 Tabs) -->
+    <nav class="tabs-wrapper" aria-label="Navegación principal de documentación">
+      <div class="tabs-nav" role="tablist">
+        <button class="tab-btn" role="tab" id="tab-btn-arch" aria-selected="true" aria-controls="panel-arch" tabindex="0">
+          <svg width="18" height="18"><use href="#icon-arch"/></svg>
+          <span>1. Arquitectura & Stack</span>
+        </button>
+        <button class="tab-btn" role="tab" id="tab-btn-db" aria-selected="false" aria-controls="panel-db" tabindex="-1">
+          <svg width="18" height="18"><use href="#icon-db"/></svg>
+          <span>2. Supabase Modelo & RLS</span>
+        </button>
+        <button class="tab-btn" role="tab" id="tab-btn-motor" aria-selected="false" aria-controls="panel-motor" tabindex="-1">
+          <svg width="18" height="18"><use href="#icon-calc"/></svg>
+          <span>3. Motor & Equivalencias L1</span>
+        </button>
+        <button class="tab-btn" role="tab" id="tab-btn-roadmap" aria-selected="false" aria-controls="panel-roadmap" tabindex="-1">
+          <svg width="18" height="18"><use href="#icon-map"/></svg>
+          <span>4. Roadmap & Pasos Faltantes</span>
+        </button>
+        <button class="tab-btn" role="tab" id="tab-btn-errores" aria-selected="false" aria-controls="panel-errores" tabindex="-1">
+          <svg width="18" height="18"><use href="#icon-bug"/></svg>
+          <span>5. Errores & Deuda Técnica</span>
+        </button>
+        <button class="tab-btn" role="tab" id="tab-btn-openfda" aria-selected="false" aria-controls="panel-openfda" tabindex="-1">
+          <svg width="18" height="18"><use href="#icon-pill"/></svg>
+          <span>6. OpenFDA Suplementos</span>
+        </button>
+        <button class="tab-btn" role="tab" id="tab-btn-agents" aria-selected="false" aria-controls="panel-agents" tabindex="-1">
+          <svg width="18" height="18"><use href="#icon-bot"/></svg>
+          <span>7. AI Agents & Tools</span>
+        </button>
+        <button class="tab-btn" role="tab" id="tab-btn-preguntas" aria-selected="false" aria-controls="panel-preguntas" tabindex="-1">
+          <svg width="18" height="18"><use href="#icon-help"/></svg>
+          <span>8. Preguntas Dev / Leads</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- PANEL 1: ARQUITECTURA & STACK -->
+    <section class="tab-panel active" id="panel-arch" role="tabpanel" aria-labelledby="tab-btn-arch">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">
+            <svg width="22" height="22"><use href="#icon-arch"/></svg>
+            Visión del Producto y Principios Rectores
+          </h2>
+          <span class="badge badge--green">Rama Activa: feature/api-equivalencias (2dc2dab)</span>
+        </div>
+        <p>
+          <strong>AppCalorias</strong> es una aplicación web colaborativa y asimétrica pensada para resolver la brecha entre el criterio clínico del nutricionista/entrenador (Coach) y la simplicidad operativa del usuario de gimnasio (Alumno).
+        </p>
+
+        <div class="grid-2" style="margin-top:1.25rem;">
+          <div style="background:var(--surface-alt); padding:1.25rem; border-radius:0.75rem;">
+            <h4 style="font-family:var(--fuente-display); font-size:1.05rem; color:var(--accent); margin-bottom:0.5rem;">👤 Alumno: "Acciones, no datos"</h4>
+            <ul style="margin-left:1.25rem; font-size:0.875rem; color:var(--text-secondary); line-height:1.7;">
+              <li>Delega la complejidad de fórmulas metabólicas en su coach o plantillas inteligentes.</li>
+              <li>Registra comidas en menos de 10 segundos con el botón <em>1-Tap Check</em> ("Lo comí").</li>
+              <li>Reemplaza alimentos sobre la marcha sin quebrar la distribución de macronutrientes gracias al Algoritmo L1.</li>
+              <li>Monitorea su hidratación y suplementación con alertas de seguridad y recordatorios táctiles.</li>
+            </ul>
+          </div>
+          <div style="background:var(--surface-alt); padding:1.25rem; border-radius:0.75rem;">
+            <h4 style="font-family:var(--fuente-display); font-size:1.05rem; color:var(--accent); margin-bottom:0.5rem;">🏋️ Coach: "El método le pertenece"</h4>
+            <ul style="margin-left:1.25rem; font-size:0.875rem; color:var(--text-secondary); line-height:1.7;">
+              <li>Modela el contexto energético del alumno calculando BMR (Mifflin-St Jeor), NEAT y TDEE.</li>
+              <li>Estructura planes alimenticios en 4 comidas diarias con alimentos fijados por cantidad/porción.</li>
+              <li>Supervisa el cumplimiento diario en tiempo real mediante la vista agregada <code>coach_alumno_summary</code>.</li>
+              <li>Genera vínculos seguros e instantáneos mediante códigos aleatorios de cliente (<code>client_code</code>).</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3 style="font-family:var(--fuente-display); font-size:1.2rem; margin:1.75rem 0 0.75rem;">
+          Flujo de Datos y Arquitectura de Comunicación
+        </h3>
+        <p style="font-size:0.875rem; color:var(--text-secondary); margin-bottom:1rem;">
+          Diagrama de arquitectura Mobile-First Vanilla Web conectado a Supabase PostgreSQL y servicios periféricos:
+        </p>
+
+        <!-- SVG Architecture Diagram -->
+        <div style="background:#111814; border-radius:0.875rem; padding:1.5rem; text-align:center; overflow-x:auto;">
+          <svg viewBox="0 0 880 260" width="100%" height="auto" style="min-width:640px; max-width:850px;" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="20" y="20" width="220" height="220" rx="12" fill="#1B2620" stroke="#2D4236" stroke-width="2"/>
+            <text x="130" y="55" fill="#4ADE80" font-family="system-ui" font-size="14" font-weight="bold" text-anchor="middle">CLIENTE WEB (ESM)</text>
+            <rect x="40" y="75" width="180" height="35" rx="6" fill="#25382D"/>
+            <text x="130" y="98" fill="#FFFFFF" font-family="system-ui" font-size="12" text-anchor="middle">pages/alumno (1-Tap Check)</text>
+            <rect x="40" y="125" width="180" height="35" rx="6" fill="#25382D"/>
+            <text x="130" y="148" fill="#FFFFFF" font-family="system-ui" font-size="12" text-anchor="middle">pages/coach (Editor Plan)</text>
+            <rect x="40" y="175" width="180" height="35" rx="6" fill="#25382D"/>
+            <text x="130" y="198" fill="#FFFFFF" font-family="system-ui" font-size="12" text-anchor="middle">Motor L1 Equivalencias</text>
+
+            <path d="M240 130 H320" stroke="#4ADE80" stroke-width="2" stroke-dasharray="4 4"/>
+            <polygon points="320,130 312,125 312,135" fill="#4ADE80"/>
+
+            <rect x="330" y="20" width="230" height="220" rx="12" fill="#1B2620" stroke="#2D4236" stroke-width="2"/>
+            <text x="445" y="55" fill="#60A5FA" font-family="system-ui" font-size="14" font-weight="bold" text-anchor="middle">SUPABASE BACKEND</text>
+            <rect x="350" y="75" width="190" height="35" rx="6" fill="#1E293B"/>
+            <text x="445" y="98" fill="#FFFFFF" font-family="system-ui" font-size="12" text-anchor="middle">PostgreSQL 15+ & RLS</text>
+            <rect x="350" y="125" width="190" height="35" rx="6" fill="#1E293B"/>
+            <text x="445" y="148" fill="#FFFFFF" font-family="system-ui" font-size="12" text-anchor="middle">Auth JWT & GoTrue</text>
+            <rect x="350" y="175" width="190" height="35" rx="6" fill="#1E293B"/>
+            <text x="445" y="198" fill="#FFFFFF" font-family="system-ui" font-size="12" text-anchor="middle">RPCs (Vincular, Códigos)</text>
+
+            <path d="M560 130 H640" stroke="#60A5FA" stroke-width="2" stroke-dasharray="4 4"/>
+            <polygon points="640,130 632,125 632,135" fill="#60A5FA"/>
+
+            <rect x="650" y="20" width="210" height="220" rx="12" fill="#1B2620" stroke="#2D4236" stroke-width="2"/>
+            <text x="755" y="55" fill="#F472B6" font-family="system-ui" font-size="14" font-weight="bold" text-anchor="middle">APIs & AGENTES</text>
+            <rect x="665" y="75" width="180" height="35" rx="6" fill="#3B182B"/>
+            <text x="755" y="98" fill="#FFFFFF" font-family="system-ui" font-size="12" text-anchor="middle">OpenFDA (DSHEA & UNII)</text>
+            <rect x="665" y="125" width="180" height="35" rx="6" fill="#3B182B"/>
+            <text x="755" y="148" fill="#FFFFFF" font-family="system-ui" font-size="12" text-anchor="middle">Open Food Facts (Barcodes)</text>
+            <rect x="665" y="175" width="180" height="35" rx="6" fill="#3B182B"/>
+            <text x="755" y="198" fill="#FFFFFF" font-family="system-ui" font-size="12" text-anchor="middle">AI Agent Tools (MCP)</text>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- PANEL 2: MODELO DE DATOS & RLS SUPABASE -->
+    <section class="tab-panel" id="panel-db" role="tabpanel" aria-labelledby="tab-btn-db">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">
+            <svg width="22" height="22"><use href="#icon-db"/></svg>
+            Diagrama Entidad-Relación y Tablas Supabase
+          </h2>
+          <span class="badge badge--blue">PostgreSQL 15+</span>
+        </div>
+        <p>
+          Esquema relacional en Supabase con aislamiento estricto por <strong>Row Level Security (RLS)</strong>. Un alumno solo lee su propio plan y registros; un coach solo accede a los alumnos con vinculación activa confirmada.
+        </p>
+
+        <div class="tech-table-wrapper">
+          <table class="tech-table">
+            <thead>
+              <tr>
+                <th>Tabla PostgreSQL</th>
+                <th>Propósito y Claves</th>
+                <th>Políticas RLS Aplicadas</th>
+                <th>Estado Repositorio</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>public.perfiles</code></td>
+                <td>ID único (`auth.users`), username único, rol (`alumno`/`coach`), client_code</td>
+                <td>Select público de usernames / Update solo propietario</td>
+                <td><span class="badge badge--green">Conectado</span></td>
+              </tr>
+              <tr>
+                <td><code>public.alumnos_coach</code></td>
+                <td>Vínculo relacional `coach_id` &harr; `alumno_id`, timestamp `vinculado_en`</td>
+                <td>Coach lee sus alumnos / Alumno lee su coach</td>
+                <td><span class="badge badge--green">Conectado</span></td>
+              </tr>
+              <tr>
+                <td><code>public.planes_alimentacion</code></td>
+                <td>Cabecera de plan, versión activa, `alumno_id`, `coach_id`, calorías totales</td>
+                <td>Coach edita / Alumno solo lectura del activo</td>
+                <td><span class="badge badge--amber">Falta UI Alumno</span></td>
+              </tr>
+              <tr>
+                <td><code>public.daily_logs</code></td>
+                <td>Registro diario de comidas consumidas (1-Tap Check), timestamp, calorías reales</td>
+                <td>Alumno inserta/lee / Coach consulta vía vista</td>
+                <td><span class="badge badge--amber">Falta conexión</span></td>
+              </tr>
+              <tr>
+                <td><code>public.alimentos</code></td>
+                <td>Catálogo con Kcal, Proteínas, Carbohidratos, Grasas, `is_public`</td>
+                <td>Públicos legibles por todos / Privados solo creador</td>
+                <td><span class="badge badge--green">Conectado</span></td>
+              </tr>
+              <tr>
+                <td><code>public.antropometrias</code></td>
+                <td>Tabla obsoleta de medidas corporales descartada en UI moderna</td>
+                <td>Pendiente drop migration</td>
+                <td><span class="badge badge--red">Deuda Técnica</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 style="font-family:var(--fuente-display); font-size:1.2rem; margin:1.75rem 0 0.75rem;">
+          Procedimientos Almacenados Críticos (RPC PostgreSQL)
+        </h3>
+
+        <!-- Código SQL RPC Vincular Alumno -->
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span>supabase/migrations/20261016_vincular_alumno_rpc.sql</span>
+            <button class="code-copy-btn" onclick="copiarAlPortapapeles(this)">Copiar SQL</button>
+          </div>
+          <pre class="code-block"><code>CREATE OR REPLACE FUNCTION public.vincular_alumno_por_codigo(p_codigo TEXT)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_coach_id UUID := auth.uid();
+  v_alumno_id UUID;
+  v_perfil_alumno RECORD;
+BEGIN
+  IF v_coach_id IS NULL THEN
+    RETURN jsonb_build_object('ok', false, 'error', 'No autenticado');
+  END IF;
+
+  SELECT id, nombre, usuario INTO v_perfil_alumno
+  FROM public.perfiles
+  WHERE UPPER(client_code) = UPPER(TRIM(p_codigo)) AND rol = 'alumno';
+
+  IF NOT FOUND THEN
+    RETURN jsonb_build_object('ok', false, 'error', 'Código de alumno inexistente');
+  END IF;
+
+  v_alumno_id := v_perfil_alumno.id;
+
+  INSERT INTO public.alumnos_coach (coach_id, alumno_id, vinculado_en)
+  VALUES (v_coach_id, v_alumno_id, NOW())
+  ON CONFLICT (coach_id, alumno_id) DO NOTHING;
+
+  RETURN jsonb_build_object('ok', true, 'alumno_id', v_alumno_id, 'nombre', v_perfil_alumno.nombre);
+END;
+$$;</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- PANEL 3: MOTOR NUTRICIONAL & EQUIVALENCIAS L1 -->
+    <section class="tab-panel" id="panel-motor" role="tabpanel" aria-labelledby="tab-btn-motor">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">
+            <svg width="22" height="22"><use href="#icon-calc"/></svg>
+            Algoritmo de Equivalencias: Mediana Ponderada en Distancia L1
+          </h2>
+          <span class="badge badge--green">Resolución Analítica en O(1)</span>
+        </div>
+        <p>
+          El motor de reemplazo nutricional de AppCalorias resuelve analíticamente la porción óptima \(x^*\) (en gramos) de un alimento alternativo \(B\) para sustituir un alimento planificado \(A\).
+        </p>
+
+        <div style="background:var(--surface-alt); padding:1.25rem; border-radius:0.75rem; margin:1rem 0;">
+          <h4 style="font-family:var(--fuente-display); font-size:1.05rem; color:var(--text); margin-bottom:0.5rem;">
+            Función Objetivo de Minimización:
+          </h4>
+          <p style="font-family:var(--fuente-mono); font-size:0.875rem; color:var(--accent); line-height:1.8;">
+            E(x) = w_1 · |C_A - x·C_B|/C_A + w_2 · 4|P_A - x·P_B|/C_A + w_3 · 4|CH_A - x·CH_B|/C_A + w_4 · 9|G_A - x·G_B|/C_A
+          </p>
+          <p style="font-size:0.8125rem; color:var(--text-secondary); margin-top:0.5rem;">
+            Donde \(w_1 = 0.20\) (peso calórico global) y \(w_2, w_3, w_4\) se distribuyen proporcionalmente al 80% restante según la densidad de macronutrientes del alimento original. La solución \(x^*\) es la <strong>mediana ponderada</strong> de los 4 multiplicadores individuales.
+          </p>
+        </div>
+
+        <!-- SIMULADOR INTERACTIVO L1 COMPLETO -->
+        <div class="sim-box" id="simulador-l1-box">
+          <h3 style="font-family:var(--fuente-display); font-size:1.25rem; color:var(--accent); margin-bottom:0.5rem;">
+            ⚡ Simulador Analítico L1 en Vivo (4 Macronutrientes)
+          </h3>
+          <p style="font-size:0.875rem; color:var(--text-secondary); margin-bottom:1.25rem;">
+            Ajustá porciones y macronutrientes de ambos alimentos o seleccioná preajustes para evaluar la mediana ponderada en tiempo real:
+          </p>
+
+          <div class="sim-grid">
+            <!-- ALIMENTO A -->
+            <div class="sim-food-card">
+              <h4>
+                <span>Alimento Planificado (Comida A)</span>
+                <span class="badge badge--blue">Base</span>
+              </h4>
+              <div class="form-group">
+                <label>Preajuste Rápido Alimento A</label>
+                <select class="form-control" id="sim-preset-a">
+                  <option value="arroz">Arroz blanco cocido (150g)</option>
+                  <option value="pollo">Pechuga de pollo cocida (120g)</option>
+                  <option value="fideos">Fideos al dente (150g)</option>
+                  <option value="papa">Papa hervida con piel (200g)</option>
+                  <option value="banana">Banana / Plátano maduro (120g)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Nombre</label>
+                <input type="text" class="form-control" id="sim-nombre-a" value="Arroz blanco cocido">
+              </div>
+              <div class="grid-2">
+                <div class="form-group">
+                  <label>Gramos planificados</label>
+                  <input type="number" class="form-control" id="sim-g-a" value="150" step="5">
+                </div>
+                <div class="form-group">
+                  <label>Kcal / 100g</label>
+                  <input type="number" class="form-control" id="sim-kcal-a" value="130">
+                </div>
+              </div>
+              <div class="grid-3">
+                <div class="form-group">
+                  <label>P / 100g (g)</label>
+                  <input type="number" class="form-control" id="sim-p-a" value="2.7" step="0.1">
+                </div>
+                <div class="form-group">
+                  <label>CH / 100g (g)</label>
+                  <input type="number" class="form-control" id="sim-ch-a" value="28.2" step="0.1">
+                </div>
+                <div class="form-group">
+                  <label>G / 100g (g)</label>
+                  <input type="number" class="form-control" id="sim-g-a-val" value="0.3" step="0.1">
+                </div>
+              </div>
+            </div>
+
+            <!-- ALIMENTO B -->
+            <div class="sim-food-card">
+              <h4>
+                <span>Alimento de Reemplazo (Comida B)</span>
+                <span class="badge badge--green">Candidato</span>
+              </h4>
+              <div class="form-group">
+                <label>Preajuste Rápido Alimento B</label>
+                <select class="form-control" id="sim-preset-b">
+                  <option value="avena">Avena en copos</option>
+                  <option value="papa">Papa hervida</option>
+                  <option value="pollo">Pechuga de pollo (Mala similitud)</option>
+                  <option value="batata">Batata / Camote al horno</option>
+                  <option value="lentejas">Lentejas cocidas</option>
+                  <option value="huevos">Huevo entero hervido</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Nombre</label>
+                <input type="text" class="form-control" id="sim-nombre-b" value="Avena en copos">
+              </div>
+              <div class="grid-2">
+                <div class="form-group">
+                  <label>Kcal / 100g</label>
+                  <input type="number" class="form-control" id="sim-kcal-b" value="389">
+                </div>
+                <div class="form-group">
+                  <label>P / 100g (g)</label>
+                  <input type="number" class="form-control" id="sim-p-b" value="16.9" step="0.1">
+                </div>
+              </div>
+              <div class="grid-2">
+                <div class="form-group">
+                  <label>CH / 100g (g)</label>
+                  <input type="number" class="form-control" id="sim-ch-b" value="66.3" step="0.1">
+                </div>
+                <div class="form-group">
+                  <label>G / 100g (g)</label>
+                  <input type="number" class="form-control" id="sim-g-b-val" value="6.9" step="0.1">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RESULTADOS DEL SIMULADOR -->
+          <div class="sim-results">
+            <div class="sim-res-header">
+              <div>
+                <span style="font-size:0.8125rem; color:#A0B2A6; text-transform:uppercase; letter-spacing:0.04em;">Cantidad Equivalente Óptima</span>
+                <div class="sim-res-val" id="sim-res-gramos">65 g</div>
+              </div>
+              <div style="text-align:right;">
+                <span class="badge badge--green" id="sim-res-badge" style="font-size:0.875rem; padding:0.4rem 0.9rem;">Equivalente Óptimo</span>
+                <div style="font-size:0.8125rem; color:#A0B2A6; margin-top:0.35rem;" id="sim-res-scores">Adherencia: 92% · Similitud: 78%</div>
+              </div>
+            </div>
+
+            <!-- BARRAS COMPARATIVAS DE LOS 4 MACROS -->
+            <div class="sim-bars">
+              <div class="sim-bar-item">
+                <div class="sim-bar-meta">
+                  <span>⚡ Calorías (Objetivo A vs Reemplazo B)</span>
+                  <span id="sim-meta-kcal">195 kcal vs 194 kcal</span>
+                </div>
+                <div class="bar-track">
+                  <div class="bar-fill" id="sim-fill-kcal" style="width: 99%; background: var(--macro-kcal);"></div>
+                </div>
+              </div>
+              <div class="sim-bar-item">
+                <div class="sim-bar-meta">
+                  <span>🥩 Proteínas (g)</span>
+                  <span id="sim-meta-p">4.1g vs 11.0g</span>
+                </div>
+                <div class="bar-track">
+                  <div class="bar-fill" id="sim-fill-p" style="width: 70%; background: var(--macro-p);"></div>
+                </div>
+              </div>
+              <div class="sim-bar-item">
+                <div class="sim-bar-meta">
+                  <span>🌾 Carbohidratos (g)</span>
+                  <span id="sim-meta-ch">42.3g vs 43.1g</span>
+                </div>
+                <div class="bar-track">
+                  <div class="bar-fill" id="sim-fill-ch" style="width: 98%; background: var(--macro-c);"></div>
+                </div>
+              </div>
+              <div class="sim-bar-item">
+                <div class="sim-bar-meta">
+                  <span>🥑 Grasas / Lípidos (g)</span>
+                  <span id="sim-meta-g">0.5g vs 4.5g</span>
+                </div>
+                <div class="bar-track">
+                  <div class="bar-fill" id="sim-fill-g" style="width: 60%; background: var(--macro-g);"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PANEL 4: ROADMAP & PASOS FALTANTES -->
+    <section class="tab-panel" id="panel-roadmap" role="tabpanel" aria-labelledby="tab-btn-roadmap">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">
+            <svg width="22" height="22"><use href="#icon-map"/></svg>
+            Hoja de Ruta Técnica: Pasos Faltantes Priorizados
+          </h2>
+          <span class="badge badge--green" id="sprint-status-badge">0 de 4 Completados (0%)</span>
+        </div>
+        <p>
+          Estado actual de la implementación tras el commit <code>2dc2dab</code>. Marcá las casillas interactivas para simular y guardar el avance del sprint:
+        </p>
+
+        <!-- Barra de Progreso del Sprint -->
+        <div class="sprint-progress-bar">
+          <div class="sprint-progress-fill" id="sprint-progress-fill"></div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem;">
+          <span style="font-size:0.8125rem; color:var(--text-tertiary);" id="sprint-progress-text">Progreso del sprint guardado automáticamente en tu navegador.</span>
+          <button class="btn btn--secondary btn--sm" id="btn-reset-sprint" type="button">Restablecer Progreso</button>
+        </div>
+
+        <div>
+          <!-- Paso 1 -->
+          <details class="tech-accordion" open>
+            <summary class="tech-summary">
+              <span>🚀 Paso 1: Onboarding Integral del Alumno en 5 Pasos</span>
+              <span class="badge badge--amber">P0 · Pendiente Frontend</span>
+            </summary>
+            <div class="accordion-body">
+              <p>El formulario de registro fue abreviado a 4 campos (usuario, email, clave, rol). Falta la pantalla <code>frontend/pages/alumno/onboarding.html</code> para recopilar el contexto biológico:</p>
+              <ul style="margin:0.75rem 0 0.75rem 1.5rem; line-height:1.7;">
+                <li>Paso 1: Sexo biológico (M/F) y fecha de nacimiento (fórmula Mifflin-St Jeor).</li>
+                <li>Paso 2: Altura en cm y Peso actual en kg (regla táctil analógica).</li>
+                <li>Paso 3: Nivel de movimiento no deportivo (NEAT: pasos diarios promedio).</li>
+                <li>Paso 4: Entrenamientos semanales (sesiones/semana y duración media para METs).</li>
+                <li>Paso 5: Objetivo corporal (Déficit, Mantenimiento, Superávit) y tipo de dieta base.</li>
+              </ul>
+              <label class="casilla" style="display:flex; align-items:center; gap:0.5rem; margin-top:0.75rem; font-weight:600; cursor:pointer;">
+                <input type="checkbox" class="roadmap-check" data-step="step1">
+                <span>Marcar Paso 1 como completado</span>
+              </label>
+            </div>
+          </details>
+
+          <!-- Paso 2 -->
+          <details class="tech-accordion" open>
+            <summary class="tech-summary">
+              <span>🔌 Paso 2: Conexión de Datos Reales y 1-Tap Check</span>
+              <span class="badge badge--red">P0 · Crítico Repo</span>
+            </summary>
+            <div class="accordion-body">
+              <p>Las vistas principales del alumno (<code>dashboard.html</code>, <code>cantidad.html</code>, <code>reemplazar.html</code>) tienen estructura visual pero muestran guiones estáticos ("—"):</p>
+              <ul style="margin:0.75rem 0 0.75rem 1.5rem; line-height:1.7;">
+                <li>Conectar el selector de fecha con <code>public.daily_logs</code>.</li>
+                <li>Vincular el botón "Lo comí" para persistir el consumo con optimismo visual en IndexedDB.</li>
+                <li>Actualizar el anillo de calorías y las barras de macros reactivamente al confirmar tomas.</li>
+              </ul>
+              <label class="casilla" style="display:flex; align-items:center; gap:0.5rem; margin-top:0.75rem; font-weight:600; cursor:pointer;">
+                <input type="checkbox" class="roadmap-check" data-step="step2">
+                <span>Marcar Paso 2 como completado</span>
+              </label>
+            </div>
+          </details>
+
+          <!-- Paso 3 -->
+          <details class="tech-accordion">
+            <summary class="tech-summary">
+              <span>🧠 Paso 3: Motor de Equivalencias L1 en Producción</span>
+              <span class="badge badge--blue">P1 · Algoritmo</span>
+            </summary>
+            <div class="accordion-body">
+              <p>Extraer el algoritmo implementado en este dashboard a un módulo puro <code>frontend/js/motor/equivalencias.js</code> consumible por <code>reemplazar.html</code> y por los agentes LLM:</p>
+              <ul style="margin:0.75rem 0 0.75rem 1.5rem; line-height:1.7;">
+                <li>Cálculo de mediana ponderada en 4 puntos críticos con redondeo a 5 gramos.</li>
+                <li>Generación automática de advertencias si la similitud de perfil es menor al 60%.</li>
+              </ul>
+              <label class="casilla" style="display:flex; align-items:center; gap:0.5rem; margin-top:0.75rem; font-weight:600; cursor:pointer;">
+                <input type="checkbox" class="roadmap-check" data-step="step3">
+                <span>Marcar Paso 3 como completado</span>
+              </label>
+            </div>
+          </details>
+
+          <!-- Paso 4 -->
+          <details class="tech-accordion">
+            <summary class="tech-summary">
+              <span>💧 Paso 4: Contador de Suplementación e Hidratación OpenFDA</span>
+              <span class="badge badge--green">P1 · Nueva Feature</span>
+            </summary>
+            <div class="accordion-body">
+              <p>Incorporar el módulo de hidratación dinámica compensatoria y validación de dosis de creatina y cafeína según guías sanitarias FDA:</p>
+              <ul style="margin:0.75rem 0 0.75rem 1.5rem; line-height:1.7;">
+                <li>Widget visual con vasos táctiles y recordatorios de suplementación.</li>
+                <li>Cálculo dinámico: 35 ml/kg basal + 500 ml por creatina + compensación por sudoración.</li>
+              </ul>
+              <label class="casilla" style="display:flex; align-items:center; gap:0.5rem; margin-top:0.75rem; font-weight:600; cursor:pointer;">
+                <input type="checkbox" class="roadmap-check" data-step="step4">
+                <span>Marcar Paso 4 como completado</span>
+              </label>
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- PANEL 5: ERRORES ACTUALES & DEUDA TÉCNICA -->
+    <section class="tab-panel" id="panel-errores" role="tabpanel" aria-labelledby="tab-btn-errores">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">
+            <svg width="22" height="22"><use href="#icon-bug"/></svg>
+            Auditoría de Errores Reales en el Repositorio
+          </h2>
+          <span class="badge badge--red">5 Hallazgos Críticos</span>
+        </div>
+        <p>
+          Diagnóstico exhaustivo tras la inspección del código fuente y ramas activas del proyecto AppCalorias:
+        </p>
+
+        <div class="tech-table-wrapper">
+          <table class="tech-table">
+            <thead>
+              <tr>
+                <th>Componente / Archivo</th>
+                <th>Error o Deuda Técnica</th>
+                <th>Severidad</th>
+                <th>Solución de Ingeniería</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>frontend/pages/alumno/dashboard.html</code></td>
+                <td>Guiones estáticos ("—") en calorías y macros; no lee registros de Supabase.</td>
+                <td><span class="badge badge--red">P0 Crítico</span></td>
+                <td>Implementar fetch a <code>daily_logs</code> con fecha activa de la rueda de días.</td>
+              </tr>
+              <tr>
+                <td><code>frontend/registro.html</code></td>
+                <td>Flujo de onboarding ausente; el registro no calcula BMR, NEAT ni objetivos del alumno.</td>
+                <td><span class="badge badge--red">P0 Crítico</span></td>
+                <td>Redirigir a <code>onboarding.html</code> inmediatamente tras el primer login.</td>
+              </tr>
+              <tr>
+                <td><code>supabase/migrations/*</code></td>
+                <td>Tabla <code>antropometrias</code> obsoleta persiste en migraciones previas.</td>
+                <td><span class="badge badge--amber">P1 Moderado</span></td>
+                <td>Crear migración de eliminación y limpiar referencias en permisos.</td>
+              </tr>
+              <tr>
+                <td><code>public.usuario_disponible()</code></td>
+                <td>RPC pública sin rate-limiting a nivel de PostgREST expuesta a enumeración masiva.</td>
+                <td><span class="badge badge--amber">P1 Seguridad</span></td>
+                <td>Añadir rate limiting por IP mediante Edge Functions o Cloudflare Turnstile.</td>
+              </tr>
+              <tr>
+                <td><code>generar_codigo_cliente()</code></td>
+                <td>Bucle aleatorio sin backoff exponencial ni índice único garantizado.</td>
+                <td><span class="badge badge--blue">P2 Robustez</span></td>
+                <td>Crear índice único parcial y limitar reintentos a 5 iteraciones.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- PANEL 6: OPENFDA SUPLEMENTOS & HIDRATACIÓN -->
+    <section class="tab-panel" id="panel-openfda" role="tabpanel" aria-labelledby="tab-btn-openfda">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">
+            <svg width="22" height="22"><use href="#icon-pill"/></svg>
+            Integración de Seguridad Regulatoria OpenFDA & Hidratación
+          </h2>
+          <span class="badge badge--blue">DSHEA & FDA Guidelines</span>
+        </div>
+        <p>
+          Bajo la normativa <em>Dietary Supplement Health and Education Act (DSHEA)</em> de la FDA, los suplementos no requieren aprobación previa pero están sujetos a reportes de eventos adversos, estatus GRAS (*Generally Recognized as Safe*) y límites superiores tolerables (UL).
+        </p>
+
+        <!-- EXPLORADOR DE SUSTANCIAS FDA -->
+        <div class="sim-box" style="margin-top:1.5rem;">
+          <h3 style="font-family:var(--fuente-display); font-size:1.15rem; color:var(--text); margin-bottom:0.75rem;">
+            🔍 Validador de Sustancias y Estatus Regulatorio
+          </h3>
+          <div class="form-group">
+            <label>Seleccionar sustancia o suplemento:</label>
+            <select class="form-control" id="fda-select-sup">
+              <option value="creatina">Creatina Monohidrato (Creapure)</option>
+              <option value="cafeina">Cafeína Anhidra / Pre-entreno</option>
+              <option value="whey">Proteína Whey Aislada (WPI)</option>
+              <option value="vitd3">Vitamina D3 (Colecalciferol)</option>
+              <option value="omega3">Omega 3 EPA / DHA (Aceite de Pescado)</option>
+            </select>
+          </div>
+
+          <div style="background:var(--surface); border:1px solid var(--border); border-radius:0.75rem; padding:1.25rem; margin-top:1rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem; flex-wrap:wrap; gap:0.5rem;">
+              <h4 id="fda-sup-title" style="font-family:var(--fuente-display); font-size:1.1rem; color:var(--accent);">Creatina Monohidrato (Creapure)</h4>
+              <span class="badge badge--green" id="fda-status-badge">FDA GRAS (Seguro)</span>
+            </div>
+            <p id="fda-sup-desc" style="font-size:0.875rem; color:var(--text-secondary); line-height:1.6;">
+              Sustancia clasificada como GRAS por la FDA. Nivel de evidencia A (ISSN). Dosis diaria estándar: 3g a 5g. Recomendación: Ingerir con +500 ml de agua adicionales al requerimiento basal.
+            </p>
+            <div style="margin-top:0.75rem; font-family:var(--fuente-mono); font-size:0.75rem; color:var(--text-tertiary);" id="fda-unii-code">
+              UNII: MU72812GK0
+            </div>
+          </div>
+        </div>
+
+        <!-- CALCULADORA DINÁMICA DE HIDRATACIÓN -->
+        <div class="hydration-calc-box">
+          <h3 style="font-family:var(--fuente-display); font-size:1.15rem; color:#0369A1; margin-bottom:0.5rem;">
+            💧 Calculadora Interactiva de Hidratación Dinámica Compensatoria
+          </h3>
+          <p style="font-size:0.875rem; color:#0C4A6E; margin-bottom:1.25rem;">
+            Calcula la ingesta hídrica óptima según tu peso corporal, suplementación activa y pérdida por sudoración en entrenamiento:
+          </p>
+
+          <div class="grid-2">
+            <div class="form-group">
+              <label style="color:#0369A1;">Peso Corporal (kg)</label>
+              <input type="number" class="form-control" id="hyd-weight" value="70" min="40" max="180">
+            </div>
+            <div class="form-group">
+              <label style="color:#0369A1;">Dosis Diaria de Creatina (g)</label>
+              <input type="number" class="form-control" id="hyd-creatine" value="5" min="0" max="30">
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="form-group">
+              <label style="color:#0369A1;">Cafeína Consumida Hoy (mg)</label>
+              <input type="number" class="form-control" id="hyd-caffeine" value="200" min="0" max="800">
+            </div>
+            <div class="form-group">
+              <label style="color:#0369A1;">Duración Entrenamiento (min)</label>
+              <input type="number" class="form-control" id="hyd-training" value="60" min="0" max="240">
+            </div>
+          </div>
+
+          <div class="hydration-result-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+              <div>
+                <span style="font-size:0.8125rem; color:#BAE6FD; text-transform:uppercase; letter-spacing:0.04em;">Requerimiento Hídrico Diario Total</span>
+                <div style="font-family:var(--fuente-display); font-size:2rem; font-weight:800; color:#38BDF8;" id="hyd-total-liters">3.8 L</div>
+              </div>
+              <div style="text-align:right;">
+                <span class="badge badge--green" style="font-size:0.875rem; padding:0.4rem 0.9rem;">Balance Seguro FDA</span>
+                <div style="font-size:0.8125rem; color:#BAE6FD; margin-top:0.35rem;" id="hyd-total-glasses">~ 15 Vasos de 250ml</div>
+              </div>
+            </div>
+
+            <div style="margin-top:1rem; font-size:0.8125rem; color:#E0F2FE; line-height:1.6; border-top:1px solid rgba(255,255,255,0.15); padding-top:0.75rem;">
+              <strong>Desglose del cálculo:</strong>
+              <span id="hyd-breakdown">2,450 ml (Basal 35 ml/kg) + 500 ml (Creatina) + 150 ml (Cafeína) + 720 ml (Sudor 60min)</span>
+              <br>
+              <em style="color:#FDE047;">⚠️ Alerta FDA: Distribuir tomas a lo largo del día. Evitar superar 1.0 L/hora para prevenir hiponatremia dilucional.</em>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PANEL 7: AI AGENTS ARCHITECTURE & TOOL SCHEMAS -->
+    <section class="tab-panel" id="panel-agents" role="tabpanel" aria-labelledby="tab-btn-agents">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">
+            <svg width="22" height="22"><use href="#icon-bot"/></svg>
+            Arquitectura de Agentes Inteligentes y Esquemas de Herramientas
+          </h2>
+          <span class="badge badge--purple">agent-tool-builder & MCP</span>
+        </div>
+        <p>
+          Diseño multi-agente determinístico para asistir tanto al Coach en la planificación como al Alumno en el registro rápido. Cada agente ejecuta herramientas acotadas con esquemas estrictos sin alucinar datos nutricionales.
+        </p>
+
+        <div class="grid-2" style="margin:1.25rem 0;">
+          <div style="background:var(--surface-alt); padding:1.25rem; border-radius:0.75rem;">
+            <h4 style="font-family:var(--fuente-display); font-size:1.1rem; color:var(--accent); margin-bottom:0.5rem;">🤖 Coach AI Co-pilot</h4>
+            <p style="font-size:0.875rem; color:var(--text-secondary); line-height:1.6;">
+              Ayuda a formular planes nutricionales respetando el balance de macronutrientes, distribuyendo calorías en 4 comidas y sugiriendo plantillas según el perfil del alumno.
+            </p>
+          </div>
+          <div style="background:var(--surface-alt); padding:1.25rem; border-radius:0.75rem;">
+            <h4 style="font-family:var(--fuente-display); font-size:1.1rem; color:var(--accent); margin-bottom:0.5rem;">💬 Student AI Companion</h4>
+            <p style="font-size:0.875rem; color:var(--text-secondary); line-height:1.6;">
+              Resuelve dudas operativas en menos de 10 segundos: <em>"¿Con qué reemplazo el pollo si no tengo?", "¿Cómo registro 1 banana mediana?"</em>. Ejecuta herramientas determinísticas y no inventa macros.
+            </p>
+          </div>
+        </div>
+
+        <h3 style="font-family:var(--fuente-display); font-size:1.2rem; margin:1.75rem 0 0.75rem;">
+          Especificación de Herramientas (5 JSON Schemas Listos para Producción)
+        </h3>
+        <p style="font-size:0.875rem; color:var(--text-secondary); margin-bottom:1rem;">
+          Esquemas formales JSON Schema listos para Gemini API, Claude MCP o frameworks de agentes:
+        </p>
+
+        <!-- TOOL 1: compute_food_equivalence -->
+        <div class="code-wrapper" id="tool-schema-1">
+          <div class="code-header">
+            <span>tool 1: compute_food_equivalence.json (L1 Algorithm)</span>
+            <button class="code-copy-btn" onclick="copiarAlPortapapeles(this)">Copiar Schema</button>
+          </div>
+          <pre class="code-block"><code>{
+  "name": "compute_food_equivalence",
+  "description": "Calcula analíticamente la porción óptima en gramos y el índice de adherencia nutricional para sustituir un alimento planificado por otro alternativo mediante la minimización en mediana ponderada L1.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "target_food": {
+        "type": "object",
+        "description": "Valores nutricionales absolutos del alimento original planificado",
+        "properties": {
+          "name": { "type": "string" },
+          "quantity_grams": { "type": "number", "minimum": 1 },
+          "calories": { "type": "number", "minimum": 0 },
+          "protein": { "type": "number", "minimum": 0 },
+          "carbs": { "type": "number", "minimum": 0 },
+          "fat": { "type": "number", "minimum": 0 }
+        },
+        "required": ["name", "quantity_grams", "calories", "protein", "carbs", "fat"]
+      },
+      "replacement_food": {
+        "type": "object",
+        "description": "Valores nutricionales del alimento de reemplazo cada 100 gramos",
+        "properties": {
+          "name": { "type": "string" },
+          "calories_per_100g": { "type": "number", "minimum": 0 },
+          "protein_per_100g": { "type": "number", "minimum": 0 },
+          "carbs_per_100g": { "type": "number", "minimum": 0 },
+          "fat_per_100g": { "type": "number", "minimum": 0 }
+        },
+        "required": ["name", "calories_per_100g", "protein_per_100g", "carbs_per_100g", "fat_per_100g"]
+      }
+    },
+    "required": ["target_food", "replacement_food"]
+  }
+}</code></pre>
+        </div>
+
+        <!-- TOOL 2: validate_supplement_safety_fda -->
+        <div class="code-wrapper" id="tool-schema-2">
+          <div class="code-header">
+            <span>tool 2: validate_supplement_safety_fda.json (openFDA)</span>
+            <button class="code-copy-btn" onclick="copiarAlPortapapeles(this)">Copiar Schema</button>
+          </div>
+          <pre class="code-block"><code>{
+  "name": "validate_supplement_safety_fda",
+  "description": "Valida una sustancia o suplemento dietario contra las bases de datos regulatorias de OpenFDA (tolerable upper intake levels, estatus GRAS, advertencias y reportes de eventos adversos).",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "supplement_name": { "type": "string", "description": "Nombre de la sustancia o principio activo (ej. creatine, caffeine, vitamin_d)" },
+      "dosage": { "type": "string", "description": "Dosis diaria planificada (ej. '5g', '300mg')" },
+      "user_age": { "type": "integer", "description": "Edad del usuario para validar límites pediátricos o geriátricos" }
+    },
+    "required": ["supplement_name", "dosage"]
+  }
+}</code></pre>
+        </div>
+
+        <!-- TOOL 3: search_food_database -->
+        <div class="code-wrapper" id="tool-schema-3">
+          <div class="code-header">
+            <span>tool 3: search_food_database.json (Catalog Query)</span>
+            <button class="code-copy-btn" onclick="copiarAlPortapapeles(this)">Copiar Schema</button>
+          </div>
+          <pre class="code-block"><code>{
+  "name": "search_food_database",
+  "description": "Busca alimentos en el catálogo oficial de AppCalorias con filtrado por macronutrientes, coincidencia difusa (fuzzy search) y banderas dietarias (vegano, celíaco, keto).",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "query": { "type": "string", "description": "Término de búsqueda (ej. 'arroz integral', 'pechuga', 'huevo')" },
+      "dietary_flags": {
+        "type": "array",
+        "items": { "type": "string", "enum": ["vegan", "vegetarian", "gluten_free", "lactose_free", "keto"] },
+        "description": "Restricciones dietarias obligatorias"
+      },
+      "max_results": { "type": "integer", "default": 10, "maximum": 50 }
+    },
+    "required": ["query"]
+  }
+}</code></pre>
+        </div>
+
+        <!-- TOOL 4: generate_coach_meal_plan -->
+        <div class="code-wrapper" id="tool-schema-4">
+          <div class="code-header">
+            <span>tool 4: generate_coach_meal_plan.json (AI Planner)</span>
+            <button class="code-copy-btn" onclick="copiarAlPortapapeles(this)">Copiar Schema</button>
+          </div>
+          <pre class="code-block"><code>{
+  "name": "generate_coach_meal_plan",
+  "description": "Genera una propuesta estructurada de plan de alimentación en 4 comidas diarias que respeta con precisión milimétrica el presupuesto calórico y de macronutrientes fijado por el Coach.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "target_calories": { "type": "number", "description": "Calorías diarias objetivo (TDEE corregido)" },
+      "target_protein_g": { "type": "number", "description": "Gramos de proteína diarios objetivo" },
+      "target_carbs_g": { "type": "number", "description": "Gramos de carbohidratos diarios objetivo" },
+      "target_fat_g": { "type": "number", "description": "Gramos de grasas diarios objetivo" },
+      "meals_distribution": {
+        "type": "object",
+        "description": "Porcentaje calórico por comida (ej. desayuno: 0.25, almuerzo: 0.35, merienda: 0.15, cena: 0.25)",
+        "properties": {
+          "desayuno": { "type": "number" },
+          "almuerzo": { "type": "number" },
+          "merienda": { "type": "number" },
+          "cena": { "type": "number" }
+        }
+      }
+    },
+    "required": ["target_calories", "target_protein_g", "target_carbs_g", "target_fat_g"]
+  }
+}</code></pre>
+        </div>
+
+        <!-- TOOL 5: log_student_daily_intake -->
+        <div class="code-wrapper" id="tool-schema-5">
+          <div class="code-header">
+            <span>tool 5: log_student_daily_intake.json (Student Companion)</span>
+            <button class="code-copy-btn" onclick="copiarAlPortapapeles(this)">Copiar Schema</button>
+          </div>
+          <pre class="code-block"><code>{
+  "name": "log_student_daily_intake",
+  "description": "Registra el consumo confirmado de una comida, suplemento o ingesta hídrica en la tabla daily_logs de Supabase, validando previamente que no se dupliquen registros para la misma fecha.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "log_type": { "type": "string", "enum": ["meal", "supplement", "water"] },
+      "date": { "type": "string", "format": "date", "description": "Fecha del consumo (YYYY-MM-DD)" },
+      "meal_name": { "type": "string", "description": "Nombre de la comida (Desayuno, Almuerzo, Merienda, Cena) si aplica" },
+      "item_id": { "type": "string", "description": "ID del alimento o suplemento" },
+      "quantity": { "type": "number", "description": "Cantidad consumida en gramos, unidades o mililitros" },
+      "calories": { "type": "number", "description": "Calorías aportadas" }
+    },
+    "required": ["log_type", "date", "quantity"]
+  }
+}</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- PANEL 8: 25 PREGUNTAS ESTRATÉGICAS PARA DEVS & LEADS -->
+    <section class="tab-panel" id="panel-preguntas" role="tabpanel" aria-labelledby="tab-btn-preguntas">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">
+            <svg width="22" height="22"><use href="#icon-help"/></svg>
+            25 Preguntas Estratégicas para Devs & Tech Leads
+          </h2>
+          <span class="badge badge--green" id="preguntas-counter-badge">Mostrando 25 de 25</span>
+        </div>
+        <p>
+          Cuestionario técnico exhaustivo con propuestas de arquitectura y trade-offs para resolver antes del lanzamiento a producción. Utilizá los filtros cruzados por <strong>Eje temático</strong> y por <strong>Nivel de Prioridad</strong>:
+        </p>
+
+        <!-- Filtros Cruzados Dinámicos -->
+        <div style="background:var(--surface-alt); padding:1rem; border-radius:0.75rem; margin:1.25rem 0;">
+          <div style="display:flex; flex-direction:column; gap:0.75rem;">
+            <!-- Filtro por Eje -->
+            <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+              <span style="font-size:0.75rem; font-weight:700; color:var(--text-tertiary); text-transform:uppercase; min-width:80px;">Eje Temático:</span>
+              <button class="tab-btn filter-btn filter-eje active" data-eje="todos">Todos (25)</button>
+              <button class="tab-btn filter-btn filter-eje" data-eje="eje-a">Eje A: Frontend (5)</button>
+              <button class="tab-btn filter-btn filter-eje" data-eje="eje-b">Eje B: Supabase & DB (5)</button>
+              <button class="tab-btn filter-btn filter-eje" data-eje="eje-c">Eje C: Motor L1 (5)</button>
+              <button class="tab-btn filter-btn filter-eje" data-eje="eje-d">Eje D: Seguridad (5)</button>
+              <button class="tab-btn filter-btn filter-eje" data-eje="eje-e">Eje E: UX & Producto (5)</button>
+            </div>
+            <!-- Filtro por Prioridad -->
+            <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+              <span style="font-size:0.75rem; font-weight:700; color:var(--text-tertiary); text-transform:uppercase; min-width:80px;">Prioridad:</span>
+              <button class="tab-btn filter-btn filter-prio active" data-prio="todas">Todas</button>
+              <button class="tab-btn filter-btn filter-prio" data-prio="p0"><span class="badge badge--red">P0 Crítico</span></button>
+              <button class="tab-btn filter-btn filter-prio" data-prio="p1"><span class="badge badge--blue">P1 Importante</span></button>
+              <button class="tab-btn filter-btn filter-prio" data-prio="p2"><span class="badge badge--purple">P2 Deseable</span></button>
+            </div>
+          </div>
+        </div>
+
+        <div id="preguntas-container">
+          <!-- EJE A: FRONTEND & STACK (1 - 5) -->
+          <details class="tech-accordion pregunta-item" data-eje="eje-a" data-prio="p1" open>
+            <summary class="tech-summary">
+              <span>1. Estrategia sin Bundler a Escala (Cache-Busting de ES Modules)</span>
+              <span class="badge badge--blue">Eje A · P1</span>
+            </summary>
+            <div class="accordion-body">
+              <strong>Problema Técnico:</strong> Al importar módulos directamente mediante ESM CDN, los navegadores de clientes recurrentes pueden retener archivos cacheados tras una actualización de código.<br>
+              <strong>Propuesta Arquitectónica:</strong> Adoptar querystrings con versión fija <code>?v=1.2.0</code> en los imports de cada script HTML durante despliegues automatizados de Git.
+            </div>
+          </details>
+
+          <details class="tech-accordion pregunta-item" data-eje="eje-a" data-prio="p0">
+            <summary class="tech-summary">
+              <span>2. Sincronización Offline-First en el Gimnasio (Background Sync)</span>
+              <span class="badge badge--red">Eje A · P0</span>
+            </summary>
+            <div class="accordion-body">
+              <strong>Problema Técnico:</strong> Muchos gimnasios tienen sótanos con nula señal móvil; si el alumno toca "Lo comí", la petición a Supabase falla.<br>
+              <strong>Propuesta Arquitectónica:</strong> Implementar capa de persistencia en <code>IndexedDB</code> con Service Worker y sincronización diferida al recuperar conexión.
+            </div>
+          </details>
+
+          <details class="tech-accordion pregunta-item" data-eje="eje-a" data-prio="p2">
+            <summary class="tech-summary">
+              <span>3. Manejo Centralizado de Estado Reactivo entre Pantallas</span>
+              <span class="badge badge--purple">Eje A · P2</span>
+            </summary>
+            <div class="accordion-body">
+              <strong>Problema Técnico:</strong> Cada UI mantiene variables globales en memoria (`let elegido`, `let clientes`). Si cambia la fecha, no siempre se refrescan los componentes hijos.<br>
+              <strong>Propuesta Arquitectónica:</strong> Crear un bus nativo con <code>CustomEvent</code> y <code>BroadcastChannel</code> para sincronizar pestañas en segundo plano.
+            </div>
+          </details>
+
+          <details class="tech-accordion pregunta-item" data-eje="eje-a" data-prio="p0">
+            <summary class="tech-summary">
+              <span>4. Sanitización y Validación en Formularios Críticos (crear-alimento.html)</span>
+              <span class="badge badge--red">Eje A · P0</span>
+            </summary>
+            <div class="accordion-body">
+              <strong>Problema Técnico:</strong> La inserción directa de nombres y notas de alimentos puede permitir ataques XSS o inyecciones si no se escapan en el DOM al renderizar listas.<br>
+              <strong>Propuesta Arquitectónica:</strong> Sanitización estricta mediante <code>textContent</code> y esquemas de validación tipo Zod/JSON Schema en el cliente antes de llamar a PostgREST.
+            </div>
+          </details>
+
+          <details class="tech-accordion pregunta-item" data-eje="eje-a" data-prio="p2">
+            <summary class="tech-summary">
+              <span>5. Componentización de SVG Sprites vs Inyección Inline</span>
+              <span class="badge badge--purple">Eje A · P2</span>
+            </summary>
+            <div class="accordion-body">
+              <strong>Problema Técnico:</strong> Múltiples vistas replican SVGs idénticos (íconos de chevron, fuego, manzana, pesa), inflando el peso del HTML innecesariamente.<br>
+              <strong>Propuesta Arquitectónica:</strong> Unificar en un sprite central <code>frontend/assets/icons.svg</code> consumido mediante <code>&lt;svg&gt;&lt;use href="assets/icons.svg#id"/&gt;&lt;/svg&gt;</code>.
+            </div>
+          </details>
+
+          <!-- EJE B: SUPABASE & DB (6 - 10) -->
+          <details class="tech-accordion pregunta-item" data-eje="eje-b" data-prio="p0" open>
+            <summary class="tech-summary">
+              <span>6. Desacoplamiento Formal de Antropometría en PostgreSQL</span>
+              <span class="badge badge--red">Eje B · P0</span>
+            </summary>
+            <div class="accordion-body">
+              <strong>Problema Técnico:</strong> La tabla <code>antropometrias</code> aún existe en migraciones previas a pesar de que la UI ya la descartó.<br>
+              <strong>Propuesta Arquitectónica:</strong> Ejecutar migración <code>20261017_drop_antropometria.sql</code> y redefinir permisos de coach sin exponer columnas obsoletas.
+            </div>
+          </details>
+
+          <details class="tech-accordion pregunta-item" data-eje="eje-b" data-prio="p1">
+            <summary class="tech-summary">
+              <span>7. Normalización Relacional vs JSONB en Planes de Alimentación</span>
+              <span class="badge badge--blue">Eje B · P1</span>
+            </summary>
+            <div class="accordion-body">
+              <strong>Problema Técnico:</strong> Almacenar las 4 comidas como un blob JSONB en <code>planes_alimentacion</code> dificulta auditorías y consultas de adherencia.<br>
+              <strong>Propuesta Arquitectónica:</strong> Normalizar a tablas relacionales <code>plan_meals</code> y <code>plan_items</code> con claves foráneas para auditoría de reemplazos e integridad referencial.
+            </div>
+          </details>
+
+          <details class="tech-accordion pregunta-item" data-eje="eje-b" data-prio="p1">
+            <summary class="tech-summary">
+              <span>8. Performance de la Vista SQL coach_alumno_summary</span>
+              <span class="badge badge--blue">Eje B · P1</span>
+            </summary>
+            <div class="accordion-body">
+              <strong>Problema Técnico:</strong> Calcular agregados semanales para coaches con cientos de alumnos provocará consultas secuenciales lentas.<br>
+              <strong>Propuesta Arquitectónica:</strong> Convertir la vista en una <code>MATERIALIZED VIEW</code> refrescada periódicamente mediante la extensión <code>pg_cron</code> de Supabase.
+            </div>
+          </details>
+
+          <details class="tech-accordion pregunta-item" data-eje="eje-b" data-prio="p1">
+            <summary class="tech-summary">
+              <span>9. Manejo de Zonas Horarias y Registros a Medianoche</span>
+              <span class="badge badge--blue">Eje B · P1</span>
+            </summary>
+            <div class="accordion-body">
+              <strong>Problema Técnico:</strong> Si un alumno cena a las 23:45 y registra a las 00:15 UTC, el registro se asigna al día siguiente erróneamente.<br>
+              <strong>Propuesta Arquitectónica:</strong> Almacenar la columna <code>log_date</code> como tipo <code>DATE</code> estricto en la zona horaria del cliente (ej. <code>America/Argentina/Cordoba</code>), desacoplada del <code>created_at TIMESTAMPTZ</code>.
+            </div>
+          </details>
+
+          <details class="tech-accordion pregunta-item" data-eje="eje-b" data-prio="p1">
+            <summary class="tech-summary">
+              <span>10. Riesgo de Colisión en Generación de Código client_code</span>
+              <span class="badge badge--blue">Eje B · P1</span>
+            </summary>
+            <div class="accordion-body">
+              <strong>Problema Técnico:</strong> La función <code>generar_codigo_cliente()</code> utiliza un bucle con números aleatorios en formato <code>NF-1234-AB</code>.<br>
+              <strong>Propuesta Arquitectónica:</strong> Añadir índice único y un límite de 5 reintentos con backoff exponencial para garantizar inserción en menos de 5 ms sin deadlocks.
+            </div>
+          </details>
+
+          <!-- EJE C: MOTOR NUTRICIONAL & EQUIVALENCIAS L1 (11 - 15) -->
+          <details class="tech-accordion pregunta-item" data-eje="eje-c" data-prio="p0" open>
+            <summary class="tech-summary">
+              <span>11. Fuente de Datos Definitiva del Catálogo de Alimentos</span>
+              <span class="badge badge--red">Eje C · P0</span>
+            </summary>
+            <div class="accordion-body">
+              <strong>Problema Técnico:</strong> Actualmente solo existen ejemplos aislados en maquetas.<br>
+              <strong>Propuesta Arquitectónica:</strong> Base curada en Supabase (500 alimentos frecuentes de consumo regional) combinada con la API de Open Food Facts para escaneo de códigos de barra.
+            </div>
+          </details>
+
+          <details class="tech-accordion pregunta-item" data-eje="eje-c" data-prio="p1">
+            <summary class="tech-summary">
+              <span>12. Soporte para Unidades y Medidas Caseras (1 Banana, 2 Huevos)</span>
+              <span class="badge badge--blue">Eje C · P1</span>
+            </summary>
+            <div class="accordion-body">
+              <strong>Problema Técnico:</strong> El algoritmo L1 opera exclusivamente en gramos, pero el usuario casual no pesa una fruta ni un huevo.<br>
+              <strong>Propuesta Arquitectónica:</strong> Almacenar el gramaje por unidad promedio (ej. 1 huevo M = 55g, 1 banana = 120g) y redondear al múltiplo de unidad más cercano.
+            </div>
+          </details>
+
+          <details class="tech-accordion pregunta-item" data-eje="eje-c" data-prio="p1">
+            <summary class="tech-summary">
+              <span>13. Calibración y Validación Clínica de Umbrales L1</span>
+              <span class="badge badge--blue">Eje C · P1</span>
+            </summary>
+            <div class="accordion-body">
+              <strong>Problema Técnico:</strong> Los umbrales de equivalencia óptima (&ge;90% adherencia, &ge;75% similitud) requieren validación nutricional.<br>
+              <strong>Propuesta Arquitectónica:</strong> Panel de calibración donde el nutricionista jefe valide la matriz de penalización por micronutrientes y fibra dietaria.
+            </div>
+          </details>
+
+          <details class="tech-accordion pregunta-item" data-eje="eje-c" data-prio="p0">
+            <summary class="tech-summary">
+              <span>14. Restricción por Categorías y Perfiles Lipídicos</span>
+              <span class="badge badge--red">Eje C · P0</span>
+            </summary>
+            <div class="accordion-body">
+              <strong>Problema Técnico:</strong> Evitar que el algoritmo matemático sugiera reemplazar hidratos complejos (arroz) por grasas puras (manteca) si solo coinciden calorías.<br>
+              <strong>Propuesta Arquitectónica:</strong> Matriz de compatibilidad biológica obligatoria antes de ejecutar la minimización L1, bloqueando cruces incompatibles.
+            </div>
+          </details>
+
+          <details class="tech-accordion pregunta-item" data-eje="eje-c" data-prio="p2">
+            <summary class="tech-summary">
+              <span>15. Alimentos Creados por Usuarios: Privacidad vs Catálogo Comunitario</span>
+              <span class="badge badge--purple">Eje C · P2</span>
+            </summary>
+            <div class="accordion-body">
+              <strong>Problema Técnico:</strong> Cuando un alumno o coach crea un alimento custom en <code>crear-alimento.html</code>, este puede contener errores o duplicar ítems existentes.<br>
+              <strong>Propuesta Arquitectónica:</strong> Visibilidad privada por defecto (<code>is_public = false</code>), con un flujo de moderación técnica para promover alimentos de calidad al catálogo global.
+            </div>
+          </details>
+
+          <!-- EJE D: SEGURIDAD, ROLES & AUTENTICACIÓN (16 - 20) -->
+          <details class="tech-accordion pregunta-item" data-eje="eje-d" data-prio="p1" open>
+            <summary class="tech-summary">
+              <span>16. Protección contra Registro Abierto y Abuso de Cuentas de Coach</span>
+              <span class="badge badge--blue">Eje D · P1</span>
+            </summary>
+            <div class="accordion-body">
+              <strong>Problema Técnico:</strong> En <code>registro.html</code> cualquier persona puede seleccionarse como coach sin verificación profesional.<br>
+              <strong>Propuesta Arquitectónica:</strong> Implementar tabla de códigos de invitación o revisión manual de estado <code>approved = false</code> antes de habilitar clientes.
+            </div>
+          </details>
+
+          <details class="tech-accordion pregunta-item" data-eje="eje-d" data-prio="p1">
+            <summary class="tech-summary">
+              <span>17. Rate-Limiting en RPC Pública usuario_disponible</span>
+              <span class="badge badge--blue">Eje D · P1</span>
+            </summary>
+            <div class="accordion-body">
+              <strong>Problema Técnico:</strong> Scraping masivo para enumerar nombres de usuario existentes en el sistema.<br>
+              <strong>Propuesta Arquitectónica:</strong> Configurar rate limiting por IP mediante Supabase Edge Functions o Cloudflare Turnstile en el registro.
+            </div>
+          </details>
+
+          <details class="tech-accordion pregunta-item" data-eje="eje-d" data-prio="p0">
+            <summary class="tech-summary">
+              <span>18. Ciclo de Vida de Tokens JWT y Prevención de Pérdida de Datos</span>
+              <span class="badge badge--red">Eje D · P0</span>
+            </summary>
+            <div class="accordion-body">
+              <strong>Problema Técnico:</strong> Si el token expira mientras el usuario completa un formulario extenso de comidas, la petición POST falla con error 401.<br>
+              <strong>Propuesta Arquitectónica:</strong> Listener global con <code>supabase.auth.onAuthStateChange</code> que renueve proactivamente la sesión y reintente peticiones encoladas.
+            </div>
+          </details>
+
+          <details class="tech-accordion pregunta-item" data-eje="eje-d" data-prio="p1">
+            <summary class="tech-summary">
+              <span>19. Privacidad y Borrado de Datos (GDPR / Desvinculación de Coach)</span>
+              <span class="badge badge--blue">Eje D · P1</span>
+            </summary>
+            <div class="accordion-body">
+              <strong>Problema Técnico:</strong> Qué ocurre con los registros históricos del alumno cuando este desvincula a su coach.<br>
+              <strong>Propuesta Arquitectónica:</strong> Desvinculación lógica (<code>unlinked_at</code>), revocando acceso al coach de manera instantánea mediante RLS sin eliminar el historial médico del alumno.
+            </div>
+          </details>
+
+          <details class="tech-accordion pregunta-item" data-eje="eje-d" data-prio="p0">
+            <summary class="tech-summary">
+              <span>20. Validación de Roles en el Servidor (Bypass de Frontend)</span>
+              <span class="badge badge--red">Eje D · P0</span>
+            </summary>
+            <div class="accordion-body">
+              <strong>Problema Técnico:</strong> Si un alumno manipula localStorage o invoca directamente endpoints de Supabase con <code>role=coach</code>.<br>
+              <strong>Propuesta Arquitectónica:</strong> Inmutabilidad del rol en <code>auth.users</code> mediante triggers PostgreSQL en <code>handle_new_user()</code> y verificación estricta en todas las RLS policies.
+            </div>
+          </details>
+
+          <!-- EJE E: UX, PRODUCTO & ROADMAP (21 - 25) -->
+          <details class="tech-accordion pregunta-item" data-eje="eje-e" data-prio="p1" open>
+            <summary class="tech-summary">
+              <span>21. Experiencia del Alumno sin Coach (Dietas Plantilla)</span>
+              <span class="badge badge--blue">Eje E · P1</span>
+            </summary>
+            <div class="accordion-body">
+              <strong>Problema Técnico:</strong> Si el alumno no vincula a un coach, la app queda vacía.<br>
+              <strong>Propuesta Arquitectónica:</strong> Proveer plantillas iniciales (Alta en Proteína, Déficit Moderado, Keto) con gramajes adaptados a su contexto energético.
+            </div>
+          </details>
+
+          <details class="tech-accordion pregunta-item" data-eje="eje-e" data-prio="p2">
+            <summary class="tech-summary">
+              <span>22. El "Muñeco Dinámico" de Progreso Físico</span>
+              <span class="badge badge--purple">Eje E · P2</span>
+            </summary>
+            <div class="accordion-body">
+              <strong>Problema Técnico:</strong> En el Google Doc se pide un avatar visual interactivo que evolucione con el peso.<br>
+              <strong>Propuesta Arquitectónica:</strong> Emplear un SVG paramétrico liviano en lugar de librerías 3D pesadas para asegurar 60 fps en teléfonos de gama baja.
+            </div>
+          </details>
+
+          <details class="tech-accordion pregunta-item" data-eje="eje-e" data-prio="p1">
+            <summary class="tech-summary">
+              <span>23. Notificaciones Push para Recordatorio de Hidratación</span>
+              <span class="badge badge--blue">Eje E · P1</span>
+            </summary>
+            <div class="accordion-body">
+              <strong>Problema Técnico:</strong> La suplementación y el agua se olvidan con facilidad.<br>
+              <strong>Propuesta Arquitectónica:</strong> Web Push API integrada en el Service Worker para recordar tomas en las horas clave de entrenamiento.
+            </div>
+          </details>
+
+          <details class="tech-accordion pregunta-item" data-eje="eje-e" data-prio="p2">
+            <summary class="tech-summary">
+              <span>24. Frecuencia y Validación de Pesajes Corporales</span>
+              <span class="badge badge--purple">Eje E · P2</span>
+            </summary>
+            <div class="accordion-body">
+              <strong>Problema Técnico:</strong> Fluctuaciones de agua corporal pueden confundir al alumno si se pesa varias veces al día.<br>
+              <strong>Propuesta Arquitectónica:</strong> Regla analógica táctil limitada a un registro matutino diario con media móvil de 7 días para suavizar variaciones hídricas.
+            </div>
+          </details>
+
+          <details class="tech-accordion pregunta-item" data-eje="eje-e" data-prio="p1">
+            <summary class="tech-summary">
+              <span>25. Telemetría y Monitoreo de Errores en Clientes Móviles</span>
+              <span class="badge badge--blue">Eje E · P1</span>
+            </summary>
+            <div class="accordion-body">
+              <strong>Problema Técnico:</strong> Los errores de JavaScript en WebView de smartphones suelen pasar desapercibidos para el equipo de desarrollo.<br>
+              <strong>Propuesta Arquitectónica:</strong> Integración de Sentry lightweight o logging estructurado hacia una tabla <code>client_logs</code> en Supabase con sampling del 10%.
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="dashboard-footer">
+      <p>AppCalorias Technical Hub · Diseñado bajo estándares de ingeniería y visualización ergonómica.</p>
+      <p style="margin-top:0.25rem;">Vanilla ES Modules · Supabase PostgreSQL · Algoritmo L1 · OpenFDA API Integration · 25 Preguntas Leads</p>
+    </footer>
+
+  </div>
+
+  <!-- ==========================================================
+       MODAL DE BÚSQUEDA RÁPIDA (Ctrl+K) DINÁMICO
+       ========================================================== -->
+  <div class="modal-overlay" id="search-modal-overlay">
+    <div class="search-modal">
+      <div class="search-input-box">
+        <svg width="20" height="20" style="color:var(--text-tertiary);"><use href="#icon-search"/></svg>
+        <input type="text" id="modal-search-input" placeholder="Buscar concepto, tabla, fórmula, schema o pregunta..." autocomplete="off">
+        <span style="font-size:0.75rem; background:var(--surface-alt); padding:0.2rem 0.5rem; border-radius:4px; color:var(--text-tertiary);">ESC</span>
+      </div>
+      <div class="search-results-list" id="modal-search-results">
+        <!-- Los resultados se generan dinámicamente -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Copy Notification -->
+  <div class="toast-msg" id="toast-msg">
+    <span>Copiado al portapapeles</span>
+  </div>
+
+  <!-- ==========================================================
+       SCRIPT CONTROLADOR DE INTERACTIVIDAD
+       ========================================================== -->
+  <script>
+    // 1. MANEJO DE PESTAÑAS (TABS)
+    const tabBtns = document.querySelectorAll('.tab-btn[role="tab"]');
+    const tabPanels = document.querySelectorAll('.tab-panel');
+
+    function activarPestaña(panelId, targetElementId = null) {
+      tabPanels.forEach(p => p.classList.remove('active'));
+      tabBtns.forEach(b => {
+        b.setAttribute('aria-selected', 'false');
+        b.tabIndex = -1;
+      });
+
+      const panel = document.getElementById(panelId);
+      if (panel) {
+        panel.classList.add('active');
+      }
+
+      const btn = document.querySelector(`.tab-btn[aria-controls="${panelId}"]`);
+      if (btn) {
+        btn.setAttribute('aria-selected', 'true');
+        btn.tabIndex = 0;
+        btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      }
+
+      if (targetElementId) {
+        setTimeout(() => {
+          const el = document.getElementById(targetElementId);
+          if (el) {
+            if (el.tagName.toLowerCase() === 'details') el.open = true;
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            el.classList.add('target-highlight');
+            setTimeout(() => el.classList.remove('target-highlight'), 2600);
+          }
+        }, 100);
+      }
+    }
+
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.getAttribute('aria-controls');
+        activarPestaña(target);
+      });
+    });
+
+    // 2. SIMULADOR DE EQUIVALENCIA L1 EN VIVO (4 MACROS + PRESETS A Y B)
+    const presetsA = {
+      arroz: { nombre: 'Arroz blanco cocido', g: 150, kcal: 130, p: 2.7, ch: 28.2, g_fat: 0.3 },
+      pollo: { nombre: 'Pechuga de pollo cocida', g: 120, kcal: 165, p: 31.0, ch: 0.0, g_fat: 3.6 },
+      fideos: { nombre: 'Fideos al dente', g: 150, kcal: 157, p: 5.8, ch: 30.7, g_fat: 0.9 },
+      papa: { nombre: 'Papa hervida con piel', g: 200, kcal: 87, p: 1.9, ch: 20.1, g_fat: 0.1 },
+      banana: { nombre: 'Banana / Plátano maduro', g: 120, kcal: 89, p: 1.1, ch: 22.8, g_fat: 0.3 }
+    };
+
+    const presetsB = {
+      avena: { nombre: 'Avena en copos', kcal: 389, p: 16.9, ch: 66.3, g: 6.9 },
+      papa: { nombre: 'Papa hervida con piel', kcal: 87, p: 1.9, ch: 20.1, g: 0.1 },
+      pollo: { nombre: 'Pechuga de pollo cocida', kcal: 165, p: 31.0, ch: 0.0, g: 3.6 },
+      batata: { nombre: 'Batata / Camote asado', kcal: 90, p: 2.0, ch: 20.7, g: 0.1 },
+      lentejas: { nombre: 'Lentejas cocidas', kcal: 116, p: 9.0, ch: 20.1, g: 0.4 },
+      huevos: { nombre: 'Huevo entero hervido', kcal: 155, p: 12.6, ch: 1.1, g: 10.6 }
+    };
+
+    const presetASelect = document.getElementById('sim-preset-a');
+    if (presetASelect) {
+      presetASelect.addEventListener('change', () => {
+        const item = presetsA[presetASelect.value];
+        if (item) {
+          document.getElementById('sim-nombre-a').value = item.nombre;
+          document.getElementById('sim-g-a').value = item.g;
+          document.getElementById('sim-kcal-a').value = item.kcal;
+          document.getElementById('sim-p-a').value = item.p;
+          document.getElementById('sim-ch-a').value = item.ch;
+          document.getElementById('sim-g-a-val').value = item.g_fat;
+          calcularEquivalenciaL1();
+        }
+      });
+    }
+
+    const presetBSelect = document.getElementById('sim-preset-b');
+    if (presetBSelect) {
+      presetBSelect.addEventListener('change', () => {
+        const item = presetsB[presetBSelect.value];
+        if (item) {
+          document.getElementById('sim-nombre-b').value = item.nombre;
+          document.getElementById('sim-kcal-b').value = item.kcal;
+          document.getElementById('sim-p-b').value = item.p;
+          document.getElementById('sim-ch-b').value = item.ch;
+          document.getElementById('sim-g-b-val').value = item.g;
+          calcularEquivalenciaL1();
+        }
+      });
+    }
+
+    function calcularEquivalenciaL1() {
+      // Alimento A
+      const gA = parseFloat(document.getElementById('sim-g-a').value) || 100;
+      const kcal100A = parseFloat(document.getElementById('sim-kcal-a').value) || 100;
+      const p100A = parseFloat(document.getElementById('sim-p-a').value) || 0;
+      const ch100A = parseFloat(document.getElementById('sim-ch-a').value) || 0;
+      const g100A = parseFloat(document.getElementById('sim-g-a-val').value) || 0;
+
+      const cA = (gA / 100) * kcal100A;
+      const pA = (gA / 100) * p100A;
+      const chA = (gA / 100) * ch100A;
+      const fatA = (gA / 100) * g100A;
+
+      // Alimento B
+      const cB = parseFloat(document.getElementById('sim-kcal-b').value) || 100;
+      const pB = parseFloat(document.getElementById('sim-p-b').value) || 0;
+      const chB = parseFloat(document.getElementById('sim-ch-b').value) || 0;
+      const fatB = parseFloat(document.getElementById('sim-g-b-val').value) || 0;
+
+      // Perfiles
+      const calP_A = 4 * pA;
+      const calCH_A = 4 * chA;
+      const calG_A = 9 * fatA;
+      const sumaCalA = calP_A + calCH_A + calG_A || cA || 1;
+
+      const pctP_A = calP_A / sumaCalA;
+      const pctCH_A = calCH_A / sumaCalA;
+      const pctG_A = calG_A / sumaCalA;
+
+      // Pesos L1
+      const w1 = 0.20;
+      const w2 = 0.80 * pctP_A;
+      const w3 = 0.80 * pctCH_A;
+      const w4 = 0.80 * pctG_A;
+
+      // Puntos de corte
+      const puntos = [];
+      if (cB > 0) puntos.push({ x: cA / cB, p: w1 * cB });
+      if (pB > 0) puntos.push({ x: pA / pB, p: w2 * 4 * pB });
+      if (chB > 0) puntos.push({ x: chA / chB, p: w3 * 4 * chB });
+      if (fatB > 0) puntos.push({ x: fatA / fatB, p: w4 * 9 * fatB });
+
+      puntos.sort((a, b) => a.x - b.x);
+
+      const pesoTotal = puntos.reduce((acc, cur) => acc + cur.p, 0);
+      let acum = 0;
+      let xOpt = puntos[0]?.x || 1;
+
+      for (const pt of puntos) {
+        acum += pt.p;
+        if (acum >= pesoTotal / 2) {
+          xOpt = pt.x;
+          break;
+        }
+      }
+
+      // Redondeo a 5g
+      const gramosOpt = Math.max(5, Math.round((100 * xOpt) / 5) * 5);
+      const xFinal = gramosOpt / 100;
+
+      // Aportes totales
+      const cTot = xFinal * cB;
+      const pTot = xFinal * pB;
+      const chTot = xFinal * chB;
+      const gTot = xFinal * fatB;
+
+      // Errores normalizados
+      const errC = Math.abs(cA - cTot) / (cA || 1);
+      const errP = (4 * Math.abs(pA - pTot)) / (cA || 1);
+      const errCH = (4 * Math.abs(chA - chTot)) / (cA || 1);
+      const errG = (9 * Math.abs(fatA - gTot)) / (cA || 1);
+
+      const errTotal = (w1 * errC) + (w2 * errP) + (w3 * errCH) + (w4 * errG);
+      const adherencia = Math.max(0, Math.round((1 - errTotal) * 100));
+
+      // Similitud de perfil
+      const calP_B = 4 * pB;
+      const calCH_B = 4 * chB;
+      const calG_B = 9 * fatB;
+      const sumaCalB = calP_B + calCH_B + calG_B || cB || 1;
+      const pctP_B = calP_B / sumaCalB;
+      const pctCH_B = calCH_B / sumaCalB;
+      const pctG_B = calG_B / sumaCalB;
+
+      const diffPerfil = 0.5 * (Math.abs(pctP_A - pctP_B) + Math.abs(pctCH_A - pctCH_B) + Math.abs(pctG_A - pctG_B));
+      const similitud = Math.max(0, Math.round((1 - diffPerfil) * 100));
+
+      // Actualizar DOM
+      document.getElementById('sim-res-gramos').textContent = `${gramosOpt} g`;
+      document.getElementById('sim-res-scores').textContent = `Adherencia: ${adherencia}% · Similitud: ${similitud}%`;
+
+      const badge = document.getElementById('sim-res-badge');
+      if (adherencia >= 90 && similitud >= 75) {
+        badge.textContent = 'Equivalente Óptimo';
+        badge.className = 'badge badge--green';
+      } else if (adherencia >= 75 && similitud >= 60) {
+        badge.textContent = 'Equivalente Parcial';
+        badge.className = 'badge badge--amber';
+      } else {
+        badge.textContent = 'No Recomendado (Distinto Perfil)';
+        badge.className = 'badge badge--red';
+      }
+
+      // 4 Barras de Macronutrientes
+      document.getElementById('sim-meta-kcal').textContent = `${Math.round(cA)} kcal vs ${Math.round(cTot)} kcal`;
+      document.getElementById('sim-fill-kcal').style.width = `${Math.min(100, Math.round((cTot / (cA || 1)) * 100))}%`;
+
+      document.getElementById('sim-meta-p').textContent = `${pA.toFixed(1)}g vs ${pTot.toFixed(1)}g`;
+      document.getElementById('sim-fill-p').style.width = `${Math.min(100, Math.round((pTot / (pA || 1)) * 100))}%`;
+
+      document.getElementById('sim-meta-ch').textContent = `${chA.toFixed(1)}g vs ${chTot.toFixed(1)}g`;
+      document.getElementById('sim-fill-ch').style.width = `${Math.min(100, Math.round((chTot / (chA || 1)) * 100))}%`;
+
+      document.getElementById('sim-meta-g').textContent = `${fatA.toFixed(1)}g vs ${gTot.toFixed(1)}g`;
+      document.getElementById('sim-fill-g').style.width = `${Math.min(100, Math.round((gTot / (fatA || 1)) * 100))}%`;
+    }
+
+    document.querySelectorAll('.sim-box input').forEach(input => {
+      input.addEventListener('input', calcularEquivalenciaL1);
+    });
+    calcularEquivalenciaL1();
+
+    // 3. EXPLORADOR OPENFDA Y CALCULADORA DE HIDRATACIÓN
+    const fdaData = {
+      creatina: {
+        titulo: 'Creatina Monohidrato (Creapure)',
+        desc: 'Sustancia clasificada como GRAS por la FDA. Nivel de evidencia A (ISSN). Dosis diaria estándar: 3g a 5g. Recomendación: Ingerir con +500 ml de agua adicionales al requerimiento basal.',
+        badge: 'FDA GRAS (Seguro)',
+        badgeClass: 'badge--green',
+        unii: 'UNII: MU72812GK0'
+      },
+      cafeina: {
+        titulo: 'Cafeína Anhidra / Pre-entreno',
+        desc: 'Límite máximo recomendado por la FDA para adultos sanos: 400 mg diarios. Vida media: 5 horas. Evitar consumo 6 horas antes de dormir para no perjudicar la síntesis proteica nocturna.',
+        badge: 'Límite FDA: 400mg',
+        badgeClass: 'badge--amber',
+        unii: 'UNII: 3G6A5W338E'
+      },
+      whey: {
+        titulo: 'Proteína Whey Aislada (WPI)',
+        desc: 'Suplemento proteico derivado del suero lácteo. Alto valor biológico y rica en leucina. Segura dentro del rango 1.6 - 2.2 g de proteína total/kg corporal.',
+        badge: 'FDA GRAS (Seguro)',
+        badgeClass: 'badge--green',
+        unii: 'UNII: 72N6YF3527'
+      },
+      vitd3: {
+        titulo: 'Vitamina D3 (Colecalciferol)',
+        desc: 'Vitamina liposoluble con acumulación en tejido adiposo. Límite superior tolerable (UL) fijado por autoridades sanitarias: 4,000 UI diarias sin supervisión médica.',
+        badge: 'Precaución UL 4000 UI',
+        badgeClass: 'badge--blue',
+        unii: 'UNII: 1C6V77QF41'
+      },
+      omega3: {
+        titulo: 'Omega 3 EPA / DHA (Aceite de Pescado)',
+        desc: 'Ácidos grasos poliinsaturados esenciales. La FDA establece estatus GRAS para ingestas de hasta 3,000 mg (3g) diarios totales de EPA y DHA combinados.',
+        badge: 'FDA GRAS (Hasta 3g/día)',
+        badgeClass: 'badge--green',
+        unii: 'UNII: 0G416P149N'
+      }
+    };
+
+    const fdaSelect = document.getElementById('fda-select-sup');
+    if (fdaSelect) {
+      fdaSelect.addEventListener('change', () => {
+        const sup = fdaData[fdaSelect.value];
+        if (sup) {
+          document.getElementById('fda-sup-title').textContent = sup.titulo;
+          document.getElementById('fda-sup-desc').textContent = sup.desc;
+          const b = document.getElementById('fda-status-badge');
+          b.textContent = sup.badge;
+          b.className = `badge ${sup.badgeClass}`;
+          document.getElementById('fda-unii-code').textContent = sup.unii;
+        }
+      });
+    }
+
+    // Calculadora dinámica de hidratación
+    function calcularHidratacion() {
+      const weight = parseFloat(document.getElementById('hyd-weight').value) || 70;
+      const creatine = parseFloat(document.getElementById('hyd-creatine').value) || 0;
+      const caffeine = parseFloat(document.getElementById('hyd-caffeine').value) || 0;
+      const training = parseFloat(document.getElementById('hyd-training').value) || 0;
+
+      const basal = weight * 35; // 35 ml / kg
+      const extraCreatine = creatine * 100; // 100ml por g de creatina (~500ml para 5g)
+      const extraCaffeine = caffeine >= 200 ? 150 : 0;
+      const sweatLoss = training * 12; // 12 ml por min (~720ml para 60min)
+
+      const totalMl = Math.round(basal + extraCreatine + extraCaffeine + sweatLoss);
+      const totalLiters = (totalMl / 1000).toFixed(1);
+      const glasses = Math.round(totalMl / 250);
+
+      document.getElementById('hyd-total-liters').textContent = `${totalLiters} L`;
+      document.getElementById('hyd-total-glasses').textContent = `~ ${glasses} Vasos de 250ml`;
+      document.getElementById('hyd-breakdown').textContent = 
+        `${Math.round(basal)} ml (Basal 35 ml/kg) + ${Math.round(extraCreatine)} ml (Creatina) + ${Math.round(extraCaffeine)} ml (Cafeína) + ${Math.round(sweatLoss)} ml (Sudor ${training}min)`;
+    }
+
+    ['hyd-weight', 'hyd-creatine', 'hyd-caffeine', 'hyd-training'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('input', calcularHidratacion);
+    });
+    calcularHidratacion();
+
+    // 4. CHECKLIST SPRINT ROADMAP INTERACTIVO CON PERSISTENCIA
+    const roadmapChecks = document.querySelectorAll('.roadmap-check');
+    const sprintFill = document.getElementById('sprint-progress-fill');
+    const sprintBadge = document.getElementById('sprint-status-badge');
+    const btnResetSprint = document.getElementById('btn-reset-sprint');
+
+    function actualizarProgresoSprint() {
+      const total = roadmapChecks.length;
+      let completados = 0;
+      const state = {};
+
+      roadmapChecks.forEach(ch => {
+        const step = ch.dataset.step;
+        if (ch.checked) {
+          completados++;
+          state[step] = true;
+        } else {
+          state[step] = false;
+        }
+      });
+
+      const pct = Math.round((completados / total) * 100);
+      sprintFill.style.width = `${pct}%`;
+      sprintBadge.textContent = `${completados} de ${total} Completados (${pct}%)`;
+
+      if (pct === 100) {
+        sprintBadge.className = 'badge badge--green';
+      } else if (pct > 0) {
+        sprintBadge.className = 'badge badge--amber';
+      } else {
+        sprintBadge.className = 'badge badge--blue';
+      }
+
+      localStorage.setItem('appcalorias_sprint_state', JSON.stringify(state));
+    }
+
+    roadmapChecks.forEach(ch => {
+      ch.addEventListener('change', actualizarProgresoSprint);
+    });
+
+    if (btnResetSprint) {
+      btnResetSprint.addEventListener('click', () => {
+        roadmapChecks.forEach(ch => ch.checked = false);
+        actualizarProgresoSprint();
+      });
+    }
+
+    // Cargar estado inicial de localStorage
+    try {
+      const saved = JSON.parse(localStorage.getItem('appcalorias_sprint_state') || '{}');
+      roadmapChecks.forEach(ch => {
+        if (saved[ch.dataset.step]) ch.checked = true;
+      });
+      actualizarProgresoSprint();
+    } catch (e) {
+      actualizarProgresoSprint();
+    }
+
+    // 5. FILTRADO CRUZADO DE LAS 25 PREGUNTAS DEV (EJE + PRIORIDAD)
+    const filterEjeBtns = document.querySelectorAll('.filter-eje');
+    const filterPrioBtns = document.querySelectorAll('.filter-prio');
+    const preguntaItems = document.querySelectorAll('.pregunta-item');
+    const preguntasCounterBadge = document.getElementById('preguntas-counter-badge');
+
+    let activoEje = 'todos';
+    let activoPrio = 'todas';
+
+    function aplicarFiltrosPreguntas() {
+      let visibles = 0;
+      preguntaItems.forEach(item => {
+        const itemEje = item.dataset.eje;
+        const itemPrio = item.dataset.prio;
+
+        const matchEje = (activoEje === 'todos' || itemEje === activoEje);
+        const matchPrio = (activoPrio === 'todas' || itemPrio === activoPrio);
+
+        if (matchEje && matchPrio) {
+          item.style.display = 'block';
+          visibles++;
+        } else {
+          item.style.display = 'none';
+        }
+      });
+
+      preguntasCounterBadge.textContent = `Mostrando ${visibles} de ${preguntaItems.length}`;
+    }
+
+    filterEjeBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterEjeBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activoEje = btn.dataset.eje;
+        aplicarFiltrosPreguntas();
+      });
+    });
+
+    filterPrioBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterPrioBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activoPrio = btn.dataset.prio;
+        aplicarFiltrosPreguntas();
+      });
+    });
+
+    // 6. BUSCADOR GLOBAL EN VIVO (Ctrl+K)
+    const searchIndex = [
+      { titulo: 'Algoritmo L1 (Mediana Ponderada)', cat: 'Motor Nutricional & Equivalencias', panel: 'panel-motor', target: 'simulador-l1-box' },
+      { titulo: 'Simulador Interactivo de Equivalencias L1', cat: 'Motor Nutricional & Equivalencias', panel: 'panel-motor', target: 'simulador-l1-box' },
+      { titulo: 'Row Level Security (RLS) & Aislamiento Coach-Alumno', cat: 'Supabase Base de Datos', panel: 'panel-db' },
+      { titulo: 'RPC public.vincular_alumno_por_codigo()', cat: 'Supabase Procedimientos Almacenados', panel: 'panel-db' },
+      { titulo: 'Arquitectura Mobile-First Vanilla Web', cat: 'Arquitectura & Stack', panel: 'panel-arch' },
+      { titulo: 'Onboarding Integral del Alumno en 5 Pasos', cat: 'Roadmap & Pasos Faltantes', panel: 'panel-roadmap' },
+      { titulo: 'Conexión de Datos Reales y 1-Tap Check', cat: 'Roadmap & Pasos Faltantes', panel: 'panel-roadmap' },
+      { titulo: 'Auditoría de Errores Reales en el Repositorio', cat: 'Errores & Deuda Técnica', panel: 'panel-errores' },
+      { titulo: 'OpenFDA Suplementación & Tolerable Upper Limits', cat: 'Seguridad Regulatoria OpenFDA', panel: 'panel-openfda' },
+      { titulo: 'Calculadora Dinámica de Hidratación (Creatina + Sudor)', cat: 'Seguridad Regulatoria OpenFDA', panel: 'panel-openfda' },
+      { titulo: 'Tool Schema: compute_food_equivalence', cat: 'AI Agents Architecture', panel: 'panel-agents', target: 'tool-schema-1' },
+      { titulo: 'Tool Schema: validate_supplement_safety_fda', cat: 'AI Agents Architecture', panel: 'panel-agents', target: 'tool-schema-2' },
+      { titulo: 'Tool Schema: search_food_database', cat: 'AI Agents Architecture', panel: 'panel-agents', target: 'tool-schema-3' },
+      { titulo: 'Tool Schema: generate_coach_meal_plan', cat: 'AI Agents Architecture', panel: 'panel-agents', target: 'tool-schema-4' },
+      { titulo: 'Tool Schema: log_student_daily_intake', cat: 'AI Agents Architecture', panel: 'panel-agents', target: 'tool-schema-5' },
+      { titulo: 'Cache-Busting de ES Modules en Producción (Pregunta 1)', cat: 'Preguntas Dev · Eje A', panel: 'panel-preguntas' },
+      { titulo: 'Sincronización Offline-First con IndexedDB (Pregunta 2)', cat: 'Preguntas Dev · Eje A', panel: 'panel-preguntas' },
+      { titulo: 'Sanitización y Validación XSS (Pregunta 4)', cat: 'Preguntas Dev · Eje A', panel: 'panel-preguntas' },
+      { titulo: 'Desacoplamiento de Antropometría (Pregunta 6)', cat: 'Preguntas Dev · Eje B', panel: 'panel-preguntas' },
+      { titulo: 'Normalización vs JSONB en Planes (Pregunta 7)', cat: 'Preguntas Dev · Eje B', panel: 'panel-preguntas' },
+      { titulo: 'Performance de Materialized Views con pg_cron (Pregunta 8)', cat: 'Preguntas Dev · Eje B', panel: 'panel-preguntas' },
+      { titulo: 'Manejo de Zonas Horarias y Registros a Medianoche (Pregunta 9)', cat: 'Preguntas Dev · Eje B', panel: 'panel-preguntas' },
+      { titulo: 'Catálogo de Alimentos Curado + Open Food Facts (Pregunta 11)', cat: 'Preguntas Dev · Eje C', panel: 'panel-preguntas' },
+      { titulo: 'Soporte para Medidas Caseras y Unidades (Pregunta 12)', cat: 'Preguntas Dev · Eje C', panel: 'panel-preguntas' },
+      { titulo: 'Restricción por Categorías y Perfiles Lipídicos (Pregunta 14)', cat: 'Preguntas Dev · Eje C', panel: 'panel-preguntas' },
+      { titulo: 'Protección de Registro de Coaches (Pregunta 16)', cat: 'Preguntas Dev · Eje D', panel: 'panel-preguntas' },
+      { titulo: 'Rate-Limiting en usuario_disponible (Pregunta 17)', cat: 'Preguntas Dev · Eje D', panel: 'panel-preguntas' },
+      { titulo: 'Ciclo de Vida de Tokens JWT (Pregunta 18)', cat: 'Preguntas Dev · Eje D', panel: 'panel-preguntas' },
+      { titulo: 'Experiencia del Alumno sin Coach (Pregunta 21)', cat: 'Preguntas Dev · Eje E', panel: 'panel-preguntas' },
+      { titulo: 'Muñeco Dinámico de Progreso SVG (Pregunta 22)', cat: 'Preguntas Dev · Eje E', panel: 'panel-preguntas' },
+      { titulo: 'Notificaciones Push de Hidratación (Pregunta 23)', cat: 'Preguntas Dev · Eje E', panel: 'panel-preguntas' }
+    ];
+
+    const overlay = document.getElementById('search-modal-overlay');
+    const searchInput = document.getElementById('modal-search-input');
+    const searchResults = document.getElementById('modal-search-results');
+    const btnQuickSearch = document.getElementById('btn-quick-search');
+
+    function renderSearchResults(query = '') {
+      const q = query.trim().toLowerCase();
+      const filtrados = searchIndex.filter(item => {
+        return !q || item.titulo.toLowerCase().includes(q) || item.cat.toLowerCase().includes(q);
+      });
+
+      if (filtrados.length === 0) {
+        searchResults.innerHTML = `<div style="padding:1.5rem; text-align:center; color:var(--text-tertiary); font-size:0.875rem;">No se encontraron resultados para "${query}"</div>`;
+        return;
+      }
+
+      searchResults.innerHTML = filtrados.map(item => `
+        <div class="search-item" data-panel="${item.panel}" data-target="${item.target || ''}">
+          <span class="search-item-title">${item.titulo}</span>
+          <span class="search-item-cat">${item.cat}</span>
+        </div>
+      `).join('');
+
+      searchResults.querySelectorAll('.search-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const panel = item.dataset.panel;
+          const target = item.dataset.target || null;
+          cerrarBuscador();
+          activarPestaña(panel, target);
+        });
+      });
+    }
+
+    function abrirBuscador() {
+      overlay.classList.add('active');
+      searchInput.value = '';
+      renderSearchResults('');
+      searchInput.focus();
+    }
+
+    function cerrarBuscador() {
+      overlay.classList.remove('active');
+    }
+
+    btnQuickSearch.addEventListener('click', abrirBuscador);
+
+    searchInput.addEventListener('input', (e) => {
+      renderSearchResults(e.target.value);
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        abrirBuscador();
+      }
+      if (e.key === 'Escape') {
+        cerrarBuscador();
+      }
+    });
+
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) cerrarBuscador();
+    });
+
+    // 7. FUNCIÓN UNIVERSAL COPIAR AL PORTAPAPELES
+    function copiarAlPortapapeles(btn) {
+      const wrapper = btn.closest('.code-wrapper');
+      const code = wrapper ? wrapper.querySelector('code').innerText : '';
+      if (!code) return;
+
+      navigator.clipboard.writeText(code).then(() => {
+        const toast = document.getElementById('toast-msg');
+        toast.style.display = 'flex';
+        setTimeout(() => {
+          toast.style.display = 'none';
+        }, 2200);
+      });
+    }
+    window.copiarAlPortapapeles = copiarAlPortapapeles;
+  </script>
+</body>
+</html>

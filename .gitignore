@@ -12,3 +12,7 @@ desktop.ini
 # Dependencias y logs
 node_modules/
 *.log
+
+# Entornos y scratch local
+.loki/
+scratch/
