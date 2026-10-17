@@ -9,7 +9,8 @@ Cómo están organizados los datos (tablas, relaciones y permisos): [ESQUEMA.md]
 supabase/
 ├── migrations/   # Cambios al esquema, en orden por fecha (AAAAMMDDHHMMSS_nombre.sql)
 ├── rollback/     # Reversión de cada migración (mismo nombre + .down.sql)
-└── tests/        # Pruebas: simulan usuarios y verifican permisos (no dejan datos)
+├── tests/        # Pruebas: simulan usuarios y verifican permisos (no dejan datos)
+└── alimentos/    # Planilla de alimentos y el script que la convierte en la carga
 ```
 
 ## Aplicar una migración
@@ -103,3 +104,62 @@ const { data } = await supabase.from('contextos_energeticos')
 await supabase.from('permisos_alumno')
   .insert({ alumno_id: alumnoId, seccion: 'antropometria', habilitado_por: coachId });
 ```
+
+## Alimentos (`20261017120000_alimentos.sql`)
+
+Base propia de alimentos, con los valores **cada 100 g**.
+
+| Tabla | Qué guarda |
+|---|---|
+| `categorias_alimento` | Las 12 categorías (Carnes, Lácteos, Frutas…). Lista cerrada. |
+| `alimentos` | Nombre, categoría, cocción (`crudo`, `cocido`, `listo`), kcal y macros cada 100 g, porción, unidad, sinónimos, marca y fuente. |
+| `correcciones_alimento` | Cambios propuestos a un alimento aprobado ("Editar alimento"), hasta que un coach los acepta. |
+
+**De dónde salen los alimentos.**
+- **El equipo**, desde la planilla (ver abajo): entran aprobados.
+- **Alumnos y coaches**, desde la app: entran `pendiente`. Solo los ven su
+  autor y el coach del autor hasta que el coach los aprueba; ahí los ven todos.
+
+**Controles de calidad** (los aplica la base, no se pueden saltear desde el navegador):
+- kcal entre 0 y 900, cada macro entre 0 y 100 g y los tres juntos hasta 100 g.
+- Las kcal tienen que coincidir con los macros (4·P + 4·C + 9·G, con 20 % o
+  15 kcal de margen). Se exige a lo que llega desde la app; la planilla lo
+  avisa y admite excepciones marcadas (ej. bebidas con alcohol).
+- Unidad completa: nombre y peso juntos.
+- Sin duplicados: mismo nombre, marca y cocción, sin importar tildes ni mayúsculas.
+- Desde la app, el estado, el autor y la fuente los pone la base.
+
+```js
+// Buscar (sin tildes, por nombre, marca o sinónimo, tolera errores de tipeo)
+const { data } = await supabase.rpc('buscar_alimentos', { p_texto: 'pollo', p_categoria: null, p_limite: 20 });
+
+// Crear un alimento desde la app (queda pendiente)
+await supabase.from('alimentos').insert({
+  nombre: 'Galletitas de avena', categoria: 'cereales', coccion: 'listo',
+  kcal: 450, proteinas: 8, carbohidratos: 65, grasas: 17, fuente: 'alumno'
+});
+
+// Proponer una corrección a un alimento aprobado
+await supabase.from('correcciones_alimento').insert({ alimento_id, ...valoresCorregidos, nota: 'Según la etiqueta' });
+
+// El coach revisa (rechazar pide motivo)
+await supabase.rpc('revisar_alimento', { p_alimento_id, p_aprobar: true });
+await supabase.rpc('revisar_correccion', { p_correccion_id, p_aceptar: false, p_motivo: 'Los valores eran por porción' });
+```
+
+### Cargar alimentos desde la planilla
+
+La planilla es `supabase/alimentos/planilla_alimentos.xlsx`: una hoja por
+categoría, con listas desplegables y una columna `control` que se pone en
+rojo si una fila tiene un error. La hoja "Instrucciones" explica cada columna.
+
+1. Instalar lo necesario (una sola vez): `pip install openpyxl`
+2. Completar la planilla. La columna `control` tiene que decir OK en todas las filas.
+3. Desde `supabase/alimentos/`: `python planilla_a_sql.py`
+   - Si hay errores, los lista con hoja y fila y no genera nada.
+   - Si está todo bien, genera `carga_alimentos.sql`.
+4. Supabase → SQL Editor → pegar `carga_alimentos.sql` → Run.
+
+Se puede repetir cada vez que se actualice la planilla: los alimentos que ya
+están se actualizan en vez de duplicarse. Para empezar una planilla vacía:
+`python crear_planilla.py` (pisa la que haya).

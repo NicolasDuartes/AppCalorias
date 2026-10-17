@@ -18,6 +18,9 @@ erDiagram
     PLAN_MEALS ||--o{ PLAN_ITEMS : "alimentos"
     PROFILES ||--o{ DAILY_LOGS : "días"
     DAILY_LOGS ||--o{ LOGGED_ITEMS : "lo que comió"
+    CATEGORIAS_ALIMENTO ||--o{ ALIMENTOS : "categoría"
+    PROFILES ||--o{ ALIMENTOS : "creados desde la app"
+    ALIMENTOS ||--o{ CORRECCIONES_ALIMENTO : "cambios propuestos"
 ```
 
 | Tabla | Qué guarda | Estado |
@@ -29,6 +32,7 @@ erDiagram
 | `meal_plans`, `plan_meals`, `plan_items` | Planes alimenticios. | Existen, sin conectar |
 | `daily_logs`, `logged_items` | Registro diario del alumno. | Existen, sin conectar |
 | `coach_alumno_summary` | Vista de resumen para el coach. | Existe, sin conectar |
+| `categorias_alimento`, `alimentos`, `correcciones_alimento` | Base propia de alimentos (cada 100 g) y sus correcciones. | Nueva, sin pantalla todavía |
 | `alumnos` | Tabla vieja sin uso. Bloqueada. | Para borrar |
 
 ## Cuentas y vínculo (`profiles`)
@@ -82,6 +86,26 @@ Un perfil por cuenta de Supabase Auth. Lo crea un trigger al registrarse.
 | Archivo | `pdf_path` (ruta en Supabase Storage, cuando se implemente) |
 | Calculados en JS | `imc`, `indice_cintura_cadera`, `indice_cintura_talla`, `area_muscular_brazo_cm2`, `suma_8_pliegues_mm`, `grasa_pct`, `grasa_kg`, `masa_osea_kg`, `musculo_pct`, `musculo_kg`, `residual_pct`, `residual_kg`, `relacion_musculo_hueso` |
 
+## Alimentos
+
+| Columna de `alimentos` | Qué es |
+|---|---|
+| `nombre`, `categoria`, `coccion`, `marca` | Qué alimento es. `coccion`: `crudo`, `cocido` o `listo`. |
+| `kcal`, `proteinas`, `carbohidratos`, `grasas` | Valores **cada 100 g**. |
+| `porcion_g`, `porcion_texto` | Porción habitual ("40 g · 4 cucharadas"): la cantidad que la app propone. |
+| `unidad_nombre`, `unidad_g` | Solo si se cuenta por unidades: "u" = 50 g. |
+| `sinonimos` | Otros nombres para buscar ("aguacate" para la palta). |
+| `fuente`, `fuente_ref` | De dónde salió: `equipo`, `tabla_ar`, `usda`, `off`, `coach` o `alumno`, y su id ahí. |
+| `estado_revision`, `motivo_rechazo`, `revisado_por`, `revisado_el` | `pendiente`, `aprobado` o `rechazado`, y quién lo revisó. |
+| `creado_por`, `creado_el`, `actualizado_el` | Quién lo cargó y cuándo (los pone la base). |
+| `texto_busqueda`, `clave` | Calculadas por la base: texto normalizado para buscar y clave para detectar duplicados. |
+
+| | Ver | Crear | Editar / borrar | Revisar |
+|---|---|---|---|---|
+| Aprobados | Todos los usuarios con sesión | — | Solo con una corrección aceptada | — |
+| Pendientes y rechazados | Su autor y el coach del autor | Cualquier usuario con sesión (entra pendiente) | Su autor, mientras está pendiente | El coach del autor (o el autor, si es coach) |
+| Sin sesión | Nada | Nada | Nada | Nada |
+
 ## Quién ve y quién carga
 
 | | Ver | Cargar, editar, borrar |
@@ -109,6 +133,9 @@ alguien llame a la API sin pasar por la app.
 | `vincular_alumno(p_codigo)` | Vincular un alumno por su ID de cliente. | Coach |
 | `desvincular_alumno(p_alumno_id)` | Cortar el vínculo. | Coach del alumno o el alumno |
 | `actualizar_datos_personales(p_alumno_id, p_sexo, p_fecha_nacimiento)` | Guardar sexo y fecha de nacimiento. | El alumno o su coach |
+| `buscar_alimentos(p_texto, p_categoria, p_limite)` | Buscar alimentos (máximo 50 resultados). | Cualquier usuario con sesión |
+| `revisar_alimento(p_alimento_id, p_aprobar, p_motivo)` | Aprobar o rechazar un alimento pendiente. | Coach del autor |
+| `revisar_correccion(p_correccion_id, p_aceptar, p_motivo)` | Aceptar o rechazar una corrección. | Coach del autor |
 
 ## Migraciones que arman este esquema
 
@@ -117,6 +144,7 @@ alguien llame a la API sin pasar por la app.
 | `20261005120000_cuentas_y_vinculo.sql` | @usuario, ID de cliente, vínculo por código, cierre de accesos abiertos. |
 | `20261006120000_contexto_y_antropometria.sql` | Sexo y fecha de nacimiento, `permisos_alumno`, `contextos_energeticos`, `antropometrias`. |
 | `20261006130000_datos_personales_en_registro.sql` | El alta acepta sexo y fecha de nacimiento si vienen (hoy el frontend no los manda). |
+| `20261017120000_alimentos.sql` | Base propia de alimentos: categorías, alimentos, correcciones, revisión y búsqueda. |
 
 Las tablas de planes y registro diario son anteriores a estas migraciones y
 todavía no tienen archivo en `migrations/`.

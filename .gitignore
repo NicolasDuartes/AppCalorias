@@ -16,3 +16,10 @@ node_modules/
 # Entornos y scratch local
 .loki/
 scratch/
+
+# Python (scripts de supabase/alimentos)
+__pycache__/
+
+# Generado desde la planilla: se pega en el SQL Editor, no se versiona
+supabase/alimentos/carga_alimentos.sql
+supabase/alimentos/carga_alimentos_prueba.sql
