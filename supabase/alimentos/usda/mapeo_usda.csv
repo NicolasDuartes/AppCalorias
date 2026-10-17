@@ -1,5 +1,5 @@
 ﻿nombre;categoria;coccion;usda_descripcion;sinonimos;unidad_nombre;unidad_buscar;nota
-Pechuga de pollo;carnes;crudo;Chicken, broilers or fryers, breast, meat only, raw;suprema, pollo;;;
+Pechuga de pollo;carnes;crudo;Chicken, breast, boneless, skinless, raw;suprema, pollo;;;Foundation Foods
 Pechuga de pollo;carnes;cocido;Chicken, broilers or fryers, breast, meat only, cooked, roasted;suprema, pollo;;;
 Pata muslo de pollo con piel;carnes;crudo;Chicken, broilers or fryers, leg, meat and skin, raw;pata y muslo, cuarto trasero;;;
 Pata muslo de pollo con piel;carnes;cocido;Chicken, broilers or fryers, leg, meat and skin, cooked, roasted;pata y muslo, cuarto trasero;;;
@@ -23,7 +23,7 @@ Carne picada común (80 % magra);carnes;cocido;Beef, ground, 80% lean meat / 20%
 Carne picada común (80 % magra);carnes;crudo;Beef, ground, 80% lean meat / 20% fat, raw;carne molida;;;Graso
 Medallón de carne casero (hamburguesa);carnes;cocido;Beef, ground, 85% lean meat / 15% fat, patty, cooked, broiled;hamburguesa;;;Las hamburguesas industriales van desde Open Food Facts
 Lomo de cerdo;carnes;cocido;Pork, fresh, loin, tenderloin, separable lean only, cooked, roasted;solomillo de cerdo;;;Sugerido
-Jamón cocido magro;carnes;listo;Ham, sliced, extra lean, (approximately 5% fat);jamón natural;;;Fiambre
+Jamón cocido magro;carnes;listo;Pork, cured, ham, steak, boneless, extra lean, unheated;jamón natural;;;Fiambre
 Jamón cocido común;carnes;listo;Ham, sliced, regular (approximately 11% fat);jamón;;;Fiambre
 Huevo;huevos;crudo;Egg, whole, raw, fresh;huevo entero;u;large;
 Huevo duro;huevos;cocido;Egg, whole, cooked, hard-boiled;huevo cocido;u;large;
@@ -103,13 +103,13 @@ Arroz integral;cereales;crudo;Rice, brown, long grain, unenriched, raw;;;;
 Arroz integral;cereales;cocido;Rice, brown, long-grain, cooked;;;;
 Fideos;cereales;crudo;Pasta, dry, enriched;fideos secos, pasta, spaghetti;;;
 Fideos;cereales;cocido;Pasta, cooked, enriched, without added salt;pasta, spaghetti;;;
-Fideos integrales;cereales;cocido;Spaghetti, whole-wheat, cooked;;;;
+Fideos integrales;cereales;cocido;Pasta, whole-wheat, cooked;;;;
 Pan francés;cereales;listo;Bread, french or vienna (includes sourdough);pan blanco, flauta, baguette;;;
 Pan de molde blanco;cereales;listo;Bread, white, commercially prepared (includes soft bread crumbs);pan lactal;rebanada;slice;
 Pan de molde integral;cereales;listo;Bread, whole-wheat, commercially prepared;pan lactal integral;rebanada;slice;
 Galletas de arroz;cereales;listo;Snacks, rice cakes, brown rice, plain, unsalted;galletitas de arroz;u;cake;
 Avena;cereales;crudo;Cereals, oats, regular and quick, not fortified, dry;avena arrollada, copos de avena;;;
-Copos de maíz sin azúcar;cereales;listo;Cereals ready-to-eat, corn flakes, plain;corn flakes;;;Revisar: el nombre exacto en USDA puede variar
+Copos de maíz sin azúcar;cereales;listo;Cereals ready-to-eat, RALSTON Corn Flakes;corn flakes;;;Único corn flakes en USDA (de marca)
 Polenta;cereales;crudo;Cornmeal, degermed, enriched, yellow;harina de maíz;;;
 Harina de trigo 000;cereales;crudo;Wheat flour, white, all-purpose, enriched, bleached;harina;;;
 Harina integral;cereales;crudo;Wheat flour, whole-grain (Includes foods for USDA's Food Distribution Program);;;;
@@ -147,7 +147,7 @@ Pomelo;frutas;listo;Grapefruit, raw, pink and red, all areas;;;;
 Limón;frutas;listo;Lemons, raw, without peel;;;;
 Durazno;frutas;listo;Peaches, yellow, raw;;u;medium;
 Ciruela;frutas;listo;Plums, raw;;u;;
-Damasco;frutas;listo;Apricots, raw;;u;;
+Damasco;frutas;listo;Apricots, raw;;u;apricot;
 Cerezas;frutas;listo;Cherries, sweet, raw;;;;
 Kiwi;frutas;listo;Kiwifruit, green, raw;;u;;
 Ananá;frutas;listo;Pineapple, raw, all varieties;piña;;;

@@ -176,8 +176,10 @@ def leer_mapeo(ruta):
     raise SystemExit(f'No se pudo leer {ruta.name}: guardalo desde Excel como "CSV UTF-8 (delimitado por comas)".')
 
 
-def mapear(fila, por_descripcion):
-    """Devuelve (datos para la planilla o None, estado, detalle)."""
+def mapear(fila, por_descripcion, variantes=None):
+    """Devuelve (datos para la planilla o None, estado, detalle).
+    variantes: todos los alimentos de USDA con cada descripción (una misma
+    descripción puede estar en SR Legacy y en Foundation)."""
     alimento = por_descripcion.get(normalizar(fila['usda_descripcion']))
     if alimento is None:
         return None, 'No encontrado', 'Parecidos en USDA: ' + ' | '.join(candidatos(fila['usda_descripcion'], por_descripcion))
@@ -196,7 +198,11 @@ def mapear(fila, por_descripcion):
     }
     estado, detalle = 'OK', ''
     if fila['unidad_nombre'].strip():
-        gramos = gramos_por_unidad(alimento, fila['unidad_buscar'].strip())
+        # Si el alimento elegido no trae la porción por unidad, se busca en el
+        # mismo alimento de la otra base (ej. kiwi: Foundation no la trae, SR Legacy sí)
+        mismos = (variantes or {}).get(normalizar(fila['usda_descripcion']), [])
+        gramos = next((g for g in (gramos_por_unidad(a, fila['unidad_buscar'].strip())
+                                   for a in [alimento] + [m for m in mismos if m is not alimento]) if g), None)
         if gramos:
             datos['unidad_nombre'] = fila['unidad_nombre'].strip()
             datos['unidad_g'] = gramos
@@ -263,9 +269,10 @@ def main():
         print('desde https://fdc.nal.usda.gov/download-datasets y dejalos en esa carpeta.')
         sys.exit(1)
     # Si una descripción está en las dos bases, se usa la que tenga los 4 valores completos
-    por_descripcion = {}
+    por_descripcion, variantes = {}, {}
     for alimento in alimentos_usda:
         clave = normalizar(alimento.get('description'))
+        variantes.setdefault(clave, []).append(alimento)
         if clave not in por_descripcion or (valores_cada_100g(por_descripcion[clave]) is None
                                             and valores_cada_100g(alimento) is not None):
             por_descripcion[clave] = alimento
@@ -277,7 +284,7 @@ def main():
         if categoria not in CATEGORIAS:
             informe.append({**fila, 'estado': 'Revisar', 'detalle': f'La categoría "{categoria}" no existe'})
             continue
-        datos, estado, detalle = mapear(fila, por_descripcion)
+        datos, estado, detalle = mapear(fila, por_descripcion, variantes)
         alimento = por_descripcion.get(normalizar(fila['usda_descripcion'])) or {}
         informe.append({**fila, 'estado': estado, 'detalle': detalle, 'fdcId': alimento.get('fdcId', '')})
         if datos:
