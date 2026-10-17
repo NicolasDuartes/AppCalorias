@@ -37,9 +37,115 @@ export function mostrarAvisoFlotante(mensaje, duracion = 3000) {
 }
 
 /**
+ * Guarda un aviso flotante en sessionStorage para mostrarlo al cargar la siguiente pantalla.
+ * @param {string} mensaje Texto a comunicar al usuario.
+ */
+export function guardarAvisoToast(mensaje) {
+  try {
+    sessionStorage.setItem('aviso-toast', mensaje);
+  } catch {
+    // Si sessionStorage no está disponible o falla, ignorar
+  }
+}
+
+/**
+ * Muestra y consume cualquier aviso toast pendiente en sessionStorage.
+ */
+function procesarAvisoToastPendiente() {
+  try {
+    const avisoPendiente = sessionStorage.getItem('aviso-toast');
+    if (avisoPendiente) {
+      sessionStorage.removeItem('aviso-toast');
+      mostrarAvisoFlotante(avisoPendiente);
+    }
+  } catch {
+    // Ignorar si sessionStorage no está disponible
+  }
+}
+
+/**
+ * Adapta los botones de cantidad.html según si el usuario llega desde agregar.html
+ * o desde dashboard.html.
+ */
+function adaptarCantidadContextual() {
+  const ruta = window.location.pathname;
+  const esPaginaCantidad = ruta.endsWith('cantidad.html') || ruta.includes('/cantidad.html') || !!document.querySelector('.input--cantidad');
+  if (!esPaginaCantidad) return;
+
+  const pie = document.querySelector('.pantalla > .pie') || document.querySelector('.pie');
+  if (!pie) return;
+
+  const btnQuitar = pie.querySelector('.btn--peligro-texto');
+  const btnGuardar = pie.querySelector('.btn--primario');
+  const btnVolver = document.querySelector('a[aria-label^="Volver"]');
+
+  const params = new URLSearchParams(window.location.search);
+  let origen = params.get('origen');
+  if (!origen && document.referrer) {
+    try {
+      const refUrl = new URL(document.referrer, window.location.href);
+      if (refUrl.pathname.includes('agregar.html') || refUrl.pathname.includes('crear-alimento.html')) {
+        origen = 'agregar';
+      } else if (refUrl.pathname.includes('dashboard.html')) {
+        origen = 'dashboard';
+      }
+    } catch {
+      if (document.referrer.includes('agregar.html') || document.referrer.includes('crear-alimento.html')) origen = 'agregar';
+      else if (document.referrer.includes('dashboard.html')) origen = 'dashboard';
+    }
+  }
+  if (!origen) {
+    try {
+      origen = sessionStorage.getItem('origen-cantidad');
+    } catch {
+      // Ignorar
+    }
+  }
+
+  if (origen === 'agregar') {
+    if (btnQuitar) {
+      btnQuitar.hidden = true;
+    }
+    if (btnGuardar) {
+      btnGuardar.textContent = 'Agregar a la comida';
+      btnGuardar.setAttribute('href', 'agregar.html');
+      btnGuardar.dataset.toast = 'Alimento agregado a la comida';
+    }
+    if (btnVolver) {
+      btnVolver.setAttribute('href', 'agregar.html');
+    }
+  } else {
+    if (btnQuitar) {
+      btnQuitar.hidden = false;
+      btnQuitar.setAttribute('href', 'dashboard.html');
+      btnQuitar.dataset.toast = 'Alimento quitado de la comida';
+    }
+    if (btnGuardar) {
+      btnGuardar.textContent = 'Guardar';
+      btnGuardar.setAttribute('href', 'dashboard.html');
+      btnGuardar.dataset.toast = 'Cantidad guardada';
+    }
+    if (btnVolver) {
+      btnVolver.setAttribute('href', 'dashboard.html');
+    }
+  }
+}
+
+let navegacionIniciada = false;
+
+/**
  * Inicializa los controladores globales de retorno inteligente, accesibilidad y retroalimentación.
  */
 export function iniciarNavegacion() {
+  // 0. Aviso toast inter-páginas pendiente en sessionStorage
+  procesarAvisoToastPendiente();
+
+  // 0.1 Adaptación contextual de botones en cantidad.html
+  adaptarCantidadContextual();
+
+  if (navegacionIniciada) return;
+  navegacionIniciada = true;
+
   // 1. Retorno inteligente en enlaces de Volver y Cerrar
   document.addEventListener('click', (evento) => {
     const enlaceVolver = evento.target.closest('a[aria-label^="Volver"], a[aria-label^="Cerrar"], a[data-volver]');
@@ -53,8 +159,17 @@ export function iniciarNavegacion() {
       try {
         const refUrl = new URL(document.referrer, window.location.href);
         if (refUrl.origin === window.location.origin) {
-          evento.preventDefault();
-          window.history.back();
+          // Prevenir volver hacia pantallas secundarias/hijas que acaban de completarse
+          // (ej. volver desde agregar.html no debe reabrir cantidad.html; volver desde cantidad.html no debe reabrir crear/editar)
+          const esRetornoAHija =
+            (window.location.pathname.includes('agregar.html') && refUrl.pathname.includes('cantidad.html')) ||
+            (window.location.pathname.includes('cantidad.html') && (refUrl.pathname.includes('editar-alimento.html') || refUrl.pathname.includes('crear-alimento.html'))) ||
+            (window.location.pathname.includes('plan-editor.html') && refUrl.pathname.includes('buscar-alimento.html'));
+
+          if (!esRetornoAHija) {
+            evento.preventDefault();
+            window.history.back();
+          }
         }
       } catch {
         // En caso de discrepancia de URL, sigue el href nativo
@@ -79,6 +194,52 @@ export function iniciarNavegacion() {
     const aviso = elAviso.dataset.aviso;
     if (aviso) {
       mostrarAvisoFlotante(aviso);
+    }
+  });
+
+  // 3.1. Soporte para clics en elementos con atributo data-toast (inter-páginas o inmediato)
+  document.addEventListener('click', (evento) => {
+    const elToast = evento.target.closest('[data-toast]');
+    if (!elToast) return;
+
+    const texto = elToast.dataset.toast;
+    if (!texto) return;
+
+    const href = elToast.getAttribute('href');
+    const esNavegacion = (elToast.tagName === 'A' && href && !href.startsWith('#')) ||
+                         (elToast.tagName === 'BUTTON' && elToast.type === 'submit');
+
+    if (esNavegacion) {
+      guardarAvisoToast(texto);
+    } else {
+      mostrarAvisoFlotante(texto);
+    }
+  });
+
+  // 3.2. Seguimiento de origen al navegar a cantidad.html y limpieza al salir
+  document.addEventListener('click', (evento) => {
+    const enlaceCantidad = evento.target.closest('a[href*="cantidad.html"], button[form="form-alimento"], form[action*="cantidad.html"] button[type="submit"]');
+    if (enlaceCantidad) {
+      const ruta = window.location.pathname;
+      try {
+        if (ruta.includes('agregar.html') || ruta.includes('crear-alimento.html')) {
+          sessionStorage.setItem('origen-cantidad', 'agregar');
+        } else if (ruta.includes('dashboard.html')) {
+          sessionStorage.setItem('origen-cantidad', 'dashboard');
+        }
+      } catch {
+        // Ignorar
+      }
+      return;
+    }
+
+    const esAccionSalidaCantidad = evento.target.closest('.pie .btn, a[aria-label^="Volver"]');
+    if (esAccionSalidaCantidad && (window.location.pathname.includes('cantidad.html') || document.querySelector('.input--cantidad'))) {
+      try {
+        sessionStorage.removeItem('origen-cantidad');
+      } catch {
+        // Ignorar
+      }
     }
   });
 
@@ -211,6 +372,11 @@ export function iniciarNavegacion() {
     radio.setAttribute('aria-checked', 'true');
   });
 }
+
+window.addEventListener('pageshow', () => {
+  procesarAvisoToastPendiente();
+  adaptarCantidadContextual();
+});
 
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', iniciarNavegacion);

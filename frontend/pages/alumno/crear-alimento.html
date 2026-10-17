@@ -30,6 +30,7 @@
       </header>
 
       <form class="columna gap-l" id="form-alimento" action="cantidad.html" method="get" novalidate>
+        <input type="hidden" name="origen" value="agregar">
         <label class="campo">
           <span class="campo__etiqueta campo__etiqueta--fuerte">Nombre</span>
           <span class="input"><input type="text" name="nombre" autocomplete="off" placeholder="Ej.: Galletitas de avena" required></span>
@@ -95,7 +96,7 @@
 
     <div class="pie pie--centrado pie--columna">
       <div class="grilla-2">
-        <a class="btn btn--secundario" href="agregar.html">Cancelar</a>
+        <a class="btn btn--secundario" href="agregar.html" data-volver>Cancelar</a>
         <button class="btn btn--primario" type="submit" form="form-alimento">Crear y elegir cantidad</button>
       </div>
     </div>
