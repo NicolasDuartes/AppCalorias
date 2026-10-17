@@ -53,28 +53,49 @@ def normalizar(texto):
 
 
 # ---------- Lectura de las bases de USDA ----------
-def leer_json(contenido):
-    """Devuelve la lista de alimentos de un JSON de FoodData Central (SR Legacy, Foundation…)."""
-    datos = json.loads(contenido)
-    if isinstance(datos, list):
-        return datos
-    alimentos = []
-    for valor in datos.values():
-        if isinstance(valor, list) and valor and isinstance(valor[0], dict) and 'description' in valor[0]:
-            alimentos += valor
-    return alimentos
+def es_alimento(dato):
+    return isinstance(dato, dict) and 'description' in dato and ('foodNutrients' in dato or 'fdcId' in dato)
+
+
+def buscar_alimentos(dato):
+    """Junta los alimentos de un JSON de FoodData Central, estén donde estén
+    (SR Legacy los trae en "SRLegacyFoods", Foundation en "FoundationFoods", etc.)."""
+    if es_alimento(dato):
+        return [dato]
+    encontrados = []
+    if isinstance(dato, list):
+        for item in dato:
+            encontrados += buscar_alimentos(item)
+    elif isinstance(dato, dict):
+        for valor in dato.values():
+            if isinstance(valor, (list, dict)):
+                encontrados += buscar_alimentos(valor)
+    return encontrados
 
 
 def cargar_bases(carpeta):
+    """Lee todos los .zip y .json de la carpeta y muestra cuántos alimentos trae cada uno."""
     alimentos = []
+
+    def leer(nombre, contenido):
+        try:
+            encontrados = buscar_alimentos(json.loads(contenido))
+        except ValueError:
+            print(f'  {nombre}: no es un JSON válido, se saltea')
+            return
+        print(f'  {nombre}: {len(encontrados)} alimentos')
+        alimentos.extend(encontrados)
+
     for ruta in sorted(carpeta.glob('*')):
-        if ruta.suffix == '.zip':
+        if ruta.suffix.lower() == '.zip':
             with zipfile.ZipFile(ruta) as archivo:
-                for nombre in archivo.namelist():
-                    if nombre.endswith('.json'):
-                        alimentos += leer_json(archivo.read(nombre))
-        elif ruta.suffix == '.json':
-            alimentos += leer_json(ruta.read_bytes())
+                jsons = [n for n in archivo.namelist() if n.lower().endswith('.json')]
+                if not jsons:
+                    print(f'  {ruta.name}: no trae archivos .json (¿se descargó la versión CSV?)')
+                for nombre in jsons:
+                    leer(f'{ruta.name} → {nombre}', archivo.read(nombre))
+        elif ruta.suffix.lower() == '.json':
+            leer(ruta.name, ruta.read_bytes())
     return alimentos
 
 
@@ -205,6 +226,7 @@ def main():
     carpeta = Path(sys.argv[1]) if len(sys.argv) > 1 else AQUI / 'datos'
     salida = Path(sys.argv[2]) if len(sys.argv) > 2 else AQUI / 'planilla_usda.xlsx'
 
+    print(f'Leyendo las bases de USDA en {carpeta}:')
     alimentos_usda = cargar_bases(carpeta)
     if not alimentos_usda:
         print(f'No hay bases de USDA en {carpeta}. Descargá los JSON de "SR Legacy" y "Foundation Foods"')
