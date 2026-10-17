@@ -78,10 +78,10 @@ rutas de las páginas son relativas a esa carpeta.
 
 ### Base de datos
 
-- **Alimentos:** migración `20261017120000_alimentos.sql` lista (alimentos
+- **Alimentos:** migración `20261017120000_alimentos.sql` aplicada (alimentos
   cada 100 g, categorías, revisión por el coach, correcciones y búsqueda),
-  con su test y la planilla para cargarlos. Falta aplicarla en Supabase,
-  cargar la planilla y conectar las pantallas de comidas.
+  con 165 alimentos de USDA cargados. Falta conectar las pantallas de comidas
+  y sumar productos envasados (Open Food Facts).
 
 - Migración que quite la tabla `antropometrias` y lo relacionado.
 - Preferencias del alumno en una tabla propia, visibles para el coach.
