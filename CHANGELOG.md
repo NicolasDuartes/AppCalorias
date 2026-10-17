@@ -2,6 +2,18 @@
 
 Este documento registra los hitos de versiones **Mayores (Major)** y **Medianas (Minor)** de la aplicación con resúmenes ejecutivos concisos ($\le 10$ renglones). Los cambios atómicos y parches específicos se registran directamente en los commits de Git bajo la convención *Conventional Commits*.
 
+## [v0.4.1] — 17/10/2026
+- **Tipo:** Versión Menor / Parche (Navegación Contextual, Toasts Inter-páginas y Blindaje de Retorno)
+- **Fecha:** 17 de Octubre de 2026
+- **Resumen:**
+  1. Adaptación contextual dinámica en `cantidad.html`: oculta "Quitar" y conmuta a "Agregar a la comida" al venir de `agregar.html`.
+  2. Sistema de avisos flotantes (toasts) inter-páginas persistido en `sessionStorage` (`guardarAvisoToast` y `[data-toast]`).
+  3. Estandarización de botones "Cancelar" con `data-volver` para retorno por historial en modales y editores.
+  4. Guarda anti-bucle ping-pong en `navegacion.js` evitando que `history.back()` reabra pantallas hijas concluidas.
+  5. Campo oculto `origen=agregar` en `crear-alimento.html` para trazabilidad de flujo sin depender de cabeceras HTTP.
+  6. Verificación automatizada exhaustiva: 100% passed en tests estáticos, requisitos y comportamiento profundo.
+  7. Cálculo matemático de macros y mocks pospuestos para integración definitiva con API de alimentos y coach.
+
 ---
 
 ## [v0.4.0] — 17/10/2026
