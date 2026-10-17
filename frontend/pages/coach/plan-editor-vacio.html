@@ -32,7 +32,7 @@
           <h1 class="titulo">Plan alimenticio</h1>
           <p class="sub">benja.blason · Día único</p>
         </div>
-        <button class="btn btn--chico btn--secundario" type="button">Borrador</button>
+        <button class="btn btn--chico btn--secundario" type="button" data-aviso="Estado del plan: borrador guardado localmente.">Borrador</button>
       </header>
 
       <!-- ===== Resumen fijo de calorías y macros ===== -->
@@ -123,7 +123,7 @@
       </details>
 
       <!-- ===== Comida extra ===== -->
-      <button class="btn btn--punteado" type="button"><svg class="icono icono--grueso" width="18" height="18" aria-hidden="true"><use href="#mas"/></svg>Añadir colación / comida extra</button>
+      <button class="btn btn--punteado" type="button" data-aviso="Añadir colación: disponible próximamente."><svg class="icono icono--grueso" width="18" height="18" aria-hidden="true"><use href="#mas"/></svg>Añadir colación / comida extra</button>
 
       <!-- ===== Pautas e hidratación ===== -->
       <details class="acordeon">
@@ -144,8 +144,11 @@
         </div>
       </details>
 
-      <!-- ===== Acción principal (bloqueada hasta que haya alimentos) ===== -->
-      <button class="btn btn--primario btn--alto" type="button" disabled>Guardar y asignar plan</button>
+      <!-- ===== Acciones principales ===== -->
+      <div class="grilla-2">
+        <a class="btn btn--secundario btn--alto" href="plan-nuevo.html" data-volver>Cancelar</a>
+        <a class="btn btn--primario btn--alto" href="plan-activo.html">Guardar y asignar plan</a>
+      </div>
     </main>
 
     <!-- ===== Navegación del coach (igual en todas las pantallas del coach) ===== -->
@@ -157,5 +160,6 @@
       <a class="barra-inferior__item" href="perfil.html"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#perfil"/></svg><span>Perfil</span></a>
     </nav>
   </div>
+  <script type="module" src="../../js/utils/navegacion.js"></script>
 </body>
 </html>

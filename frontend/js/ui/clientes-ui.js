@@ -7,6 +7,7 @@
 import { supabase } from '../data/supabase.js';
 import { exigirRol } from '../data/sesion.js';
 import { iniciales, nombreDe } from '../utils/texto.js';
+import '../utils/navegacion.js';
 
 const FORMATO_ID = /^NF-\d{4}-[A-Z]{2}$/;
 const COLORES_AVATAR = ['avatar--azul', 'avatar--naranja'];

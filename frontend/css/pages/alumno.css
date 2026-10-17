@@ -302,44 +302,6 @@
 .btn-agregar[aria-pressed="true"] .btn-agregar__mas,
 .btn-agregar[aria-pressed="false"] .btn-agregar__hecho { display: none; }
 
-/* Aviso que aparece abajo después de "Lo comí", con "Deshacer" */
-.aviso-flotante {
-  position: absolute;
-  left: var(--pad-contenido);
-  right: var(--pad-contenido);
-  bottom: calc(80px + var(--espacio-l));
-  z-index: 20;
-  min-height: 52px;
-  display: flex;
-  align-items: center;
-  gap: var(--espacio-s);
-  padding: var(--espacio-xs) var(--espacio-xs) var(--espacio-xs) var(--espacio-l);
-  border-radius: var(--radio-fila);
-  background: var(--verde-oscuro);
-  color: var(--blanco);
-  box-shadow: var(--sombra-flotante);
-  font-size: 14px;
-}
-
-.aviso-flotante > .icono { color: var(--verde-brillante); }
-
-.aviso-flotante__accion {
-  min-height: var(--alto-tactil);
-  padding: 0 var(--espacio-m);
-  border: none;
-  background: transparent;
-  color: var(--verde-brillante);
-  font-weight: 700;
-}
-
-@media (min-width: 768px) {
-  .aviso-flotante {
-    left: calc(var(--ancho-menu) + var(--pad-contenido));
-    bottom: var(--espacio-xl);
-    max-width: var(--ancho-lectura);
-  }
-}
-
 /* ---------- Pantallas de una comida: cantidad, reemplazar, agregar y alimento ---------- */
 /* El pie de estas pantallas acompaña a la columna centrada del contenido */
 .pie--centrado { padding-inline: max(var(--pad-contenido), calc((100% - var(--ancho-lectura)) / 2)); }

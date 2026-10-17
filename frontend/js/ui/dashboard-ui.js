@@ -5,6 +5,7 @@
    Por ahora solo cambia la fecha: los datos del día todavía son de ejemplo.
    ========================================================== */
 import { exigirRol } from '../data/sesion.js';
+import '../utils/navegacion.js';
 
 // Solo para alumnos: sin sesión va al login y un coach va a su panel
 exigirRol('alumno');
@@ -158,3 +159,65 @@ calendario.addEventListener('change', () => {
 });
 
 elegir(hoy);
+
+// ---------- Comidas: marcar hecha y aviso flotante con Deshacer ----------
+const avisoComida = document.querySelector('.aviso-flotante:not(.aviso-flotante--toast)');
+let temporizadorComida = null;
+let ultimaComidaRegistrada = null;
+
+function actualizarContadorComidas() {
+  const contador = document.querySelector('[aria-labelledby="t-comidas"] .sub');
+  if (!contador) return;
+  const hechas = document.querySelectorAll('.comida[data-estado="hecha"]').length;
+  contador.textContent = `${hechas} de 4 hechas`;
+}
+
+actualizarContadorComidas();
+
+document.querySelectorAll('.comida__lo-comi').forEach((boton) => {
+  boton.addEventListener('click', (evento) => {
+    evento.stopPropagation();
+    const comida = boton.closest('.comida');
+    if (!comida) return;
+    comida.dataset.estado = 'hecha';
+    ultimaComidaRegistrada = comida;
+    actualizarContadorComidas();
+
+    if (avisoComida) {
+      const tituloComida = comida.querySelector('.comida__titulo')?.textContent?.trim() || 'Comida';
+      const kcalComida = comida.querySelector('.comida__kcal')?.textContent?.trim() || '— kcal';
+      const textoAviso = avisoComida.querySelector('.crece');
+      if (textoAviso) textoAviso.textContent = `${tituloComida} registrada · ${kcalComida}`;
+      avisoComida.hidden = false;
+
+      if (temporizadorComida) clearTimeout(temporizadorComida);
+      temporizadorComida = setTimeout(() => {
+        avisoComida.hidden = true;
+        temporizadorComida = null;
+      }, 4000);
+    }
+  });
+});
+
+const botonDeshacer = avisoComida?.querySelector('.aviso-flotante__accion');
+botonDeshacer?.addEventListener('click', () => {
+  if (ultimaComidaRegistrada) {
+    ultimaComidaRegistrada.dataset.estado = 'pendiente';
+    ultimaComidaRegistrada = null;
+    actualizarContadorComidas();
+  }
+  if (avisoComida) avisoComida.hidden = true;
+  if (temporizadorComida) {
+    clearTimeout(temporizadorComida);
+    temporizadorComida = null;
+  }
+});
+
+// ---------- Vasos de agua: alternar estado ----------
+document.querySelectorAll('.vasos .vaso').forEach((vaso) => {
+  vaso.addEventListener('click', () => {
+    const presionado = vaso.getAttribute('aria-pressed') === 'true';
+    vaso.setAttribute('aria-pressed', String(!presionado));
+  });
+});
+

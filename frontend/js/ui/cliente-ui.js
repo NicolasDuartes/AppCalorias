@@ -9,6 +9,7 @@
 import { supabase } from '../data/supabase.js';
 import { exigirRol } from '../data/sesion.js';
 import { iniciales, nombreDe } from '../utils/texto.js';
+import '../utils/navegacion.js';
 
 const LISTA = 'clientes.html';
 const CLAVE_GUARDADA = 'clienteActual';

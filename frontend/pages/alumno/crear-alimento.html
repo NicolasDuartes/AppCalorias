@@ -29,7 +29,7 @@
         </div>
       </header>
 
-      <form class="columna gap-l" id="form-alimento" novalidate>
+      <form class="columna gap-l" id="form-alimento" action="cantidad.html" method="get" novalidate>
         <label class="campo">
           <span class="campo__etiqueta campo__etiqueta--fuerte">Nombre</span>
           <span class="input"><input type="text" name="nombre" autocomplete="off" placeholder="Ej.: Galletitas de avena" required></span>
@@ -94,10 +94,12 @@
     </main>
 
     <div class="pie pie--centrado pie--columna">
-      <!-- Dice qué falta mientras el botón está deshabilitado -->
-      <p class="nota-centrada">Completá el nombre y los 4 valores.</p>
-      <button class="btn btn--primario" type="submit" form="form-alimento" disabled>Crear y elegir cantidad</button>
+      <div class="grilla-2">
+        <a class="btn btn--secundario" href="agregar.html">Cancelar</a>
+        <button class="btn btn--primario" type="submit" form="form-alimento">Crear y elegir cantidad</button>
+      </div>
     </div>
   </div>
+  <script type="module" src="../../js/utils/navegacion.js"></script>
 </body>
 </html>

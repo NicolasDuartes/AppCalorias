@@ -8,6 +8,7 @@
 import { supabase } from '../data/supabase.js';
 import { cerrarSesion, exigirRol } from '../data/sesion.js';
 import { iniciales, nombreDe } from '../utils/texto.js';
+import '../utils/navegacion.js';
 
 const el = (id) => document.getElementById(id);
 

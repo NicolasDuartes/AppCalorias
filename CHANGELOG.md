@@ -11,8 +11,10 @@ Este documento registra los hitos de versiones **Mayores (Major)** y **Medianas 
   1. Guardas de sesión resilientes con soporte de `redirect_to` para preservar la ruta original post-login.
   2. Detección automática del rol (alumno/coach) en la pantalla compartida `contexto.html` vía Supabase Auth.
   3. Retroalimentación visual accesible (toast/aviso flotante "Próximamente") en botones pendientes de la barra inferior.
-  4. Estandarización de botones de retorno ("Volver") con historial inteligente del navegador (`history.back`).
+  4. Estandarización de botones de retorno ("Volver") con historial inteligente del navegador (`history.back`) y protección de anclajes modales.
   5. Cobertura homogénea de sesiones en las subpáginas de carga y edición de alimentos.
+  6. Auditoría integral de redirecciones de botones entre pantallas HTML (acciones Cancelar/Guardar en editores, Crear primer plan en historial vacío, micro-interacciones accesibles para segmentados, switches y lista de alimentos).
+
 
 ---
 

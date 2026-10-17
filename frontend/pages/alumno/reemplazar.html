@@ -73,8 +73,12 @@
     <div class="pie pie--centrado pie--columna">
       <!-- Solo si la opción elegida es "No equivalente": explica por qué y el botón pasa a btn--secundario ("Cambiar igual por …") -->
       <p class="nota fila fila--arriba gap-s" hidden><svg class="icono" width="18" height="18" aria-hidden="true"><use href="#info"/></svg><span>Son alimentos de otro tipo. Para seguir tu plan, conviene elegir uno parecido.</span></p>
-      <button class="btn btn--primario" type="button" disabled><svg class="icono icono--grueso" width="18" height="18" aria-hidden="true"><use href="#reemplazar"/></svg>Cambiar</button>
+      <div class="grilla-2">
+        <a class="btn btn--secundario" href="dashboard.html">Cancelar</a>
+        <a class="btn btn--primario" href="dashboard.html"><svg class="icono icono--grueso" width="18" height="18" aria-hidden="true"><use href="#reemplazar"/></svg>Reemplazar</a>
+      </div>
     </div>
   </div>
+  <script type="module" src="../../js/utils/navegacion.js"></script>
 </body>
 </html>
