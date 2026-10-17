@@ -2,6 +2,20 @@
 
 Este documento registra los hitos de versiones **Mayores (Major)** y **Medianas (Minor)** de la aplicación con resúmenes ejecutivos concisos ($\le 10$ renglones). Los cambios atómicos y parches específicos se registran directamente en los commits de Git bajo la convención *Conventional Commits*.
 
+## [v0.4.2] — 17/10/2026
+- **Tipo:** Versión Menor (Validador Inteligente de Alimentos, Teclado Móvil y Accesibilidad)
+- **Fecha:** 17 de Octubre de 2026
+- **Resumen:**
+  1. Detector inteligente de calorías: Compara automáticamente las calorías con las proteínas, carbohidratos y grasas usando un semáforo visual (verde, naranja y rojo).
+  2. Criterio de prudencia: Ante pequeñas diferencias de etiqueta ($\le 25\%$), la app adopta el valor más alto para cuidar el plan y no subestimar calorías.
+  3. Bloqueo de errores absurdos: Impide guardar datos físicamente imposibles (como superar 900 kcal en 100g o más de 100g de nutrientes por porción).
+  4. Escritura fluida en celulares: Convierte comas en puntos al tipear decimales en teclados móviles en tiempo real, sin trabas ni saltos de cursor.
+  5. Cierre rápido con tecla Escape: Permite cerrar cualquier ventana emergente, menú o aviso presionando Escape o tocando afuera, regresando al punto anterior.
+  6. Organización limpia de cálculos: Toda la matemática nutricional y de formato quedó aislada en módulos independientes (`frontend/js/calc/`) con pruebas unitarias.
+  7. Verificación completa en navegador: 27 pruebas automáticas en navegador real superadas con 100% de éxito.
+
+---
+
 ## [v0.4.1] — 17/10/2026
 - **Tipo:** Versión Menor / Parche (Navegación Contextual, Toasts Inter-páginas y Blindaje de Retorno)
 - **Fecha:** 17 de Octubre de 2026

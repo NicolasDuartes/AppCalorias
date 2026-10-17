@@ -9,6 +9,8 @@
      botones segmentados, interruptores (switch) y selectores de alimentos.
    ========================================================== */
 
+import { normalizarDecimal } from '../calc/formato-calc.js';
+
 let temporizadorToast = null;
 
 /**
@@ -370,6 +372,84 @@ export function iniciarNavegacion() {
 
     grupo.querySelectorAll('[role="radio"]').forEach((r) => r.setAttribute('aria-checked', 'false'));
     radio.setAttribute('aria-checked', 'true');
+  });
+
+  // 12. Sanitización decimal transparente en inputs móviles (inputmode="decimal")
+  document.addEventListener('input', (evento) => {
+    const input = evento.target;
+    if (input && input.tagName === 'INPUT' && input.getAttribute('inputmode') === 'decimal') {
+      const original = input.value;
+      const normalizado = normalizarDecimal(original);
+      if (original !== normalizado) {
+        const cursor = input.selectionStart;
+        input.value = normalizado;
+        try {
+          input.setSelectionRange(cursor, cursor);
+        } catch {
+          // Ignorar en inputs donde setSelectionRange no aplique
+        }
+      }
+    }
+  });
+
+  // 13. Accesibilidad WCAG: Cerrar modales, hojas, desplegables y acordeones con tecla Escape
+  document.addEventListener('keydown', (evento) => {
+    if (evento.key !== 'Escape') return;
+
+    // A. Si hay un desplegable de selección abierto (details.desplegable[open]), cerrarlo
+    const desplegableAbierto = document.querySelector('details.desplegable[open]');
+    if (desplegableAbierto) {
+      desplegableAbierto.removeAttribute('open');
+      desplegableAbierto.querySelector('summary')?.focus();
+      return;
+    }
+
+    // B. Si el foco está dentro de un acordeón abierto, cerrarlo y retornar foco a su cabecera
+    const acordeonAbierto = document.activeElement?.closest('details.acordeon[open], details[open]');
+    if (acordeonAbierto) {
+      acordeonAbierto.removeAttribute('open');
+      acordeonAbierto.querySelector('summary')?.focus();
+      return;
+    }
+
+    // C. Si hay un hash activo modal (ej. #anadir-cliente), cerrarlo y restaurar foco
+    if (window.location.hash && window.location.hash.length > 1) {
+      const modalTarget = document.querySelector(window.location.hash);
+      if (modalTarget) {
+        evento.preventDefault();
+        const disparador = document.querySelector(`a[href="${window.location.hash}"]`);
+        const btnCerrar = modalTarget.querySelector('a.modal-fondo__cerrar, a[aria-label^="Cerrar"]');
+        if (btnCerrar) {
+          btnCerrar.click();
+        } else {
+          window.location.hash = '';
+        }
+        if (disparador) {
+          disparador.focus();
+        }
+        return;
+      }
+    }
+
+    // D. Si es una pantalla modal/hoja (ej. buscar-alimento.html), ejecutar retorno inteligente
+    const esHojaModal = document.querySelector('.hoja[role="dialog"]') || document.querySelector('.fondo-oscurecido');
+    if (esHojaModal) {
+      const btnCerrar = document.querySelector('a[aria-label^="Cerrar"], a[data-volver]');
+      if (btnCerrar) {
+        btnCerrar.click();
+        return;
+      }
+    }
+  });
+
+  // 14. Cerrar desplegables de selección al hacer click fuera
+  document.addEventListener('click', (evento) => {
+    const desplegables = document.querySelectorAll('details.desplegable[open]');
+    desplegables.forEach((d) => {
+      if (!d.contains(evento.target)) {
+        d.removeAttribute('open');
+      }
+    });
   });
 }
 
