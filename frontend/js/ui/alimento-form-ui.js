@@ -164,7 +164,7 @@ export function iniciarValidadorAlimento() {
 
     // Principio de prudencia nutricional: si es válido y hay calorías adoptadas,
     // reflejar el valor adoptado en el campo antes de enviar el formulario.
-    if (evalFinal.valido && evalFinal.kcalAdoptadas != null && evalFinal.kcalAdoptadas > 0) {
+    if (evalFinal.valido && evalFinal.kcalAdoptadas != null && evalFinal.kcalAdoptadas >= 0) {
       inputKcal.value = String(evalFinal.kcalAdoptadas);
     }
   });

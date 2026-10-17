@@ -414,10 +414,16 @@ export function iniciarNavegacion() {
 
     // C. Si hay un hash activo modal (ej. #anadir-cliente), cerrarlo y restaurar foco
     if (window.location.hash && window.location.hash.length > 1) {
-      const modalTarget = document.querySelector(window.location.hash);
+      const modalId = decodeURIComponent(window.location.hash.slice(1));
+      const modalTarget = document.getElementById(modalId);
       if (modalTarget) {
         evento.preventDefault();
-        const disparador = document.querySelector(`a[href="${window.location.hash}"]`);
+        let disparador = null;
+        try {
+          disparador = document.querySelector(`a[href="${window.location.hash}"]`);
+        } catch {
+          // Ignorar si el selector no es válido
+        }
         const btnCerrar = modalTarget.querySelector('a.modal-fondo__cerrar, a[aria-label^="Cerrar"]');
         if (btnCerrar) {
           btnCerrar.click();

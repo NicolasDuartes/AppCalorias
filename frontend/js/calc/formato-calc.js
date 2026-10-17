@@ -27,10 +27,11 @@ export function normalizarDecimal(valor) {
   // 2. Conservar únicamente dígitos y puntos decimales
   const soloDigitosYPunto = conPuntos.replace(/[^0-9.]/g, '');
 
-  // 3. Garantizar un único punto decimal
+  // 3. Garantizar un único punto decimal (y anteponer 0 si comienza directamente con separador decimal)
   const partes = soloDigitosYPunto.split('.');
   if (partes.length > 1) {
-    return `${partes[0]}.${partes.slice(1).join('')}`;
+    const parteEntera = partes[0] === '' ? '0' : partes[0];
+    return `${parteEntera}.${partes.slice(1).join('')}`;
   }
   return soloDigitosYPunto;
 }
@@ -41,7 +42,7 @@ export function normalizarDecimal(valor) {
  * @returns {string} Texto formateado (ej. "2.060").
  */
 export function formatearKcal(kcal) {
-  const val = typeof kcal === 'string' ? kcal.trim().replace(',', '.') : kcal;
+  const val = typeof kcal === 'string' ? kcal.trim().replace(/,/g, '.') : kcal;
   const num = Math.round(Number(val) || 0);
   return num.toLocaleString('es-AR');
 }
@@ -54,7 +55,7 @@ export function formatearKcal(kcal) {
  * @returns {string} Texto formateado (ej. "14,5" o "100").
  */
 export function formatearGramos(gramos, decimales = 1) {
-  const val = typeof gramos === 'string' ? gramos.trim().replace(',', '.') : gramos;
+  const val = typeof gramos === 'string' ? gramos.trim().replace(/,/g, '.') : gramos;
   const num = Number(val) || 0;
   return num.toLocaleString('es-AR', {
     minimumFractionDigits: 0,

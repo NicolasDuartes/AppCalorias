@@ -32,7 +32,7 @@ export function aNumeroSeguro(valor) {
     return Number.isFinite(valor) ? valor : 0;
   }
   if (!valor || typeof valor !== 'string') return 0;
-  const limpio = valor.trim().replace(',', '.');
+  const limpio = valor.trim().replace(/,/g, '.');
   const num = parseFloat(limpio);
   return Number.isFinite(num) ? num : 0;
 }
@@ -172,8 +172,10 @@ export function evaluarConsistencia(kcalDeclaradasInput, pInput, cInput, gInput)
   }
 
   // 3. Guarda física de masa total: P + C + G no pueden sumar más de 100 g
-  const masaMacros = rawP + rawC + rawG;
+  // Se redondea a 2 decimales para evitar falsos positivos por aritmética flotante IEEE 754 (ej. 0.1 + 0.2 + 99.7)
+  const masaMacros = Math.round((rawP + rawC + rawG) * 100) / 100;
   if (masaMacros > MAX_GRAMOS_MACROS) {
+    const diffExceso = Math.round((masaMacros - MAX_GRAMOS_MACROS) * 10) / 10;
     return {
       zona: 'roja',
       valido: false,
@@ -182,7 +184,7 @@ export function evaluarConsistencia(kcalDeclaradasInput, pInput, cInput, gInput)
       kcalDeclaradas: rawKcal,
       kcalCalculadas: 0,
       kcalAdoptadas: null,
-      diff: Math.round(masaMacros - MAX_GRAMOS_MACROS),
+      diff: diffExceso > 0 ? diffExceso : 0.1,
       porcentajeDiff: 100,
       mensaje: `Los macros suman ${String(Math.round(masaMacros * 10) / 10).replace('.', ',')} g cada 100 g. No pueden superar los 100 g. Revisá que estés cargando valores por 100 g y no por porción.`,
     };
