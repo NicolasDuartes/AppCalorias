@@ -136,18 +136,34 @@ def valores_cada_100g(alimento):
     return {clave: round(max(valor, 0), 1) for clave, valor in valores.items()}
 
 
-def gramos_por_unidad(alimento, buscar):
-    """Peso de 1 unidad según las porciones de USDA ("1 large = 50 g"), o None."""
-    porciones = alimento.get('foodPortions', [])
+# Porciones que son medidas de volumen o de peso, no una unidad del alimento
+# (ej. "1 cup (4.86 large eggs)" menciona "large" pero no es 1 huevo)
+MEDIDAS = re.compile(r'\b(cups?|tbsp|tsp|tablespoons?|teaspoons?|oz|ounces?|lbs?|pounds?|packages?|servings?|nlea|racc|fl)\b')
+
+
+def porcion_por_unidad(alimento, buscar):
+    """Peso de 1 unidad según las porciones de USDA ("1 large = 50 g").
+    Devuelve (gramos, texto de la porción usada) o (None, None)."""
     palabras = [buscar] if buscar else PORCIONES_POR_DEFECTO
     for palabra in palabras:
-        for porcion in porciones:
-            texto = ' '.join(str(porcion.get(c) or '') for c in ('modifier', 'portionDescription'))
-            texto += ' ' + str((porcion.get('measureUnit') or {}).get('name') or '')
-            if re.search(rf'\b{re.escape(palabra)}\b', texto.lower()) and porcion.get('gramWeight'):
-                cantidad = float(porcion.get('amount') or 1) or 1
-                return round(float(porcion['gramWeight']) / cantidad, 1)
-    return None
+        opciones = []
+        for orden, porcion in enumerate(alimento.get('foodPortions', [])):
+            if not porcion.get('gramWeight'):
+                continue
+            texto = ' '.join(str(porcion.get(c) or '') for c in ('modifier', 'portionDescription')).strip()
+            texto = (texto + ' ' + str((porcion.get('measureUnit') or {}).get('name') or '')).strip().lower()
+            if not re.search(rf'\b{re.escape(palabra)}\b', texto) or MEDIDAS.search(texto):
+                continue
+            cantidad = float(porcion.get('amount') or 1) or 1
+            # Primero la porción que ES la unidad ("large"), después la que empieza con ella
+            # ("slice, thin") y por último la que solo la menciona ("extra large"); si empatan, la primera
+            prioridad = 0 if texto == palabra else 1 if texto.startswith(palabra) else 2
+            opciones.append((prioridad, orden, round(float(porcion['gramWeight']) / cantidad, 1),
+                             f"{porcion.get('amount') or 1} {texto} = {porcion['gramWeight']} g"))
+        if opciones:
+            _, _, gramos, texto = min(opciones)
+            return gramos, texto
+    return None, None
 
 
 def candidatos(descripcion, por_descripcion, cantidad=3):
@@ -201,9 +217,12 @@ def mapear(fila, por_descripcion, variantes=None):
         # Si el alimento elegido no trae la porción por unidad, se busca en el
         # mismo alimento de la otra base (ej. kiwi: Foundation no la trae, SR Legacy sí)
         mismos = (variantes or {}).get(normalizar(fila['usda_descripcion']), [])
-        gramos = next((g for g in (gramos_por_unidad(a, fila['unidad_buscar'].strip())
-                                   for a in [alimento] + [m for m in mismos if m is not alimento]) if g), None)
+        gramos, porcion = next((r for r in (porcion_por_unidad(a, fila['unidad_buscar'].strip())
+                                            for a in [alimento] + [m for m in mismos if m is not alimento]) if r[0]),
+                               (None, None))
         if gramos:
+            detalle = (f'1 {fila["unidad_nombre"].strip()} = {gramos} g → {round(valores["kcal"] * gramos / 100)} kcal'
+                       f' (porción de USDA: "{porcion}")')
             datos['unidad_nombre'] = fila['unidad_nombre'].strip()
             datos['unidad_g'] = gramos
             datos['porcion_g'] = gramos
