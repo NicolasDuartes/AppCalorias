@@ -16,6 +16,12 @@ los archivos JSON de "SR Legacy" y "Foundation Foods" y dejarlos (en .zip
 o descomprimidos) en la carpeta usda/datos/.
 
 Uso:  python importar_usda.py [carpeta_datos] [salida.xlsx]
+
+Para encontrar la descripción exacta de un alimento en USDA (y corregir
+mapeo_usda.csv), buscar por palabras en inglés:
+      python importar_usda.py --buscar chicken breast raw
+Muestra cada alimento que tiene todas esas palabras, con su id, sus
+valores cada 100 g y sus porciones.
 Necesita: pip install openpyxl
 """
 import csv
@@ -49,7 +55,10 @@ AMARILLO = PatternFill('solid', start_color='FBEFC9')
 
 
 def normalizar(texto):
-    return re.sub(r'\s+', ' ', (texto or '').strip().lower())
+    """Minúsculas y espacios simples. Ignora la aclaración "(Includes foods for USDA's Food
+    Distribution Program)", que USDA agrega a algunas descripciones."""
+    texto = re.sub(r"\(includes foods for usda's food distribution program\)", '', (texto or '').lower())
+    return re.sub(r'\s+', ' ', texto).strip()
 
 
 # ---------- Lectura de las bases de USDA ----------
@@ -222,7 +231,28 @@ def hoja_mapeo(libro, informe):
     hoja.freeze_panes = 'A2'
 
 
+def buscar(palabras, carpeta, maximo=40):
+    """Lista los alimentos de USDA cuya descripción tiene todas las palabras."""
+    palabras = [p.lower() for p in palabras]
+    alimentos = cargar_bases(carpeta)
+    encontrados = [a for a in alimentos if all(p in a['description'].lower() for p in palabras)]
+    encontrados.sort(key=lambda a: (len(a['description']), a['description']))
+    print(f'\n{len(encontrados)} alimentos con "{" ".join(palabras)}"' + (f' (se muestran {maximo})' if len(encontrados) > maximo else '') + ':\n')
+    for alimento in encontrados[:maximo]:
+        valores = valores_cada_100g(alimento)
+        texto = (f"{valores['kcal']} kcal · P {valores['proteinas']} · C {valores['carbohidratos']} · G {valores['grasas']}"
+                 if valores else 'faltan valores')
+        porciones = '; '.join(
+            f"{p.get('amount') or 1} {p.get('modifier') or p.get('portionDescription') or (p.get('measureUnit') or {}).get('name', '')}"
+            f" = {p.get('gramWeight')} g"
+            for p in alimento.get('foodPortions', [])[:4])
+        print(f"{alimento['description']}\n    id {alimento.get('fdcId')} · {texto}" + (f'\n    porciones: {porciones}' if porciones else ''))
+
+
 def main():
+    if len(sys.argv) > 1 and sys.argv[1] == '--buscar':
+        buscar(sys.argv[2:], AQUI / 'datos')
+        return
     carpeta = Path(sys.argv[1]) if len(sys.argv) > 1 else AQUI / 'datos'
     salida = Path(sys.argv[2]) if len(sys.argv) > 2 else AQUI / 'planilla_usda.xlsx'
 
