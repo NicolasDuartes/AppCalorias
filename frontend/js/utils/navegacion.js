@@ -11,6 +11,10 @@
 
 import { normalizarDecimal } from '../calc/formato-calc.js';
 
+// Re-exportaciones para preservar compatibilidad con código existente
+export { ALIMENTOS_PLAN_DEFECTO } from '../data/plan-defecto.js';
+export { actualizarResumenPieAgregar } from '../ui/agregar-ui.js';
+
 let temporizadorToast = null;
 
 /**
@@ -53,7 +57,7 @@ export function guardarAvisoToast(mensaje) {
 /**
  * Muestra y consume cualquier aviso toast pendiente en sessionStorage.
  */
-function procesarAvisoToastPendiente() {
+export function procesarAvisoToastPendiente() {
   try {
     const avisoPendiente = sessionStorage.getItem('aviso-toast');
     if (avisoPendiente) {
@@ -65,300 +69,6 @@ function procesarAvisoToastPendiente() {
   }
 }
 
-/**
- * Adapta los botones y datos de cantidad.html según si el usuario llega desde agregar.html
- * o desde dashboard.html.
- */
-function adaptarCantidadContextual() {
-  const ruta = window.location.pathname;
-  const esPaginaCantidad = ruta.endsWith('cantidad.html') || ruta.includes('/cantidad.html') || !!document.querySelector('.input--cantidad');
-  if (!esPaginaCantidad) return;
-
-  const pie = document.querySelector('.pantalla > .pie') || document.querySelector('.pie');
-  if (!pie) return;
-
-  const btnQuitar = pie.querySelector('.btn--peligro-texto');
-  const btnGuardar = pie.querySelector('.btn--primario');
-  const btnVolver = document.querySelector('a[aria-label^="Volver"]');
-
-  const params = new URLSearchParams(window.location.search);
-  const comida = params.get('comida');
-  const alimento = params.get('alimento');
-  const kcal = params.get('kcal');
-  const p = params.get('p');
-  const c = params.get('c');
-  const g = params.get('g');
-  const cantidad = params.get('cantidad');
-
-  const gramos = params.get('gramos');
-
-  // Adaptar contexto de comida y alimento si vienen por parámetro
-  if (comida) {
-    const antetitulo = document.querySelector('.encabezado__textos .antetitulo--verde');
-    if (antetitulo) antetitulo.textContent = comida;
-  }
-  if (alimento) {
-    const titulo = document.querySelector('.encabezado__textos .titulo');
-    if (titulo) titulo.textContent = alimento;
-  }
-
-  // Extraer gramos base
-  let baseGramos = 100;
-  if (gramos) {
-    baseGramos = parseFloat(gramos) || 100;
-  } else if (cantidad) {
-    const matchG = cantidad.match(/(\d+(?:[.,]\d+)?)\s*g\b/i);
-    if (matchG) {
-      baseGramos = parseFloat(matchG[1].replace(',', '.')) || 100;
-    } else {
-      const matchNum = cantidad.match(/\d+(?:[.,]\d+)?/);
-      if (matchNum) baseGramos = parseFloat(matchNum[0].replace(',', '.')) || 100;
-    }
-  }
-
-  const inputCantidad = document.querySelector('.input--cantidad input');
-  if (inputCantidad) {
-    inputCantidad.value = String(baseGramos);
-  }
-
-  const baseKcal = kcal ? (Number(kcal) || 0) : 0;
-  const baseP = p ? (Number(p) || 0) : 0;
-  const baseC = c ? (Number(c) || 0) : 0;
-  const baseG = g ? (Number(g) || 0) : 0;
-
-  const factor100 = baseGramos > 0 ? (100 / baseGramos) : 1;
-  const kcal100 = baseKcal * factor100;
-  const p100 = baseP * factor100;
-  const c100 = baseC * factor100;
-  const g100 = baseG * factor100;
-
-  function recalcularAportes(cantGramos) {
-    const gActual = Math.max(0, cantGramos);
-    const f = gActual / 100;
-    const kAct = Math.round(kcal100 * f);
-    const pAct = Math.round(p100 * f);
-    const cAct = Math.round(c100 * f);
-    const gAct = Math.round(g100 * f);
-
-    const celdas = document.querySelectorAll('.aporte .aporte__celda .aporte__valor');
-    if (celdas.length >= 4) {
-      celdas[0].textContent = String(kAct);
-      celdas[1].textContent = `${pAct} g`;
-      celdas[2].textContent = `${cAct} g`;
-      celdas[3].textContent = `${gAct} g`;
-    }
-  }
-
-  if (kcal || p || c || g) {
-    recalcularAportes(baseGramos);
-
-    const valores100 = document.getElementById('valores-100');
-    if (valores100) {
-      valores100.textContent = `Cada 100 g: ${Math.round(kcal100)} kcal · P ${Math.round(p100)} · C ${Math.round(c100)} · G ${Math.round(g100)}`;
-    }
-  }
-
-  if (inputCantidad && !inputCantidad.dataset.listenerCantidad) {
-    inputCantidad.dataset.listenerCantidad = 'true';
-    inputCantidad.addEventListener('input', () => {
-      const val = parseFloat(inputCantidad.value.replace(',', '.')) || 0;
-      recalcularAportes(val);
-    });
-  }
-
-  let origen = params.get('origen');
-  if (!origen && document.referrer) {
-    try {
-      const refUrl = new URL(document.referrer, window.location.href);
-      if (refUrl.pathname.includes('agregar.html') || refUrl.pathname.includes('crear-alimento.html')) {
-        origen = 'agregar';
-      } else if (refUrl.pathname.includes('dashboard.html')) {
-        origen = 'dashboard';
-      }
-    } catch {
-      if (document.referrer.includes('agregar.html') || document.referrer.includes('crear-alimento.html')) origen = 'agregar';
-      else if (document.referrer.includes('dashboard.html')) origen = 'dashboard';
-    }
-  }
-  if (!origen) {
-    try {
-      origen = sessionStorage.getItem('origen-cantidad');
-    } catch {
-      // Ignorar
-    }
-  }
-
-  const destinoAgregar = comida ? `agregar.html?comida=${encodeURIComponent(comida)}` : 'agregar.html';
-
-  if (origen === 'agregar') {
-    if (btnQuitar) {
-      btnQuitar.hidden = true;
-    }
-    if (btnGuardar) {
-      btnGuardar.textContent = 'Agregar a la comida';
-      btnGuardar.setAttribute('href', destinoAgregar);
-      btnGuardar.dataset.toast = 'Alimento agregado a la comida';
-    }
-    if (btnVolver) {
-      btnVolver.setAttribute('href', destinoAgregar);
-    }
-  } else {
-    if (btnQuitar) {
-      btnQuitar.hidden = false;
-      btnQuitar.setAttribute('href', 'dashboard.html');
-      btnQuitar.dataset.toast = 'Alimento quitado de la comida';
-    }
-    if (btnGuardar) {
-      btnGuardar.textContent = 'Guardar';
-      btnGuardar.setAttribute('href', 'dashboard.html');
-      btnGuardar.dataset.toast = 'Cantidad guardada';
-    }
-    if (btnVolver) {
-      btnVolver.setAttribute('href', 'dashboard.html');
-    }
-  }
-}
-
-export const ALIMENTOS_PLAN_DEFECTO = {
-  'Desayuno': {
-    titulo: 'Avena con leche y fruta',
-    linea: '464 kcal · P 31 · C 53 · G 14',
-    cantidad: '1 porción (250 g)',
-    kcal: 464,
-    p: 31,
-    c: 53,
-    g: 14,
-    gramos: 250
-  },
-  'Almuerzo': {
-    titulo: 'Pechuga de pollo con arroz',
-    linea: '570 kcal · P 51 · C 50 · G 16',
-    cantidad: '1 porción (350 g)',
-    kcal: 570,
-    p: 51,
-    c: 50,
-    g: 16,
-    gramos: 350
-  },
-  'Merienda': {
-    titulo: 'Yogur griego con frutos secos',
-    linea: '388 kcal · P 21 · C 38 · G 19',
-    cantidad: '1 porción (200 g)',
-    kcal: 388,
-    p: 21,
-    c: 38,
-    g: 19,
-    gramos: 200
-  },
-  'Cena': {
-    titulo: 'Lomo vacuno con batata',
-    linea: '545 kcal · P 38 · C 52 · G 20',
-    cantidad: '1 porción (300 g)',
-    kcal: 545,
-    p: 38,
-    c: 52,
-    g: 20,
-    gramos: 300
-  }
-};
-
-/**
- * Calcula y actualiza el contador de alimentos y calorías en el pie de agregar.html.
- */
-export function actualizarResumenPieAgregar() {
-  const pieResumen = document.querySelector('.pantalla > .pie .crece.sub') || document.querySelector('.pie .crece.sub');
-  if (!pieResumen) return;
-
-  const botonesPresionados = document.querySelectorAll('button.btn-agregar[aria-pressed="true"]');
-  let totalKcal = 0;
-  botonesPresionados.forEach((btn) => {
-    const fila = btn.closest('.alimento-fila');
-    if (!fila) return;
-    const kcalAttr = Number(fila.dataset.kcal);
-    if (!Number.isNaN(kcalAttr) && kcalAttr > 0) {
-      totalKcal += kcalAttr;
-    } else {
-      const matchKcal = fila.querySelector('.alimento-fila__linea')?.textContent?.match(/(\d+[\d.]*)\s*kcal/i);
-      if (matchKcal) {
-        totalKcal += parseInt(matchKcal[1].replace(/\./g, ''), 10);
-      }
-    }
-  });
-
-  const total = botonesPresionados.length;
-  const textoAlimentos = `${total} ${total === 1 ? 'alimento' : 'alimentos'}`;
-  const textoKcal = `${totalKcal.toLocaleString('es-AR')} kcal`;
-  pieResumen.innerHTML = `${textoAlimentos} · <span class="negrita">${textoKcal}</span>`;
-}
-
-/**
- * Adapta el subtítulo/antetítulo y el alimento del plan en agregar.html según la comida pasada por parámetro.
- */
-function adaptarAgregarContextual() {
-  const ruta = window.location.pathname;
-  const esPaginaAgregar = ruta.endsWith('agregar.html') || ruta.includes('/agregar.html');
-  if (!esPaginaAgregar) return;
-
-  const params = new URLSearchParams(window.location.search);
-  const comida = params.get('comida');
-  if (comida) {
-    const antetitulo = document.querySelector('.encabezado__textos .antetitulo--verde');
-    if (antetitulo) {
-      antetitulo.textContent = comida;
-    }
-
-    const info = ALIMENTOS_PLAN_DEFECTO[comida];
-    if (info) {
-      const seccionPlan = document.querySelector('[aria-labelledby="t-plan"]');
-      const filaPlan = seccionPlan?.querySelector('.alimento-fila');
-      if (filaPlan) {
-        filaPlan.dataset.kcal = String(info.kcal);
-        filaPlan.dataset.p = String(info.p);
-        filaPlan.dataset.c = String(info.c);
-        filaPlan.dataset.g = String(info.g);
-        filaPlan.dataset.gramos = String(info.gramos || 100);
-
-        const titEl = filaPlan.querySelector('.alimento-fila__titulo');
-        if (titEl) titEl.textContent = info.titulo;
-        const linEl = filaPlan.querySelector('.alimento-fila__linea');
-        if (linEl) linEl.textContent = info.linea;
-        const cantEl = filaPlan.querySelector('.alimento-fila__cantidad');
-        if (cantEl) cantEl.textContent = info.cantidad;
-
-        const enlaceCant = filaPlan.querySelector('a.alimento-fila__nombre');
-        if (enlaceCant) {
-          enlaceCant.setAttribute(
-            'href',
-            `cantidad.html?origen=agregar&comida=${encodeURIComponent(comida)}&alimento=${encodeURIComponent(info.titulo)}&kcal=${info.kcal}&p=${info.p}&c=${info.c}&g=${info.g}&cantidad=${encodeURIComponent(info.cantidad)}&gramos=${info.gramos || 100}`
-          );
-        }
-      }
-    }
-
-    // Sincronizar estado inicial de botones btn-agregar con sessionStorage si ya hay alimentos registrados
-    try {
-      const rawComidas = sessionStorage.getItem('comidas-diarias-alumno');
-      if (rawComidas) {
-        const comidasData = JSON.parse(rawComidas);
-        const guardados = comidasData[comida] || [];
-        const nombresGuardados = new Set(guardados.map((a) => a.nombre.toLowerCase().trim()));
-
-        document.querySelectorAll('.alimento-fila').forEach((fila) => {
-          const tit = fila.querySelector('.alimento-fila__titulo')?.textContent?.toLowerCase()?.trim();
-          const btn = fila.querySelector('.btn-agregar');
-          if (tit && btn && nombresGuardados.has(tit)) {
-            btn.setAttribute('aria-pressed', 'true');
-          }
-        });
-      }
-    } catch {
-      // Ignorar si sessionStorage no está disponible
-    }
-  }
-
-  actualizarResumenPieAgregar();
-}
-
 let navegacionIniciada = false;
 
 /**
@@ -367,12 +77,6 @@ let navegacionIniciada = false;
 export function iniciarNavegacion() {
   // 0. Aviso toast inter-páginas pendiente en sessionStorage
   procesarAvisoToastPendiente();
-
-  // 0.1 Adaptación contextual de botones en cantidad.html
-  adaptarCantidadContextual();
-
-  // 0.2 Adaptación contextual de comida en agregar.html
-  adaptarAgregarContextual();
 
   if (navegacionIniciada) return;
   navegacionIniciada = true;
@@ -391,7 +95,6 @@ export function iniciarNavegacion() {
         const refUrl = new URL(document.referrer, window.location.href);
         if (refUrl.origin === window.location.origin) {
           // Prevenir volver hacia pantallas secundarias/hijas que acaban de completarse
-          // (ej. volver desde agregar.html no debe reabrir cantidad.html; volver desde cantidad.html no debe reabrir crear/editar)
           const esRetornoAHija =
             (window.location.pathname.includes('agregar.html') && refUrl.pathname.includes('cantidad.html')) ||
             (window.location.pathname.includes('cantidad.html') && (refUrl.pathname.includes('editar-alimento.html') || refUrl.pathname.includes('crear-alimento.html'))) ||
@@ -444,99 +147,6 @@ export function iniciarNavegacion() {
       guardarAvisoToast(texto);
     } else {
       mostrarAvisoFlotante(texto);
-    }
-  });
-
-  // 3.2. Seguimiento de origen al navegar a cantidad.html y limpieza al salir
-  document.addEventListener('click', (evento) => {
-    const enlaceCantidad = evento.target.closest('a[href*="cantidad.html"], button[form="form-alimento"], form[action*="cantidad.html"] button[type="submit"]');
-    if (enlaceCantidad) {
-      const ruta = window.location.pathname;
-      try {
-        if (ruta.includes('agregar.html') || ruta.includes('crear-alimento.html')) {
-          sessionStorage.setItem('origen-cantidad', 'agregar');
-        } else if (ruta.includes('dashboard.html')) {
-          sessionStorage.setItem('origen-cantidad', 'dashboard');
-        }
-      } catch {
-        // Ignorar
-      }
-      return;
-    }
-
-    const esAccionSalidaCantidad = evento.target.closest('.pie .btn, a[aria-label^="Volver"]');
-    if (esAccionSalidaCantidad && (window.location.pathname.includes('cantidad.html') || document.querySelector('.input--cantidad'))) {
-      try {
-        sessionStorage.removeItem('origen-cantidad');
-      } catch {
-        // Ignorar
-      }
-    }
-
-    const esBtnQuitar = evento.target.closest('.pie .btn--peligro-texto');
-    if (esBtnQuitar && (window.location.pathname.includes('cantidad.html') || document.querySelector('.input--cantidad'))) {
-      try {
-        const params = new URLSearchParams(window.location.search);
-        const comida = params.get('comida');
-        const alimento = params.get('alimento');
-        if (comida && alimento) {
-          const raw = sessionStorage.getItem('comidas-diarias-alumno');
-          if (raw) {
-            const guardadas = JSON.parse(raw);
-            if (guardadas[comida]) {
-              guardadas[comida] = guardadas[comida].filter((it) => it.nombre.toLowerCase() !== alimento.toLowerCase());
-              sessionStorage.setItem('comidas-diarias-alumno', JSON.stringify(guardadas));
-            }
-          }
-        }
-      } catch {
-        // Ignorar
-      }
-    }
-
-    const esBtnGuardarCantidad = evento.target.closest('.pie .btn--primario');
-    if (esBtnGuardarCantidad && (window.location.pathname.includes('cantidad.html') || document.querySelector('.input--cantidad'))) {
-      try {
-        const params = new URLSearchParams(window.location.search);
-        const comida = params.get('comida');
-        const alimento = params.get('alimento');
-        const inputCant = document.querySelector('.input--cantidad input');
-        const celdas = document.querySelectorAll('.aporte .aporte__celda .aporte__valor');
-
-        if (comida && alimento) {
-          const raw = sessionStorage.getItem('comidas-diarias-alumno');
-          const guardadas = raw ? JSON.parse(raw) : { Desayuno: [], Almuerzo: [], Merienda: [], Cena: [] };
-          if (!guardadas[comida]) guardadas[comida] = [];
-
-          const cantVal = parseFloat(inputCant?.value?.replace(',', '.')) || (Number(params.get('gramos')) || 100);
-          const kcalVal = celdas[0] ? parseInt(celdas[0].textContent.replace(/\D/g, ''), 10) || 0 : (Number(params.get('kcal')) || 0);
-          const pVal = celdas[1] ? parseInt(celdas[1].textContent.replace(/\D/g, ''), 10) || 0 : (Number(params.get('p')) || 0);
-          const cVal = celdas[2] ? parseInt(celdas[2].textContent.replace(/\D/g, ''), 10) || 0 : (Number(params.get('c')) || 0);
-          const gVal = celdas[3] ? parseInt(celdas[3].textContent.replace(/\D/g, ''), 10) || 0 : (Number(params.get('g')) || 0);
-          const textoCant = `${cantVal} g`;
-
-          const item = {
-            nombre: alimento,
-            linea: `${kcalVal} kcal · P ${pVal} · C ${cVal} · G ${gVal}`,
-            cantidad: textoCant,
-            kcal: kcalVal,
-            p: pVal,
-            c: cVal,
-            g: gVal,
-            gramos: cantVal
-          };
-
-          const idx = guardadas[comida].findIndex((it) => it.nombre.toLowerCase().trim() === alimento.toLowerCase().trim());
-          if (idx >= 0) {
-            guardadas[comida][idx] = item;
-          } else {
-            guardadas[comida].push(item);
-          }
-          sessionStorage.setItem('comidas-diarias-alumno', JSON.stringify(guardadas));
-        }
-      } catch {
-        // Ignorar
-      }
     }
   });
 
@@ -607,86 +217,7 @@ export function iniciarNavegacion() {
     }
   });
 
-  // 8. Botón agregar alimento en listas (aria-pressed)
-  document.addEventListener('click', (evento) => {
-    const btnAgregar = evento.target.closest('button.btn-agregar');
-    if (!btnAgregar) return;
-
-    const presionado = btnAgregar.getAttribute('aria-pressed') === 'true';
-    const nuevoEstado = !presionado;
-    btnAgregar.setAttribute('aria-pressed', String(nuevoEstado));
-    const fila = btnAgregar.closest('.alimento-fila');
-    const nombreAlimento = fila?.querySelector('.alimento-fila__titulo')?.textContent?.trim() || 'Alimento';
-    mostrarAvisoFlotante(nuevoEstado ? `"${nombreAlimento}" agregado a la comida.` : `"${nombreAlimento}" quitado de la comida.`);
-    actualizarResumenPieAgregar();
-
-    // Sincronizar persistencia con sessionStorage
-    try {
-      const params = new URLSearchParams(window.location.search);
-      const comida = params.get('comida') || document.querySelector('.encabezado__textos .antetitulo--verde')?.textContent?.trim();
-      if (comida && fila) {
-        const raw = sessionStorage.getItem('comidas-diarias-alumno');
-        const guardadas = raw ? JSON.parse(raw) : { Desayuno: [], Almuerzo: [], Merienda: [], Cena: [] };
-        if (!guardadas[comida]) guardadas[comida] = [];
-
-        if (nuevoEstado) {
-          const kcalAttr = Number(fila.dataset.kcal);
-          const pAttr = Number(fila.dataset.p);
-          const cAttr = Number(fila.dataset.c);
-          const gAttr = Number(fila.dataset.g);
-          const linea = fila.querySelector('.alimento-fila__linea')?.textContent?.trim() || '';
-          const cantidad = fila.querySelector('.alimento-fila__cantidad')?.textContent?.trim() || '1 porción';
-
-          let kcal = !Number.isNaN(kcalAttr) && kcalAttr >= 0 ? kcalAttr : 0;
-          let p = !Number.isNaN(pAttr) && pAttr >= 0 ? pAttr : 0;
-          let c = !Number.isNaN(cAttr) && cAttr >= 0 ? cAttr : 0;
-          let g = !Number.isNaN(gAttr) && gAttr >= 0 ? gAttr : 0;
-
-          if (kcal === 0 && linea) {
-            const mK = linea.match(/(\d+[\d.]*)\s*kcal/i);
-            if (mK) kcal = parseInt(mK[1].replace(/\./g, ''), 10);
-          }
-          if (p === 0 && linea) {
-            const mP = linea.match(/P\s*(\d+)/i);
-            if (mP) p = parseInt(mP[1], 10);
-          }
-          if (c === 0 && linea) {
-            const mC = linea.match(/C\s*(\d+)/i);
-            if (mC) c = parseInt(mC[1], 10);
-          }
-          if (g === 0 && linea) {
-            const mG = linea.match(/G\s*(\d+)/i);
-            if (mG) g = parseInt(mG[1], 10);
-          }
-
-          const matchG = cantidad.match(/(\d+(?:[.,]\d+)?)\s*g\b/i);
-          const gramos = matchG ? parseFloat(matchG[1].replace(',', '.')) : (Number(fila.dataset.gramos) || 100);
-
-          const existe = guardadas[comida].some((it) => it.nombre.toLowerCase().trim() === nombreAlimento.toLowerCase().trim());
-          if (!existe) {
-            guardadas[comida].push({
-              nombre: nombreAlimento,
-              linea: linea || `${kcal} kcal · P ${p} · C ${c} · G ${g}`,
-              cantidad,
-              kcal,
-              p,
-              c,
-              g,
-              gramos
-            });
-          }
-        } else {
-          guardadas[comida] = guardadas[comida].filter((it) => it.nombre.toLowerCase().trim() !== nombreAlimento.toLowerCase().trim());
-        }
-
-        sessionStorage.setItem('comidas-diarias-alumno', JSON.stringify(guardadas));
-      }
-    } catch {
-      // Ignorar si sessionStorage no está disponible
-    }
-  });
-
-  // 9. Micro-interacción accesible: pestañas (role="tab")
+  // 8. Micro-interacción accesible: pestañas (role="tab")
   document.addEventListener('click', (evento) => {
     const pestana = evento.target.closest('[role="tablist"] > [role="tab"]');
     if (!pestana) return;
@@ -699,7 +230,7 @@ export function iniciarNavegacion() {
     pestana.setAttribute('aria-selected', 'true');
   });
 
-  // 10. Micro-interacción accesible: opciones de desplegable (role="option")
+  // 9. Micro-interacción accesible: opciones de desplegable (role="option")
   document.addEventListener('click', (evento) => {
     const opcion = evento.target.closest('[role="listbox"] [role="option"]');
     if (!opcion) return;
@@ -725,7 +256,7 @@ export function iniciarNavegacion() {
     }
   });
 
-  // 11. Opciones en grupo de radio (role="radiogroup")
+  // 10. Opciones en grupo de radio (role="radiogroup")
   document.addEventListener('click', (evento) => {
     const radio = evento.target.closest('[role="radiogroup"] [role="radio"]');
     if (!radio || radio.closest('.segmentado')) return;
@@ -737,7 +268,7 @@ export function iniciarNavegacion() {
     radio.setAttribute('aria-checked', 'true');
   });
 
-  // 12. Sanitización decimal transparente en inputs móviles (inputmode="decimal")
+  // 11. Sanitización decimal transparente en inputs móviles (inputmode="decimal")
   document.addEventListener('input', (evento) => {
     const input = evento.target;
     if (input && input.tagName === 'INPUT' && input.getAttribute('inputmode') === 'decimal') {
@@ -755,7 +286,7 @@ export function iniciarNavegacion() {
     }
   });
 
-  // 13. Accesibilidad WCAG: Cerrar modales, hojas, desplegables y acordeones con tecla Escape
+  // 12. Accesibilidad WCAG: Cerrar modales, hojas, desplegables y acordeones con tecla Escape
   document.addEventListener('keydown', (evento) => {
     if (evento.key !== 'Escape') return;
 
@@ -811,7 +342,7 @@ export function iniciarNavegacion() {
     }
   });
 
-  // 14. Cerrar desplegables de selección al hacer click fuera
+  // 13. Cerrar desplegables de selección al hacer click fuera
   document.addEventListener('click', (evento) => {
     const desplegables = document.querySelectorAll('details.desplegable[open]');
     desplegables.forEach((d) => {
@@ -824,8 +355,6 @@ export function iniciarNavegacion() {
 
 window.addEventListener('pageshow', () => {
   procesarAvisoToastPendiente();
-  adaptarCantidadContextual();
-  adaptarAgregarContextual();
 });
 
 if (document.readyState === 'loading') {
