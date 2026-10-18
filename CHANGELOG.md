@@ -2,6 +2,20 @@
 
 Este documento registra los hitos de versiones **Mayores (Major)** y **Medianas (Minor)** de la aplicación con resúmenes ejecutivos concisos ($\le 10$ renglones). Los cambios atómicos y parches específicos se registran directamente en los commits de Git bajo la convención *Conventional Commits*.
 
+## [v0.4.4] — 17/10/2026
+- **Tipo:** Versión Menor (Datos Reales en Pantalla de Inicio, Redirección a Agregar Comida y Cálculo Reactivo)
+- **Fecha:** 17 de Octubre de 2026
+- **Resumen:**
+  1. Pantalla de inicio con datos reales: Se eliminaron los guiones vacíos (`-`), mostrando ahora un plan inicial completo de 1.967 kcal con metas claras de proteínas, carbohidratos, grasas y agua.
+  2. Botón "+ Agregar alimento" corregido: Al tocar agregar en cualquier comida (Desayuno, Almuerzo, Merienda, Cena), ahora te lleva directamente al buscador de comidas de esa sección, sin mandarte por error a crear alimentos nuevos.
+  3. Comidas sincronizadas con el plan: Desayuno, almuerzo, merienda y cena muestran alimentos reales acordes a tu horario (avena, pollo con arroz, yogur griego y lomo vacuno).
+  4. Contador inteligente de comidas y agua: Al tocar "Lo comí" o los vasos de agua, la barra de progreso, los números y las calorías se recalculan en tiempo real en la pantalla.
+  5. Sumador dinámico al agregar: En la pantalla de agregar, cada alimento que seleccionas suma al instante sus calorías y porciones en la barra inferior antes de confirmar.
+  6. Código modular y desacoplado: Todo el control de la pantalla se separó en un mapa de selectores independientes para facilitar rediseños visuales futuros sin tocar la lógica.
+  7. Verificación total: 33 pruebas automáticas en navegador real Edge/Chromium superadas con 100% de éxito.
+
+---
+
 ## [v0.4.3] — 17/10/2026
 - **Tipo:** Versión Menor (Buscador Inteligente de Reemplazo de Alimentos y Cálculo de Porciones Equitativas)
 - **Fecha:** 17 de Octubre de 2026

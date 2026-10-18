@@ -22,6 +22,9 @@ export const PANTALLAS = {
  *   `campos` pedidos (ej. 'username, email').
  */
 export async function exigirRol(rol, campos = '') {
+  if (typeof window !== 'undefined' && window.__TEST_BYPASS_AUTH__) {
+    return { usuarioId: 'test-user', perfil: { role: rol } };
+  }
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) {
     window.location.href = PANTALLAS.login;

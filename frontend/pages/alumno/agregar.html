@@ -42,12 +42,12 @@
         <h2 class="antetitulo" id="t-plan">De tu plan para esta comida</h2>
         <div class="grupo grupo--filas">
           <!-- Alimentos del plan: aria-pressed="true" si ya están en la comida -->
-          <div class="alimento-fila">
+          <div class="alimento-fila" data-kcal="570">
             <a class="alimento-fila__nombre" href="cantidad.html" aria-label="Elegir la cantidad del alimento">
-              <span class="alimento-fila__titulo">Alimento</span>
-              <span class="alimento-fila__linea">— kcal · P — · C — · G —</span>
+              <span class="alimento-fila__titulo">Pechuga de pollo con arroz</span>
+              <span class="alimento-fila__linea">570 kcal · P 51 · C 50 · G 16</span>
             </a>
-            <span class="alimento-fila__cantidad">—</span>
+            <span class="alimento-fila__cantidad">1 porción (350 g)</span>
             <button class="btn-agregar" type="button" aria-pressed="false" aria-label="Agregar el alimento">
               <svg class="icono icono--grueso btn-agregar__mas" width="20" height="20" aria-hidden="true"><use href="#mas"/></svg>
               <svg class="icono icono--grueso btn-agregar__hecho" width="20" height="20" aria-hidden="true"><use href="#hecho"/></svg>
@@ -60,12 +60,12 @@
         <h2 class="antetitulo" id="t-recientes">Recientes</h2>
         <div class="grupo grupo--filas">
           <!-- Últimos alimentos registrados -->
-          <div class="alimento-fila">
+          <div class="alimento-fila" data-kcal="155">
             <a class="alimento-fila__nombre" href="cantidad.html" aria-label="Elegir la cantidad del alimento">
-              <span class="alimento-fila__titulo">Alimento</span>
-              <span class="alimento-fila__linea">— kcal · P — · C — · G —</span>
+              <span class="alimento-fila__titulo">Huevo de gallina hervido</span>
+              <span class="alimento-fila__linea">155 kcal · P 13 · C 1 · G 11</span>
             </a>
-            <span class="alimento-fila__cantidad">—</span>
+            <span class="alimento-fila__cantidad">2 u (100 g)</span>
             <button class="btn-agregar" type="button" aria-pressed="false" aria-label="Agregar el alimento">
               <svg class="icono icono--grueso btn-agregar__mas" width="20" height="20" aria-hidden="true"><use href="#mas"/></svg>
               <svg class="icono icono--grueso btn-agregar__hecho" width="20" height="20" aria-hidden="true"><use href="#hecho"/></svg>
@@ -76,7 +76,7 @@
     </main>
 
     <div class="pie pie--centrado">
-      <span class="crece sub">— alimentos · <span class="negrita">— kcal</span></span>
+      <span class="crece sub">0 alimentos · <span class="negrita">0 kcal</span></span>
       <a class="btn btn--chico btn--primario" href="dashboard.html">Listo</a>
     </div>
   </div>

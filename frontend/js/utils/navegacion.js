@@ -66,7 +66,7 @@ function procesarAvisoToastPendiente() {
 }
 
 /**
- * Adapta los botones de cantidad.html según si el usuario llega desde agregar.html
+ * Adapta los botones y datos de cantidad.html según si el usuario llega desde agregar.html
  * o desde dashboard.html.
  */
 function adaptarCantidadContextual() {
@@ -82,6 +82,44 @@ function adaptarCantidadContextual() {
   const btnVolver = document.querySelector('a[aria-label^="Volver"]');
 
   const params = new URLSearchParams(window.location.search);
+  const comida = params.get('comida');
+  const alimento = params.get('alimento');
+  const kcal = params.get('kcal');
+  const p = params.get('p');
+  const c = params.get('c');
+  const g = params.get('g');
+  const cantidad = params.get('cantidad');
+
+  // Adaptar contexto de comida y alimento si vienen por parámetro
+  if (comida) {
+    const antetitulo = document.querySelector('.encabezado__textos .antetitulo--verde');
+    if (antetitulo) antetitulo.textContent = comida;
+  }
+  if (alimento) {
+    const titulo = document.querySelector('.encabezado__textos .titulo');
+    if (titulo) titulo.textContent = alimento;
+  }
+  if (cantidad) {
+    const inputCantidad = document.querySelector('.input--cantidad input');
+    if (inputCantidad) {
+      const matchNum = cantidad.match(/\d+/);
+      if (matchNum) inputCantidad.value = matchNum[0];
+    }
+  }
+  if (kcal || p || c || g) {
+    const celdas = document.querySelectorAll('.aporte .aporte__celda .aporte__valor');
+    if (celdas.length >= 4) {
+      if (kcal) celdas[0].textContent = kcal;
+      if (p) celdas[1].textContent = `${p} g`;
+      if (c) celdas[2].textContent = `${c} g`;
+      if (g) celdas[3].textContent = `${g} g`;
+    }
+    const valores100 = document.getElementById('valores-100');
+    if (valores100 && kcal && p && c && g) {
+      valores100.textContent = `Cada 100 g: ${kcal} kcal · P ${p} · C ${c} · G ${g}`;
+    }
+  }
+
   let origen = params.get('origen');
   if (!origen && document.referrer) {
     try {
@@ -104,17 +142,19 @@ function adaptarCantidadContextual() {
     }
   }
 
+  const destinoAgregar = comida ? `agregar.html?comida=${encodeURIComponent(comida)}` : 'agregar.html';
+
   if (origen === 'agregar') {
     if (btnQuitar) {
       btnQuitar.hidden = true;
     }
     if (btnGuardar) {
       btnGuardar.textContent = 'Agregar a la comida';
-      btnGuardar.setAttribute('href', 'agregar.html');
+      btnGuardar.setAttribute('href', destinoAgregar);
       btnGuardar.dataset.toast = 'Alimento agregado a la comida';
     }
     if (btnVolver) {
-      btnVolver.setAttribute('href', 'agregar.html');
+      btnVolver.setAttribute('href', destinoAgregar);
     }
   } else {
     if (btnQuitar) {
@@ -133,6 +173,117 @@ function adaptarCantidadContextual() {
   }
 }
 
+export const ALIMENTOS_PLAN_DEFECTO = {
+  'Desayuno': {
+    titulo: 'Avena con leche y fruta',
+    linea: '464 kcal · P 31 · C 53 · G 14',
+    cantidad: '1 porción (250 g)',
+    kcal: 464,
+    p: 31,
+    c: 53,
+    g: 14
+  },
+  'Almuerzo': {
+    titulo: 'Pechuga de pollo con arroz',
+    linea: '570 kcal · P 51 · C 50 · G 16',
+    cantidad: '1 porción (350 g)',
+    kcal: 570,
+    p: 51,
+    c: 50,
+    g: 16
+  },
+  'Merienda': {
+    titulo: 'Yogur griego con frutos secos',
+    linea: '388 kcal · P 21 · C 38 · G 19',
+    cantidad: '1 porción (200 g)',
+    kcal: 388,
+    p: 21,
+    c: 38,
+    g: 19
+  },
+  'Cena': {
+    titulo: 'Lomo vacuno con batata',
+    linea: '545 kcal · P 38 · C 52 · G 20',
+    cantidad: '1 porción (300 g)',
+    kcal: 545,
+    p: 38,
+    c: 52,
+    g: 20
+  }
+};
+
+/**
+ * Calcula y actualiza el contador de alimentos y calorías en el pie de agregar.html.
+ */
+export function actualizarResumenPieAgregar() {
+  const pieResumen = document.querySelector('.pantalla > .pie .crece.sub') || document.querySelector('.pie .crece.sub');
+  if (!pieResumen) return;
+
+  const botonesPresionados = document.querySelectorAll('button.btn-agregar[aria-pressed="true"]');
+  let totalKcal = 0;
+  botonesPresionados.forEach((btn) => {
+    const fila = btn.closest('.alimento-fila');
+    if (!fila) return;
+    const kcalAttr = Number(fila.dataset.kcal);
+    if (!Number.isNaN(kcalAttr) && kcalAttr > 0) {
+      totalKcal += kcalAttr;
+    } else {
+      const matchKcal = fila.querySelector('.alimento-fila__linea')?.textContent?.match(/(\d+[\d.]*)\s*kcal/i);
+      if (matchKcal) {
+        totalKcal += parseInt(matchKcal[1].replace(/\./g, ''), 10);
+      }
+    }
+  });
+
+  const total = botonesPresionados.length;
+  const textoAlimentos = `${total} ${total === 1 ? 'alimento' : 'alimentos'}`;
+  const textoKcal = `${totalKcal.toLocaleString('es-AR')} kcal`;
+  pieResumen.innerHTML = `${textoAlimentos} · <span class="negrita">${textoKcal}</span>`;
+}
+
+/**
+ * Adapta el subtítulo/antetítulo y el alimento del plan en agregar.html según la comida pasada por parámetro.
+ */
+function adaptarAgregarContextual() {
+  const ruta = window.location.pathname;
+  const esPaginaAgregar = ruta.endsWith('agregar.html') || ruta.includes('/agregar.html');
+  if (!esPaginaAgregar) return;
+
+  const params = new URLSearchParams(window.location.search);
+  const comida = params.get('comida');
+  if (comida) {
+    const antetitulo = document.querySelector('.encabezado__textos .antetitulo--verde');
+    if (antetitulo) {
+      antetitulo.textContent = comida;
+    }
+
+    const info = ALIMENTOS_PLAN_DEFECTO[comida];
+    if (info) {
+      const seccionPlan = document.querySelector('[aria-labelledby="t-plan"]');
+      const filaPlan = seccionPlan?.querySelector('.alimento-fila');
+      if (filaPlan) {
+        filaPlan.dataset.kcal = String(info.kcal);
+        const titEl = filaPlan.querySelector('.alimento-fila__titulo');
+        if (titEl) titEl.textContent = info.titulo;
+        const linEl = filaPlan.querySelector('.alimento-fila__linea');
+        if (linEl) linEl.textContent = info.linea;
+        const cantEl = filaPlan.querySelector('.alimento-fila__cantidad');
+        if (cantEl) cantEl.textContent = info.cantidad;
+
+        const enlaceCant = filaPlan.querySelector('a.alimento-fila__nombre');
+        if (enlaceCant) {
+          enlaceCant.setAttribute(
+            'href',
+            `cantidad.html?origen=agregar&comida=${encodeURIComponent(comida)}&alimento=${encodeURIComponent(info.titulo)}&kcal=${info.kcal}&p=${info.p}&c=${info.c}&g=${info.g}&cantidad=${encodeURIComponent(info.cantidad)}`
+          );
+        }
+      }
+    }
+  }
+
+  actualizarResumenPieAgregar();
+}
+
 let navegacionIniciada = false;
 
 /**
@@ -144,6 +295,9 @@ export function iniciarNavegacion() {
 
   // 0.1 Adaptación contextual de botones en cantidad.html
   adaptarCantidadContextual();
+
+  // 0.2 Adaptación contextual de comida en agregar.html
+  adaptarAgregarContextual();
 
   if (navegacionIniciada) return;
   navegacionIniciada = true;
@@ -321,6 +475,7 @@ export function iniciarNavegacion() {
     btnAgregar.setAttribute('aria-pressed', String(!presionado));
     const nombreAlimento = btnAgregar.closest('.alimento-fila')?.querySelector('.alimento-fila__titulo')?.textContent?.trim() || 'Alimento';
     mostrarAvisoFlotante(presionado ? `"${nombreAlimento}" quitado de la comida.` : `"${nombreAlimento}" agregado a la comida.`);
+    actualizarResumenPieAgregar();
   });
 
   // 9. Micro-interacción accesible: pestañas (role="tab")
@@ -462,6 +617,7 @@ export function iniciarNavegacion() {
 window.addEventListener('pageshow', () => {
   procesarAvisoToastPendiente();
   adaptarCantidadContextual();
+  adaptarAgregarContextual();
 });
 
 if (document.readyState === 'loading') {
