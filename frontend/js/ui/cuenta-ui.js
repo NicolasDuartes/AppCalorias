@@ -9,18 +9,33 @@ import { PANTALLAS } from '../data/sesion.js';
 
 const FORMATO_USUARIO = /^[a-z0-9._]{3,30}$/;
 
-const form = document.querySelector('.form-cuenta');
-const campoUsuario = form.elements.usuario;
-const campoCorreo = form.elements.correo;
-const campoClave = form.elements.clave;
-const casillaTerminos = form.elements.acepta;
-const ayudaUsuario = document.getElementById('usuario-ayuda');
-const mensaje = document.getElementById('mensaje-cuenta');
-const fuerza = form.querySelector('.fuerza');
-const botonVerClave = document.getElementById('ver-clave');
+/**
+ * Mapa centralizado de selectores del DOM para registro.html.
+ */
+export const SELECTORES = {
+  form: '.form-cuenta',
+  campoUsuario: 'input[name="usuario"]',
+  campoCorreo: 'input[name="correo"]',
+  campoClave: 'input[name="clave"]',
+  casillaTerminos: 'input[name="acepta"]',
+  ayudaUsuario: '#usuario-ayuda',
+  mensaje: '#mensaje-cuenta',
+  fuerza: '.fuerza',
+  botonVerClave: '#ver-clave'
+};
+
+const form = document.querySelector(SELECTORES.form);
+const campoUsuario = form ? form.querySelector(SELECTORES.campoUsuario) : null;
+const campoCorreo = form ? form.querySelector(SELECTORES.campoCorreo) : null;
+const campoClave = form ? form.querySelector(SELECTORES.campoClave) : null;
+const casillaTerminos = form ? form.querySelector(SELECTORES.casillaTerminos) : null;
+const ayudaUsuario = document.querySelector(SELECTORES.ayudaUsuario);
+const mensaje = document.querySelector(SELECTORES.mensaje);
+const fuerza = form ? form.querySelector(SELECTORES.fuerza) : null;
+const botonVerClave = document.querySelector(SELECTORES.botonVerClave);
 
 function tipoElegido() {
-  return form.elements.tipo.value === 'coach' ? 'coach' : 'alumno';
+  return form?.elements?.tipo?.value === 'coach' ? 'coach' : 'alumno';
 }
 
 function mostrarMensaje(texto, tipo = 'error') {
@@ -45,28 +60,32 @@ async function usuarioDisponible(usuario) {
   return data;
 }
 
-campoUsuario.addEventListener('input', () => {
-  const limpio = campoUsuario.value.toLowerCase().replace(/[^a-z0-9._]/g, '');
-  if (limpio !== campoUsuario.value) campoUsuario.value = limpio;
-  avisoUsuario('Minúsculas, números, punto o guion bajo.', '');
-});
+if (campoUsuario) {
+  campoUsuario.addEventListener('input', () => {
+    const limpio = campoUsuario.value.toLowerCase().replace(/[^a-z0-9._]/g, '');
+    if (limpio !== campoUsuario.value) campoUsuario.value = limpio;
+    avisoUsuario('Minúsculas, números, punto o guion bajo.', '');
+  });
 
-campoUsuario.addEventListener('blur', async () => {
-  const usuario = campoUsuario.value;
-  if (!FORMATO_USUARIO.test(usuario)) return;
-  const libre = await usuarioDisponible(usuario);
-  if (campoUsuario.value !== usuario) return; // Cambió mientras se consultaba
-  if (libre === true) avisoUsuario(`@${usuario} está disponible.`, 'ok');
-  if (libre === false) avisoUsuario(`@${usuario} ya está en uso. Probá con otro.`, 'error');
-});
+  campoUsuario.addEventListener('blur', async () => {
+    const usuario = campoUsuario.value;
+    if (!FORMATO_USUARIO.test(usuario)) return;
+    const libre = await usuarioDisponible(usuario);
+    if (campoUsuario.value !== usuario) return; // Cambió mientras se consultaba
+    if (libre === true) avisoUsuario(`@${usuario} está disponible.`, 'ok');
+    if (libre === false) avisoUsuario(`@${usuario} ya está en uso. Probá con otro.`, 'error');
+  });
+}
 
 // ---------- Contraseña: mostrar y fuerza ----------
-botonVerClave.addEventListener('click', () => {
-  const visible = campoClave.type === 'text';
-  campoClave.type = visible ? 'password' : 'text';
-  botonVerClave.setAttribute('aria-pressed', String(!visible));
-  botonVerClave.setAttribute('aria-label', visible ? 'Mostrar contraseña' : 'Ocultar contraseña');
-});
+if (botonVerClave && campoClave) {
+  botonVerClave.addEventListener('click', () => {
+    const visible = campoClave.type === 'text';
+    campoClave.type = visible ? 'password' : 'text';
+    botonVerClave.setAttribute('aria-pressed', String(!visible));
+    botonVerClave.setAttribute('aria-label', visible ? 'Mostrar contraseña' : 'Ocultar contraseña');
+  });
+}
 
 function nivelClave(clave) {
   if (clave.length < 8) return clave.length ? 1 : 0;
@@ -75,9 +94,11 @@ function nivelClave(clave) {
   return clave.length >= 12 || /[^a-zA-Z0-9]/.test(clave) ? 3 : 2;
 }
 
-campoClave.addEventListener('input', () => {
-  fuerza.dataset.nivel = nivelClave(campoClave.value);
-});
+if (campoClave && fuerza) {
+  campoClave.addEventListener('input', () => {
+    fuerza.dataset.nivel = nivelClave(campoClave.value);
+  });
+}
 
 // ---------- Errores de Supabase en palabras del usuario ----------
 function textoDeError(error) {
@@ -92,7 +113,8 @@ function textoDeError(error) {
 }
 
 // ---------- Envío ----------
-form.addEventListener('submit', async (evento) => {
+if (form) {
+  form.addEventListener('submit', async (evento) => {
   evento.preventDefault();
   ocultarMensaje();
 
@@ -163,4 +185,5 @@ form.addEventListener('submit', async (evento) => {
     boton.disabled = false;
     boton.textContent = textoBoton;
   }
-});
+  });
+}

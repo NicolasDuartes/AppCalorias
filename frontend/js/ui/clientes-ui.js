@@ -12,12 +12,28 @@ import '../utils/navegacion.js';
 const FORMATO_ID = /^NF-\d{4}-[A-Z]{2}$/;
 const COLORES_AVATAR = ['avatar--azul', 'avatar--naranja'];
 
-const el = (id) => document.getElementById(id);
-const lista = el('lista-clientes');
-const buscador = el('buscar-cliente');
-const formAnadir = el('form-anadir');
-const campoId = el('id-cliente');
-const botonAnadir = el('boton-anadir');
+/**
+ * Mapa centralizado de selectores del DOM para clientes.html.
+ */
+export const SELECTORES = {
+  lista: '#lista-clientes',
+  buscador: '#buscar-cliente',
+  formAnadir: '#form-anadir',
+  campoId: '#id-cliente',
+  botonAnadir: '#boton-anadir',
+  sinClientes: '#sin-clientes',
+  sinResultados: '#sin-resultados',
+  cargandoClientes: '#cargando-clientes',
+  mensajeClientes: '#mensaje-clientes',
+  mensajeAnadir: '#mensaje-anadir'
+};
+
+const el = (sel) => document.querySelector(sel);
+const lista = el(SELECTORES.lista);
+const buscador = el(SELECTORES.buscador);
+const formAnadir = el(SELECTORES.formAnadir);
+const campoId = el(SELECTORES.campoId);
+const botonAnadir = el(SELECTORES.botonAnadir);
 
 let clientes = [];
 
@@ -62,9 +78,11 @@ function dibujarLista() {
     nombreDe(c).toLowerCase().includes(busqueda) || c.client_code.toLowerCase().includes(busqueda));
 
   lista.replaceChildren(...visibles.map(filaCliente));
-  el('sin-clientes').hidden = clientes.length > 0;
-  el('sin-resultados').hidden = clientes.length === 0 || visibles.length > 0;
-  buscador.closest('.buscador').hidden = clientes.length === 0;
+  const sinCli = el(SELECTORES.sinClientes);
+  if (sinCli) sinCli.hidden = clientes.length > 0;
+  const sinRes = el(SELECTORES.sinResultados);
+  if (sinRes) sinRes.hidden = clientes.length === 0 || visibles.length > 0;
+  if (buscador) buscador.closest('.buscador').hidden = clientes.length === 0;
 }
 
 async function cargarClientes(coachId) {
@@ -73,16 +91,17 @@ async function cargarClientes(coachId) {
     .select('id, username, email, client_code')
     .eq('coach_id', coachId)
     .order('username');
-  el('cargando-clientes').hidden = true;
+  const cargando = el(SELECTORES.cargandoClientes);
+  if (cargando) cargando.hidden = true;
   if (error) {
-    mostrarMensaje(el('mensaje-clientes'), 'No se pudieron cargar tus clientes. Revisá tu conexión y volvé a abrir la pantalla.');
+    mostrarMensaje(el(SELECTORES.mensajeClientes), 'No se pudieron cargar tus clientes. Revisá tu conexión y volvé a abrir la pantalla.');
     return;
   }
   clientes = data;
   dibujarLista();
 }
 
-buscador.addEventListener('input', dibujarLista);
+if (buscador) buscador.addEventListener('input', dibujarLista);
 
 // ---------- Añadir cliente ----------
 function textoDeError(error) {
@@ -94,49 +113,52 @@ function textoDeError(error) {
   return 'No se pudo agregar el cliente. Volvé a probar en unos minutos.';
 }
 
-formAnadir.addEventListener('submit', async (evento) => {
-  evento.preventDefault();
-  const mensaje = el('mensaje-anadir');
-  mensaje.hidden = true;
+if (formAnadir) {
+  formAnadir.addEventListener('submit', async (evento) => {
+    evento.preventDefault();
+    const mensaje = el(SELECTORES.mensajeAnadir);
+    if (mensaje) mensaje.hidden = true;
 
-  const codigo = normalizarId(campoId.value);
-  campoId.value = codigo;
-  if (!FORMATO_ID.test(codigo)) {
-    mostrarMensaje(mensaje, 'El ID tiene el formato NF-1234-AB.');
-    campoId.focus();
-    return;
-  }
-  if (clientes.some((c) => c.client_code === codigo)) {
-    mostrarMensaje(mensaje, 'Ese alumno ya está en tu lista de clientes.');
-    return;
-  }
+    const codigo = normalizarId(campoId.value);
+    campoId.value = codigo;
+    if (!FORMATO_ID.test(codigo)) {
+      mostrarMensaje(mensaje, 'El ID tiene el formato NF-1234-AB.');
+      campoId.focus();
+      return;
+    }
+    if (clientes.some((c) => c.client_code === codigo)) {
+      mostrarMensaje(mensaje, 'Ese alumno ya está en tu lista de clientes.');
+      return;
+    }
 
-  botonAnadir.disabled = true;
-  botonAnadir.textContent = 'Agregando…';
-  const { data: alumno, error } = await supabase.rpc('vincular_alumno', { p_codigo: codigo });
-  botonAnadir.disabled = false;
-  botonAnadir.textContent = 'Agregar cliente';
+    botonAnadir.disabled = true;
+    botonAnadir.textContent = 'Agregando…';
+    const { data: alumno, error } = await supabase.rpc('vincular_alumno', { p_codigo: codigo });
+    botonAnadir.disabled = false;
+    botonAnadir.textContent = 'Agregar cliente';
 
-  if (error) {
-    mostrarMensaje(mensaje, textoDeError(error));
-    return;
-  }
+    if (error) {
+      mostrarMensaje(mensaje, textoDeError(error));
+      return;
+    }
 
-  clientes = [...clientes, alumno].sort((a, b) => nombreDe(a).localeCompare(nombreDe(b)));
-  buscador.value = '';
-  dibujarLista();
-  formAnadir.reset();
-  window.location.hash = ''; // Cierra la ventana (:target)
-  mostrarMensaje(el('mensaje-clientes'), `Agregaste a @${nombreDe(alumno)} a tus clientes.`, 'ok');
-});
+    clientes = [...clientes, alumno].sort((a, b) => nombreDe(a).localeCompare(nombreDe(b)));
+    buscador.value = '';
+    dibujarLista();
+    formAnadir.reset();
+    window.location.hash = ''; // Cierra la ventana (:target)
+    mostrarMensaje(el(SELECTORES.mensajeClientes), `Agregaste a @${nombreDe(alumno)} a tus clientes.`, 'ok');
+  });
+}
 
 // ---------- Inicio ----------
 async function iniciar() {
   const cuenta = await exigirRol('coach');
   if (!cuenta) return;
   if (!cuenta.perfil) {
-    el('cargando-clientes').hidden = true;
-    mostrarMensaje(el('mensaje-clientes'), 'No se pudo cargar tu cuenta. Revisá tu conexión y volvé a abrir la pantalla.');
+    const cargando = el(SELECTORES.cargandoClientes);
+    if (cargando) cargando.hidden = true;
+    mostrarMensaje(el(SELECTORES.mensajeClientes), 'No se pudo cargar tu cuenta. Revisá tu conexión y volvé a abrir la pantalla.');
     return;
   }
   await cargarClientes(cuenta.usuarioId);
@@ -144,7 +166,7 @@ async function iniciar() {
   // Al volver de eliminar un cliente (cliente.html manda #eliminado=usuario)
   const eliminado = new URLSearchParams(window.location.hash.slice(1)).get('eliminado');
   if (eliminado) {
-    mostrarMensaje(el('mensaje-clientes'), `Eliminaste a @${eliminado} de tus clientes.`, 'ok');
+    mostrarMensaje(el(SELECTORES.mensajeClientes), `Eliminaste a @${eliminado} de tus clientes.`, 'ok');
     history.replaceState(null, '', window.location.pathname);
   }
 }

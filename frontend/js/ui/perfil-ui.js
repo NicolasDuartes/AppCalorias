@@ -10,25 +10,49 @@ import { cerrarSesion, exigirRol } from '../data/sesion.js';
 import { iniciales, nombreDe } from '../utils/texto.js';
 import '../utils/navegacion.js';
 
-const el = (id) => document.getElementById(id);
+export const SELECTORES = {
+  perfilUsuario: '#perfil-usuario',
+  perfilIniciales: '#perfil-iniciales',
+  perfilDatos: '#perfil-datos',
+  codigoCliente: '#codigo-cliente',
+  copiarCodigo: '#copiar-codigo',
+  copiarTexto: '#copiar-texto',
+  coachVinculado: '#coach-vinculado',
+  coachSinVincular: '#coach-sin-vincular',
+  coachIniciales: '#coach-iniciales',
+  coachUsuario: '#coach-usuario',
+  mensajePerfil: '#mensaje-perfil',
+  cerrarSesion: '#cerrar-sesion'
+};
+
+const el = (sel) => document.querySelector(sel);
 
 function mostrarError(texto) {
-  el('perfil-usuario').textContent = 'Tu perfil';
-  el('mensaje-perfil').textContent = texto;
-  el('mensaje-perfil').hidden = false;
+  const usuarioEl = el(SELECTORES.perfilUsuario);
+  if (usuarioEl) usuarioEl.textContent = 'Tu perfil';
+  const mensajeEl = el(SELECTORES.mensajePerfil);
+  if (mensajeEl) {
+    mensajeEl.textContent = texto;
+    mensajeEl.hidden = false;
+  }
 }
 
 function mostrarCuenta(perfil) {
   const usuario = nombreDe(perfil);
-  el('perfil-usuario').textContent = usuario;
-  el('perfil-iniciales').textContent = iniciales(usuario);
-  el('codigo-cliente').textContent = perfil.client_code;
-  el('copiar-codigo').disabled = false;
+  const usuarioEl = el(SELECTORES.perfilUsuario);
+  if (usuarioEl) usuarioEl.textContent = usuario;
+  const inicialesEl = el(SELECTORES.perfilIniciales);
+  if (inicialesEl) inicialesEl.textContent = iniciales(usuario);
+  const codigoEl = el(SELECTORES.codigoCliente);
+  if (codigoEl) codigoEl.textContent = perfil.client_code;
+  const copiarEl = el(SELECTORES.copiarCodigo);
+  if (copiarEl) copiarEl.disabled = false;
 }
 
 async function mostrarCoach(coachId) {
   if (!coachId) {
-    el('coach-sin-vincular').hidden = false;
+    const sinCoachEl = el(SELECTORES.coachSinVincular);
+    if (sinCoachEl) sinCoachEl.hidden = false;
     return;
   }
   const { data: coach, error } = await supabase
@@ -41,26 +65,39 @@ async function mostrarCoach(coachId) {
     return;
   }
   const usuario = nombreDe(coach);
-  el('coach-usuario').textContent = usuario;
-  el('coach-iniciales').textContent = iniciales(usuario);
-  el('coach-vinculado').hidden = false;
+  const coachUsuarioEl = el(SELECTORES.coachUsuario);
+  if (coachUsuarioEl) coachUsuarioEl.textContent = usuario;
+  const coachInicialesEl = el(SELECTORES.coachIniciales);
+  if (coachInicialesEl) coachInicialesEl.textContent = iniciales(usuario);
+  const vinculadoEl = el(SELECTORES.coachVinculado);
+  if (vinculadoEl) vinculadoEl.hidden = false;
 }
 
 // Copiar el ID de cliente
-el('copiar-codigo').addEventListener('click', async () => {
-  const codigo = el('codigo-cliente').textContent;
-  try {
-    await navigator.clipboard.writeText(codigo);
-    el('copiar-texto').textContent = 'Copiado';
-  } catch {
-    // Sin permiso de portapapeles: se selecciona el código para copiarlo a mano
-    window.getSelection().selectAllChildren(el('codigo-cliente'));
-    el('copiar-texto').textContent = 'Seleccionado';
-  }
-  setTimeout(() => { el('copiar-texto').textContent = 'Copiar'; }, 2000);
-});
+const botonCopiar = el(SELECTORES.copiarCodigo);
+if (botonCopiar) {
+  botonCopiar.addEventListener('click', async () => {
+    const codigoEl = el(SELECTORES.codigoCliente);
+    const copiarTextoEl = el(SELECTORES.copiarTexto);
+    const codigo = codigoEl ? codigoEl.textContent : '';
+    try {
+      await navigator.clipboard.writeText(codigo);
+      if (copiarTextoEl) copiarTextoEl.textContent = 'Copiado';
+    } catch {
+      // Sin permiso de portapapeles: se selecciona el código para copiarlo a mano
+      if (codigoEl) window.getSelection().selectAllChildren(codigoEl);
+      if (copiarTextoEl) copiarTextoEl.textContent = 'Seleccionado';
+    }
+    setTimeout(() => {
+      if (copiarTextoEl) copiarTextoEl.textContent = 'Copiar';
+    }, 2000);
+  });
+}
 
-el('cerrar-sesion').addEventListener('click', cerrarSesion);
+const botonCerrar = el(SELECTORES.cerrarSesion);
+if (botonCerrar) {
+  botonCerrar.addEventListener('click', cerrarSesion);
+}
 
 async function cargar() {
   const cuenta = await exigirRol('alumno', 'username, email, client_code, coach_id');
@@ -76,3 +113,4 @@ async function cargar() {
 }
 
 cargar();
+

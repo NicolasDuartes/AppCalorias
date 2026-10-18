@@ -6,13 +6,32 @@
 import { supabase } from '../data/supabase.js';
 import { PANTALLAS } from '../data/sesion.js';
 
-const form = document.querySelector('.form-login');
-const campoCorreo = form.elements.correo;
-const campoClave = form.elements.clave;
-const boton = document.getElementById('boton-login');
-const botonReenviar = document.getElementById('reenviar-confirmacion');
-const botonVerClave = document.getElementById('ver-clave');
-const mensaje = document.getElementById('mensaje-login');
+/**
+ * Mapa centralizado de selectores del DOM para index.html.
+ */
+export const SELECTORES = {
+  form: '.form-login',
+  campoCorreo: 'input[name="correo"]',
+  campoClave: 'input[name="clave"]',
+  boton: '#boton-login',
+  botonReenviar: '#reenviar-confirmacion',
+  botonVerClave: '#ver-clave',
+  mensaje: '#mensaje-login',
+  sesionAbierta: '#sesion-abierta',
+  sesionUsuario: '#sesion-usuario',
+  continuarSesion: '#continuar-sesion',
+  usarOtraCuenta: '#usar-otra-cuenta'
+};
+
+const el = (sel) => document.querySelector(sel);
+
+const form = el(SELECTORES.form);
+const campoCorreo = form ? form.querySelector(SELECTORES.campoCorreo) : null;
+const campoClave = form ? form.querySelector(SELECTORES.campoClave) : null;
+const boton = el(SELECTORES.boton);
+const botonReenviar = el(SELECTORES.botonReenviar);
+const botonVerClave = el(SELECTORES.botonVerClave);
+const mensaje = el(SELECTORES.mensaje);
 
 function mostrarMensaje(texto, tipo = 'error') {
   mensaje.textContent = texto;
@@ -82,39 +101,49 @@ form.addEventListener('submit', async (evento) => {
   }
 });
 
-botonReenviar.addEventListener('click', async () => {
-  botonReenviar.disabled = true;
-  const correo = campoCorreo.value.trim();
-  const { error } = await supabase.auth.resend({ type: 'signup', email: correo });
-  botonReenviar.disabled = false;
-  if (error) {
-    mostrarMensaje(textoDeError(error));
-    return;
-  }
-  botonReenviar.hidden = true;
-  mostrarMensaje(`Te reenviamos el correo de confirmación a ${correo}.`, 'ok');
-});
+if (botonReenviar) {
+  botonReenviar.addEventListener('click', async () => {
+    botonReenviar.disabled = true;
+    const correo = campoCorreo ? campoCorreo.value.trim() : '';
+    const { error } = await supabase.auth.resend({ type: 'signup', email: correo });
+    botonReenviar.disabled = false;
+    if (error) {
+      mostrarMensaje(textoDeError(error));
+      return;
+    }
+    botonReenviar.hidden = true;
+    mostrarMensaje(`Te reenviamos el correo de confirmación a ${correo}.`, 'ok');
+  });
+}
 
 // Si ya hay una sesión abierta, pregunta si seguir con esa cuenta o usar otra
-const sesionAbierta = document.getElementById('sesion-abierta');
+const sesionAbierta = el(SELECTORES.sesionAbierta);
+const btnContinuar = el(SELECTORES.continuarSesion);
+const btnOtraCuenta = el(SELECTORES.usarOtraCuenta);
 
-document.getElementById('continuar-sesion').addEventListener('click', async () => {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (session) await irSegunRol(session.user.id);
-});
+if (btnContinuar) {
+  btnContinuar.addEventListener('click', async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) await irSegunRol(session.user.id);
+  });
+}
 
-document.getElementById('usar-otra-cuenta').addEventListener('click', async () => {
-  await supabase.auth.signOut();
-  sesionAbierta.hidden = true;
-  form.hidden = false;
-  campoCorreo.focus();
-});
+if (btnOtraCuenta) {
+  btnOtraCuenta.addEventListener('click', async () => {
+    await supabase.auth.signOut();
+    if (sesionAbierta) sesionAbierta.hidden = true;
+    if (form) form.hidden = false;
+    if (campoCorreo) campoCorreo.focus();
+  });
+}
 
 const { data: { session } } = await supabase.auth.getSession();
 if (session) {
   const perfil = await cargarPerfil(session.user.id);
-  document.getElementById('sesion-usuario').textContent =
-    perfil?.username ? `@${perfil.username}` : session.user.email;
-  sesionAbierta.hidden = false;
-  form.hidden = true;
+  const usrEl = el(SELECTORES.sesionUsuario);
+  if (usrEl) {
+    usrEl.textContent = perfil?.username ? `@${perfil.username}` : session.user.email;
+  }
+  if (sesionAbierta) sesionAbierta.hidden = false;
+  if (form) form.hidden = true;
 }

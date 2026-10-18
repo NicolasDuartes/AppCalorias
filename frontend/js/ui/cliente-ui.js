@@ -14,9 +14,25 @@ import '../utils/navegacion.js';
 const LISTA = 'clientes.html';
 const CLAVE_GUARDADA = 'clienteActual';
 
-const el = (id) => document.getElementById(id);
+/**
+ * Mapa centralizado de selectores del DOM para cliente.html.
+ */
+export const SELECTORES = {
+  clienteUsuario: '#cliente-usuario',
+  clienteIniciales: '#cliente-iniciales',
+  clienteCodigo: '#cliente-codigo',
+  seccionesCliente: '#secciones-cliente',
+  mensajeCliente: '#mensaje-cliente',
+  botonEliminar: '#boton-eliminar',
+  confirmarEliminar: '#confirmar-eliminar',
+  mensajeEliminar: '#mensaje-eliminar',
+  nombreCliente: '.nombre-cliente'
+};
+
+const el = (sel) => document.querySelector(sel);
 
 function mostrarMensaje(nodo, texto) {
+  if (!nodo) return;
   nodo.textContent = texto;
   nodo.dataset.tipo = 'error';
   nodo.hidden = false;
@@ -34,17 +50,20 @@ function idDelCliente() {
 }
 
 function clienteNoDisponible() {
-  el('cliente-usuario').textContent = 'Cliente no disponible';
-  el('secciones-cliente').hidden = true;
-  mostrarMensaje(el('mensaje-cliente'), 'Este cliente ya no está en tu lista. Volvé a Clientes para elegir otro.');
+  const usr = el(SELECTORES.clienteUsuario);
+  if (usr) usr.textContent = 'Cliente no disponible';
+  const sec = el(SELECTORES.seccionesCliente);
+  if (sec) sec.hidden = true;
+  mostrarMensaje(el(SELECTORES.mensajeCliente), 'Este cliente ya no está en tu lista. Volvé a Clientes para elegir otro.');
 }
 
 async function iniciar() {
   const cuenta = await exigirRol('coach');
   if (!cuenta) return;
   if (!cuenta.perfil) {
-    el('cliente-usuario').textContent = 'Cliente';
-    mostrarMensaje(el('mensaje-cliente'), 'No se pudo cargar tu cuenta. Revisá tu conexión y volvé a abrir la pantalla.');
+    const usr = el(SELECTORES.clienteUsuario);
+    if (usr) usr.textContent = 'Cliente';
+    mostrarMensaje(el(SELECTORES.mensajeCliente), 'No se pudo cargar tu cuenta. Revisá tu conexión y volvé a abrir la pantalla.');
     return;
   }
 
@@ -62,8 +81,9 @@ async function iniciar() {
     .eq('coach_id', cuenta.usuarioId)
     .maybeSingle();
   if (error) {
-    el('cliente-usuario').textContent = 'Cliente';
-    mostrarMensaje(el('mensaje-cliente'), 'No se pudo cargar el cliente. Revisá tu conexión y volvé a abrir la pantalla.');
+    const usr = el(SELECTORES.clienteUsuario);
+    if (usr) usr.textContent = 'Cliente';
+    mostrarMensaje(el(SELECTORES.mensajeCliente), 'No se pudo cargar el cliente. Revisá tu conexión y volvé a abrir la pantalla.');
     return;
   }
   if (!cliente) {
@@ -73,26 +93,32 @@ async function iniciar() {
 
   const usuario = nombreDe(cliente);
   document.title = `${usuario} · Coach`;
-  el('cliente-usuario').textContent = usuario;
-  el('cliente-iniciales').textContent = iniciales(usuario);
-  el('cliente-codigo').textContent = `ID ${cliente.client_code}`;
-  document.querySelectorAll('.nombre-cliente').forEach((n) => { n.textContent = `@${usuario}`; });
-  el('boton-eliminar').hidden = false;
+  const usr = el(SELECTORES.clienteUsuario);
+  if (usr) usr.textContent = usuario;
+  const ini = el(SELECTORES.clienteIniciales);
+  if (ini) ini.textContent = iniciales(usuario);
+  const cod = el(SELECTORES.clienteCodigo);
+  if (cod) cod.textContent = `ID ${cliente.client_code}`;
+  document.querySelectorAll(SELECTORES.nombreCliente).forEach((n) => { n.textContent = `@${usuario}`; });
+  const btnEliminar = el(SELECTORES.botonEliminar);
+  if (btnEliminar) btnEliminar.hidden = false;
 
-  el('confirmar-eliminar').addEventListener('click', async () => {
-    const boton = el('confirmar-eliminar');
-    boton.disabled = true;
-    boton.textContent = 'Eliminando…';
-    const { error: errorEliminar } = await supabase.rpc('desvincular_alumno', { p_alumno_id: cliente.id });
-    if (errorEliminar) {
-      boton.disabled = false;
-      boton.textContent = 'Eliminar';
-      mostrarMensaje(el('mensaje-eliminar'), 'No se pudo eliminar el cliente. Volvé a probar en unos minutos.');
-      return;
-    }
-    try { sessionStorage.removeItem(CLAVE_GUARDADA); } catch { /* sin almacenamiento */ }
-    window.location.href = `${LISTA}#eliminado=${encodeURIComponent(usuario)}`;
-  });
+  const btnConfirmar = el(SELECTORES.confirmarEliminar);
+  if (btnConfirmar) {
+    btnConfirmar.addEventListener('click', async () => {
+      btnConfirmar.disabled = true;
+      btnConfirmar.textContent = 'Eliminando…';
+      const { error: errorEliminar } = await supabase.rpc('desvincular_alumno', { p_alumno_id: cliente.id });
+      if (errorEliminar) {
+        btnConfirmar.disabled = false;
+        btnConfirmar.textContent = 'Eliminar';
+        mostrarMensaje(el(SELECTORES.mensajeEliminar), 'No se pudo eliminar el cliente. Volvé a probar en unos minutos.');
+        return;
+      }
+      try { sessionStorage.removeItem(CLAVE_GUARDADA); } catch { /* sin almacenamiento */ }
+      window.location.href = `${LISTA}#eliminado=${encodeURIComponent(usuario)}`;
+    });
+  }
 }
 
 iniciar();

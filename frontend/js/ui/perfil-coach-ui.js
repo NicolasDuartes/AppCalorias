@@ -9,12 +9,25 @@ import { cerrarSesion, exigirRol } from '../data/sesion.js';
 import { iniciales, nombreDe } from '../utils/texto.js';
 import '../utils/navegacion.js';
 
-const el = (id) => document.getElementById(id);
+export const SELECTORES = {
+  perfilUsuario: '#perfil-usuario',
+  perfilIniciales: '#perfil-iniciales',
+  perfilEmail: '#perfil-email',
+  mensajePerfil: '#mensaje-perfil',
+  cantidadClientes: '#cantidad-clientes',
+  cerrarSesion: '#cerrar-sesion'
+};
+
+const el = (sel) => document.querySelector(sel);
 
 function mostrarError(texto) {
-  el('perfil-usuario').textContent = 'Tu perfil';
-  el('mensaje-perfil').textContent = texto;
-  el('mensaje-perfil').hidden = false;
+  const usuarioEl = el(SELECTORES.perfilUsuario);
+  if (usuarioEl) usuarioEl.textContent = 'Tu perfil';
+  const mensajeEl = el(SELECTORES.mensajePerfil);
+  if (mensajeEl) {
+    mensajeEl.textContent = texto;
+    mensajeEl.hidden = false;
+  }
 }
 
 async function mostrarCantidadClientes(coachId) {
@@ -23,14 +36,19 @@ async function mostrarCantidadClientes(coachId) {
     .select('id', { count: 'exact', head: true })
     .eq('coach_id', coachId);
   if (error) return;
-  if (count === 0) el('cantidad-clientes').textContent = 'Todavía no tenés clientes';
-  else el('cantidad-clientes').textContent = count === 1 ? '1 cliente vinculado' : `${count} clientes vinculados`;
+  const cantEl = el(SELECTORES.cantidadClientes);
+  if (!cantEl) return;
+  if (count === 0) cantEl.textContent = 'Todavía no tenés clientes';
+  else cantEl.textContent = count === 1 ? '1 cliente vinculado' : `${count} clientes vinculados`;
 }
 
-el('cerrar-sesion').addEventListener('click', () => {
-  el('cerrar-sesion').disabled = true;
-  cerrarSesion();
-});
+const btnCerrar = el(SELECTORES.cerrarSesion);
+if (btnCerrar) {
+  btnCerrar.addEventListener('click', () => {
+    btnCerrar.disabled = true;
+    cerrarSesion();
+  });
+}
 
 async function cargar() {
   const cuenta = await exigirRol('coach', 'username, email');
@@ -42,10 +60,14 @@ async function cargar() {
   }
 
   const usuario = nombreDe(perfil);
-  el('perfil-usuario').textContent = usuario;
-  el('perfil-iniciales').textContent = iniciales(usuario);
-  el('perfil-email').textContent = perfil.email;
+  const usuarioEl = el(SELECTORES.perfilUsuario);
+  if (usuarioEl) usuarioEl.textContent = usuario;
+  const inicialesEl = el(SELECTORES.perfilIniciales);
+  if (inicialesEl) inicialesEl.textContent = iniciales(usuario);
+  const emailEl = el(SELECTORES.perfilEmail);
+  if (emailEl) emailEl.textContent = perfil.email;
   await mostrarCantidadClientes(cuenta.usuarioId);
 }
 
 cargar();
+

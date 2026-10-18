@@ -11,27 +11,43 @@ import { normalizarDecimal } from '../calc/formato-calc.js';
 import { mostrarAvisoFlotante } from '../utils/navegacion.js';
 
 /**
+ * Mapa centralizado de selectores del DOM para crear-alimento.html y editar-alimento.html.
+ */
+export const SELECTORES = {
+  form: '#form-alimento',
+  inputNombre: 'input[name="nombre"]',
+  inputMarca: 'input[name="marca"]',
+  inputKcal: 'input[name="kcal"]',
+  inputP: 'input[name="p"]',
+  inputC: 'input[name="c"]',
+  inputG: 'input[name="g"]',
+  inputGramosUnidad: 'input[name="gramosUnidad"]',
+  mensajeOk: '.mensaje[data-tipo="ok"]',
+  mensajeAviso: '.aviso'
+};
+
+/**
  * Inicializa la validación reactiva en el formulario de alimento (#form-alimento).
  */
 export function iniciarValidadorAlimento() {
-  const form = document.getElementById('form-alimento');
+  const form = document.querySelector(SELECTORES.form);
   if (!form) return;
 
-  const inputKcal = form.querySelector('input[name="kcal"]');
-  const inputP = form.querySelector('input[name="p"]');
-  const inputC = form.querySelector('input[name="c"]');
-  const inputG = form.querySelector('input[name="g"]');
+  const inputKcal = form.querySelector(SELECTORES.inputKcal);
+  const inputP = form.querySelector(SELECTORES.inputP);
+  const inputC = form.querySelector(SELECTORES.inputC);
+  const inputG = form.querySelector(SELECTORES.inputG);
 
-  const mensajeOk = form.querySelector('.mensaje[data-tipo="ok"]');
-  const mensajeAviso = form.querySelector('.aviso');
+  const mensajeOk = form.querySelector(SELECTORES.mensajeOk);
+  const mensajeAviso = form.querySelector(SELECTORES.mensajeAviso);
   const spanTextoOk = mensajeOk?.querySelector('span') || mensajeOk;
   const spanTextoAviso = mensajeAviso?.querySelector('span') || mensajeAviso;
 
   if (!inputKcal || !inputP || !inputC || !inputG) return;
 
-  const inputNombre = form.querySelector('input[name="nombre"]');
-  const inputMarca = form.querySelector('input[name="marca"]');
-  const inputGramosUnidad = form.querySelector('input[name="gramosUnidad"]');
+  const inputNombre = form.querySelector(SELECTORES.inputNombre);
+  const inputMarca = form.querySelector(SELECTORES.inputMarca);
+  const inputGramosUnidad = form.querySelector(SELECTORES.inputGramosUnidad);
 
   // Si se reciben valores por query string (ej. editar-alimento.html), precargarlos
   try {

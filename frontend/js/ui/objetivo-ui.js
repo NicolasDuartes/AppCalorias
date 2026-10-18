@@ -11,19 +11,37 @@ const MARCAS_POR_KG = 10;
 const ANCHO_MARCA = 10; // px, igual que .marca en alumno.css
 const TOTAL_MARCAS = (PESO_MAX - PESO_MIN) * MARCAS_POR_KG;
 
-const tarjeta = document.getElementById('objetivo');
-const botonAbrir = document.getElementById('abrir-pesaje');
-const form = document.getElementById('form-pesaje');
-const regla = document.getElementById('regla');
-const ventana = document.getElementById('regla-ventana');
-const pista = document.getElementById('regla-pista');
-const textoRegla = document.getElementById('regla-valor');
-const textoActual = document.getElementById('peso-actual');
-const barra = document.getElementById('barra-objetivo');
+/**
+ * Mapa centralizado de selectores del DOM para el objetivo del alumno (perfil.html).
+ */
+export const SELECTORES = {
+  tarjeta: '#objetivo',
+  botonAbrir: '#abrir-pesaje',
+  form: '#form-pesaje',
+  regla: '#regla',
+  ventana: '#regla-ventana',
+  pista: '#regla-pista',
+  textoRegla: '#regla-valor',
+  textoActual: '#peso-actual',
+  barra: '#barra-objetivo',
+  cancelarPesaje: '#cancelar-pesaje'
+};
 
-const inicio = Number(tarjeta.dataset.inicio);
-const meta = Number(tarjeta.dataset.meta);
-let actual = Number(tarjeta.dataset.actual);
+const el = (sel) => document.querySelector(sel);
+
+const tarjeta = el(SELECTORES.tarjeta);
+const botonAbrir = el(SELECTORES.botonAbrir);
+const form = el(SELECTORES.form);
+const regla = el(SELECTORES.regla);
+const ventana = el(SELECTORES.ventana);
+const pista = el(SELECTORES.pista);
+const textoRegla = el(SELECTORES.textoRegla);
+const textoActual = el(SELECTORES.textoActual);
+const barra = el(SELECTORES.barra);
+
+const inicio = Number(tarjeta?.dataset?.inicio || 0);
+const meta = Number(tarjeta?.dataset?.meta || 0);
+let actual = Number(tarjeta?.dataset?.actual || 0);
 let marcaElegida = 0;
 
 // 72.4 -> "72,4"
@@ -147,23 +165,32 @@ function cerrar() {
   botonAbrir.focus();
 }
 
-botonAbrir.addEventListener('click', () => {
-  if (form.hidden) abrir();
-  else cerrar();
-});
+if (botonAbrir && form) {
+  botonAbrir.addEventListener('click', () => {
+    if (form.hidden) abrir();
+    else cerrar();
+  });
+}
 
-document.getElementById('cancelar-pesaje').addEventListener('click', cerrar);
+const btnCancelar = el(SELECTORES.cancelarPesaje);
+if (btnCancelar) {
+  btnCancelar.addEventListener('click', cerrar);
+}
 
-form.addEventListener('keydown', (evento) => {
-  if (evento.key === 'Escape') cerrar();
-});
+if (form) {
+  form.addEventListener('keydown', (evento) => {
+    if (evento.key === 'Escape') cerrar();
+  });
 
-form.addEventListener('submit', (evento) => {
-  evento.preventDefault();
-  actual = pesoDeMarca(marcaElegida);
+  form.addEventListener('submit', (evento) => {
+    evento.preventDefault();
+    actual = pesoDeMarca(marcaElegida);
+    dibujarAvance();
+    cerrar();
+  });
+}
+
+if (pista && tarjeta) {
+  armarRegla();
   dibujarAvance();
-  cerrar();
-});
-
-armarRegla();
-dibujarAvance();
+}
