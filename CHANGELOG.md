@@ -2,6 +2,20 @@
 
 Este documento registra los hitos de versiones **Mayores (Major)** y **Medianas (Minor)** de la aplicación con resúmenes ejecutivos concisos ($\le 10$ renglones). Los cambios atómicos y parches específicos se registran directamente en los commits de Git bajo la convención *Conventional Commits*.
 
+## [v0.4.3] — 17/10/2026
+- **Tipo:** Versión Menor (Buscador Inteligente de Reemplazo de Alimentos y Cálculo de Porciones Equitativas)
+- **Fecha:** 17 de Octubre de 2026
+- **Resumen:**
+  1. Cambio fácil de comidas: En la pantalla de reemplazo, ahora puedes buscar cualquier alimento y la app calcula al instante cuánto comer para no desbalancear tu dieta.
+  2. Ajuste inteligente de porciones: Si cambias pollo por carne o huevo, el sistema calcula la cantidad justa basándose en los nutrientes más importantes del alimento.
+  3. Semáforo de compatibilidad: Muestra en verde si el reemplazo es perfecto (ej. una fruta por otra) o en amarillo/naranja con aviso si aporta más grasa o carbohidratos de lo previsto.
+  4. Redondeo cómodo para la cocina: Las cantidades en gramos se redondean a múltiplos de 5g (para que sea fácil de pesar) y los alimentos que se comen por unidad (como huevos) se expresan en unidades enteras.
+  5. Catálogo inicial de alimentos: Incluye una lista rápida de alimentos comunes (carnes, huevos, arroz, avena, frutas, verduras y palta) para probar sin demoras.
+  6. Código modular y seguro: La lógica quedó separada de la pantalla para permitir mejoras visuales futuras sin romper los cálculos, protegiendo contra textos maliciosos.
+  7. Verificación completa: 60 pruebas automáticas superadas con 100% de éxito (37 de cálculos matemáticos y 23 de pantalla en navegador real).
+
+---
+
 ## [v0.4.2] — 17/10/2026
 - **Tipo:** Versión Menor (Validador Inteligente de Alimentos, Teclado Móvil y Accesibilidad)
 - **Fecha:** 17 de Octubre de 2026
