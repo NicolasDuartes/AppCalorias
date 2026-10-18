@@ -2,13 +2,24 @@
    dashboard-ui.js — día elegido en el dashboard del alumno
    Arma la rueda de días (el elegido siempre al centro), cambia el título
    (Hoy, Ayer o la fecha) y abre el calendario del sistema desde el título.
-   Por ahora solo cambia la fecha: los datos del día todavía son de ejemplo.
+   Conexión con Supabase para registro de ingesta diaria y sincronización reactiva.
    ========================================================== */
 import { exigirRol } from '../data/sesion.js';
 import '../utils/navegacion.js';
+import { supabase } from '../data/supabase.js';
+import {
+  obtenerConsumoDiario,
+  registrarAlimentoConsumido,
+  obtenerOCrearRegistroDiario,
+  actualizarAgua
+} from '../data/registro-api.js';
+import { obtenerPlanActivo } from '../data/planes-api.js';
 
 // Solo para alumnos: sin sesión va al login y un coach va a su panel
 exigirRol('alumno');
+
+let usuarioActualId = null;
+let logDiarioActualId = null;
 
 /**
  * Mapa centralizado de selectores del DOM para desacoplar lógica y presentación.
@@ -148,6 +159,134 @@ function elegir(fecha) {
   dibujarRueda();
   // Saltos grandes (desde el calendario) cambian sin animación
   if (Math.abs(pasos) <= LADO) animarGiro(pasos);
+
+  // Recargar datos para el día elegido
+  recargarDatosDia(elegido);
+}
+
+/**
+ * Sincroniza la sesión del alumno con Supabase Auth respetando modo test y offline.
+ * @returns {Promise<string|null>} UUID del alumno o null
+ */
+export async function sincronizarSesion() {
+  if (typeof window !== 'undefined' && window.__TEST_BYPASS_AUTH__) {
+    return null;
+  }
+  if (usuarioActualId) return usuarioActualId;
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session && session.user) {
+      usuarioActualId = session.user.id;
+      return usuarioActualId;
+    }
+  } catch (err) {
+    console.warn('Error al verificar sesión en dashboard:', err);
+  }
+  return null;
+}
+
+/**
+ * Recarga los datos de nutrición y consumo para la fecha seleccionada.
+ * @param {Date} [fecha=elegido]
+ */
+export function recargarDatosDia(fecha = elegido) {
+  if (typeof window !== 'undefined' && window.__TEST_BYPASS_AUTH__) {
+    return;
+  }
+  hidratarDashboard(fecha).catch((err) => {
+    console.warn('Error al recargar datos del día desde Supabase:', err);
+  });
+}
+
+/**
+ * Hidrata las comidas, macros y consumo de agua desde daily_logs de Supabase.
+ * En caso de error o ausencia de red, degrada graciosamente a sessionStorage.
+ * @param {Date} [fecha=elegido]
+ * @returns {Promise<Object|null>}
+ */
+export async function hidratarDashboard(fecha = elegido) {
+  if (typeof window !== 'undefined' && window.__TEST_BYPASS_AUTH__) {
+    return null;
+  }
+  const uid = usuarioActualId || (await sincronizarSesion());
+  if (!uid) return null;
+
+  try {
+    // 1. Enriquecer metas nutricionales desde el plan activo si existe
+    try {
+      const planActivo = await obtenerPlanActivo(uid);
+      if (planActivo && planActivo.plan) {
+        if (planActivo.plan.target_calories) PLAN_OBJETIVO_DEFECTO.kcal = Number(planActivo.plan.target_calories);
+        if (planActivo.plan.target_protein_g) PLAN_OBJETIVO_DEFECTO.p = Number(planActivo.plan.target_protein_g);
+        if (planActivo.plan.target_carbs_g) PLAN_OBJETIVO_DEFECTO.c = Number(planActivo.plan.target_carbs_g);
+        if (planActivo.plan.target_fat_g) PLAN_OBJETIVO_DEFECTO.g = Number(planActivo.plan.target_fat_g);
+        actualizarResumenNutricional();
+      }
+    } catch {
+      // Ignorar si falla lectura del plan
+    }
+
+    // 2. Obtener consumo del día desde daily_logs
+    const fechaISO = aTextoISO(fecha);
+    const consumo = await obtenerConsumoDiario(uid, fechaISO);
+
+    if (consumo && consumo.log) {
+      logDiarioActualId = consumo.log.id;
+
+      if (consumo.items && consumo.items.length > 0) {
+        const comidasEstructuradas = {
+          Desayuno: [],
+          Almuerzo: [],
+          Merienda: [],
+          Cena: []
+        };
+
+        consumo.items.forEach((it) => {
+          const comida = it.comida || it.meal_type || 'Almuerzo';
+          if (!comidasEstructuradas[comida]) comidasEstructuradas[comida] = [];
+          comidasEstructuradas[comida].push({
+            id: it.id,
+            nombre: it.nombre || it.food_name,
+            linea: it.linea || `${it.kcal} kcal · P ${it.p} · C ${it.c} · G ${it.g}`,
+            cantidad: it.cantidad || `${it.gramos} g`,
+            kcal: it.kcal,
+            p: it.p,
+            c: it.c,
+            g: it.g,
+            gramos: it.gramos
+          });
+        });
+
+        guardarComidasEnStorage(comidasEstructuradas);
+        renderizarAlimentosEnComidas();
+      }
+
+      // Sincronizar vasos de agua si vienen de DB
+      if (typeof consumo.aguaLitros === 'number' && consumo.aguaLitros > 0) {
+        const vasos = document.querySelectorAll(SELECTORES.vasosAgua);
+        const totalVasos = vasos.length || 8;
+        const litrosPorVaso = PLAN_OBJETIVO_DEFECTO.aguaLitros / totalVasos;
+        const numVasos = Math.min(totalVasos, Math.round(consumo.aguaLitros / litrosPorVaso));
+        const indices = [];
+        vasos.forEach((vaso, i) => {
+          const activo = i < numVasos;
+          vaso.setAttribute('aria-pressed', String(activo));
+          if (activo) indices.push(i);
+        });
+        guardarVasosAgua(indices);
+        actualizarContadorAgua();
+      }
+
+      actualizarResumenNutricional();
+      actualizarContadorComidas();
+      return consumo;
+    } else {
+      logDiarioActualId = null;
+    }
+  } catch (err) {
+    console.warn('Fallback a almacenamiento local por excepción en hidratarDashboard:', err);
+  }
+  return null;
 }
 
 // Deslizar con el dedo: cada ancho de día recorrido mueve un día
@@ -481,6 +620,29 @@ export function agregarAlimentoAComida(nombreComida, infoAlimento) {
   }
   renderizarAlimentosEnComidas();
   actualizarResumenNutricional();
+
+  // Sincronización asíncrona de fondo con Supabase si hay sesión activa
+  if (usuarioActualId && !yaExiste) {
+    (async () => {
+      try {
+        const fechaISO = aTextoISO(elegido);
+        const log = await obtenerOCrearRegistroDiario(usuarioActualId, fechaISO);
+        if (log && log.id) {
+          await registrarAlimentoConsumido(log.id, {
+            comida: nombreComida,
+            nombre: infoAlimento.nombre,
+            kcal: infoAlimento.kcal,
+            p: infoAlimento.p,
+            c: infoAlimento.c,
+            g: infoAlimento.g,
+            gramos: infoAlimento.gramos || 100
+          });
+        }
+      } catch (err) {
+        console.warn('Error al registrar alimento consumido en Supabase:', err);
+      }
+    })();
+  }
 }
 
 /**
@@ -652,6 +814,13 @@ actualizarResumenNutricional();
 restaurarVasosAgua();
 actualizarContadorAgua();
 
+// Sincronización progresiva con Supabase (enriquecimiento online)
+sincronizarSesion().then((uid) => {
+  if (uid) {
+    hidratarDashboard(elegido);
+  }
+});
+
 window.addEventListener('pageshow', () => {
   procesarReemplazoPendiente();
   renderizarAlimentosEnComidas();
@@ -660,6 +829,9 @@ window.addEventListener('pageshow', () => {
   actualizarResumenNutricional();
   restaurarVasosAgua();
   actualizarContadorAgua();
+  if (usuarioActualId) {
+    hidratarDashboard(elegido);
+  }
 });
 
 document.querySelectorAll(SELECTORES.botonLoComi).forEach((boton) => {
@@ -676,6 +848,34 @@ document.querySelectorAll(SELECTORES.botonLoComi).forEach((boton) => {
       guardarEstadosComidas(estados);
     }
     actualizarContadorComidas();
+
+    // Sincronizar registro con Supabase si hay sesión activa
+    if (usuarioActualId) {
+      (async () => {
+        try {
+          const fechaISO = aTextoISO(elegido);
+          const log = await obtenerOCrearRegistroDiario(usuarioActualId, fechaISO);
+          if (log && log.id) {
+            logDiarioActualId = log.id;
+            const comidasGuardadas = obtenerComidasGuardadas();
+            const alimentos = comidasGuardadas[tit] || [];
+            for (const alim of alimentos) {
+              await registrarAlimentoConsumido(log.id, {
+                comida: tit,
+                nombre: alim.nombre,
+                kcal: alim.kcal,
+                p: alim.p,
+                c: alim.c,
+                g: alim.g,
+                gramos: alim.gramos || 100
+              });
+            }
+          }
+        } catch (err) {
+          console.warn('Error al registrar comida en Supabase:', err);
+        }
+      })();
+    }
 
     if (avisoComida) {
       const tituloComida = comida.querySelector('.comida__titulo')?.textContent?.trim() || 'Comida';
@@ -726,6 +926,24 @@ document.querySelectorAll(SELECTORES.vasosAgua).forEach((vaso, idx) => {
     });
     guardarVasosAgua(presionados);
     actualizarContadorAgua();
+
+    // Sincronizar consumo de agua en Supabase si hay sesión activa
+    if (usuarioActualId) {
+      (async () => {
+        try {
+          const fechaISO = aTextoISO(elegido);
+          const log = await obtenerOCrearRegistroDiario(usuarioActualId, fechaISO);
+          if (log && log.id) {
+            const totalVasos = document.querySelectorAll(SELECTORES.vasosAgua).length || 8;
+            const litrosPorVaso = PLAN_OBJETIVO_DEFECTO.aguaLitros / totalVasos;
+            const litrosTotal = presionados.length * litrosPorVaso;
+            await actualizarAgua(log.id, litrosTotal);
+          }
+        } catch (err) {
+          console.warn('Error al actualizar agua en Supabase:', err);
+        }
+      })();
+    }
   });
 });
 
