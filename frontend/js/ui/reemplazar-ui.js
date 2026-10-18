@@ -15,6 +15,7 @@
 import { calcularEquivalenciaDirecta, aNumeroSeguro } from '../calc/equivalencia-calc.js';
 import { guardarAvisoToast, mostrarAvisoFlotante } from '../utils/navegacion.js';
 import { buscarAlimentosLocales, ALIMENTOS_BASE } from '../data/alimentos-locales.js';
+import { buscarAlimentos } from '../data/alimentos-api.js';
 
 /**
  * Mapa centralizado de selectores del DOM.
@@ -303,65 +304,92 @@ export function ejecutarBusqueda(termino, alimentoObjetivo, mapaSelectores = SEL
     return [];
   }
 
-  // 2. Buscar coincidencias en el catálogo base
-  const candidatos = buscarAlimentosLocales(textoLimpio, catalogo);
+  // Función auxiliar de renderizado de candidatos y cálculo de equivalencia
+  function procesarYRenderizar(candidatos) {
+    if (!candidatos || candidatos.length === 0) {
+      if (elVacio) elVacio.hidden = true;
+      if (elBloqueResultados) elBloqueResultados.hidden = true;
+      if (elContenedorReemplazos) {
+        elContenedorReemplazos.hidden = true;
+        elContenedorReemplazos.innerHTML = '';
+      }
+      if (elSinResultados) elSinResultados.hidden = false;
 
-  // 3. Si no hay resultados
-  if (candidatos.length === 0) {
+      estadoControlador.opcionesActuales = [];
+      estadoControlador.opcionSeleccionada = null;
+      actualizarPieConfirmacion(null, mapaSelectores);
+      return [];
+    }
+
+    const resultados = candidatos.map((candidato) => {
+      const calculo = calcularEquivalenciaDirecta(alimentoObjetivo, candidato);
+      return { candidato, calculo };
+    });
+
+    resultados.sort((a, b) => {
+      if (b.calculo.adherencia !== a.calculo.adherencia) {
+        return b.calculo.adherencia - a.calculo.adherencia;
+      }
+      return b.calculo.similitud - a.calculo.similitud;
+    });
+
     if (elVacio) elVacio.hidden = true;
-    if (elBloqueResultados) elBloqueResultados.hidden = true;
+    if (elSinResultados) elSinResultados.hidden = true;
+
+    if (elTituloResultados) {
+      elTituloResultados.textContent = `Resultados · ${resultados.length}`;
+    }
+    if (elBloqueResultados) elBloqueResultados.hidden = false;
+
     if (elContenedorReemplazos) {
-      elContenedorReemplazos.hidden = true;
-      elContenedorReemplazos.innerHTML = '';
+      const htmlCards = resultados.map((item, index) => {
+        const esSeleccionado = index === 0;
+        return renderizarTarjetaReemplazo(item.candidato, item.calculo, esSeleccionado);
+      }).join('\n');
+
+      elContenedorReemplazos.innerHTML = htmlCards;
+      elContenedorReemplazos.hidden = false;
     }
-    if (elSinResultados) elSinResultados.hidden = false;
 
-    estadoControlador.opcionesActuales = [];
-    estadoControlador.opcionSeleccionada = null;
-    actualizarPieConfirmacion(null, mapaSelectores);
-    return [];
+    estadoControlador.opcionesActuales = resultados;
+    estadoControlador.opcionSeleccionada = resultados[0];
+    actualizarPieConfirmacion(resultados[0], mapaSelectores);
+
+    return resultados;
   }
 
-  // 4. Calcular equivalencia directa para cada candidato
-  const resultados = candidatos.map((candidato) => {
-    const calculo = calcularEquivalenciaDirecta(alimentoObjetivo, candidato);
-    return { candidato, calculo };
-  });
+  // 2. Coincidencias en el catálogo base (inmediato / fallback offline)
+  const candidatosLocales = buscarAlimentosLocales(textoLimpio, catalogo);
+  const resultadosLocales = procesarYRenderizar(candidatosLocales);
 
-  // Ordenar resultados priorizando mayor adherencia y mayor similitud
-  resultados.sort((a, b) => {
-    if (b.calculo.adherencia !== a.calculo.adherencia) {
-      return b.calculo.adherencia - a.calculo.adherencia;
-    }
-    return b.calculo.similitud - a.calculo.similitud;
-  });
+  // 3. Consulta asíncrona a Supabase RPC buscar_alimentos para enriquecer con la base completa
+  if (typeof buscarAlimentos === 'function' && textoLimpio.length >= 2) {
+    buscarAlimentos(textoLimpio).then((alimentosDb) => {
+      if (Array.isArray(alimentosDb) && alimentosDb.length > 0) {
+        const candidatosDb = alimentosDb.map((it) => ({
+          id: it.id,
+          nombre: it.nombre,
+          categoria: it.categoria,
+          kcal: Number(it.kcal) || 0,
+          proteinas: Number(it.proteinas) || 0,
+          carbohidratos: Number(it.carbohidratos) || 0,
+          grasas: Number(it.grasas) || 0,
+          unidad_g: it.unidad_g != null ? Number(it.unidad_g) : null,
+          unidad_nombre: it.unidad_nombre || null
+        }));
 
-  // 5. Renderizar resultados en el DOM
-  if (elVacio) elVacio.hidden = true;
-  if (elSinResultados) elSinResultados.hidden = true;
-
-  if (elTituloResultados) {
-    elTituloResultados.textContent = `Resultados · ${resultados.length}`;
-  }
-  if (elBloqueResultados) elBloqueResultados.hidden = false;
-
-  if (elContenedorReemplazos) {
-    // La primera opción queda preseleccionada por defecto
-    const htmlCards = resultados.map((item, index) => {
-      const esSeleccionado = index === 0;
-      return renderizarTarjetaReemplazo(item.candidato, item.calculo, esSeleccionado);
-    }).join('\n');
-
-    elContenedorReemplazos.innerHTML = htmlCards;
-    elContenedorReemplazos.hidden = false;
+        // Verificar que la búsqueda no haya cambiado antes de actualizar el DOM
+        const inputActual = document.querySelector(mapaSelectores.inputBuscar);
+        if (!inputActual || inputActual.value.trim() === textoLimpio) {
+          procesarYRenderizar(candidatosDb);
+        }
+      }
+    }).catch((err) => {
+      console.warn('Fallback a catálogo local por error en Supabase RPC:', err);
+    });
   }
 
-  // Guardar en el estado del controlador y actualizar el pie con la primera opción seleccionada
-  estadoControlador.opcionesActuales = resultados;
-  estadoControlador.opcionSeleccionada = resultados[0];
-  actualizarPieConfirmacion(resultados[0], mapaSelectores);
-
-  return resultados;
+  return resultadosLocales;
 }
 
 /**
