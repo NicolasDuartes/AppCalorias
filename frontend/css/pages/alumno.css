@@ -230,6 +230,15 @@
   font-variant-numeric: tabular-nums;
 }
 
+.comida__alimentos {
+  display: flex;
+  flex-direction: column;
+}
+
+.comida__alimentos:not(:empty) {
+  border-top: 1px solid var(--gris-suave);
+}
+
 .comida__acciones {
   display: flex;
   gap: var(--espacio-l);

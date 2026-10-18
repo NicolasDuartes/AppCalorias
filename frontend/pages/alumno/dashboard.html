@@ -77,7 +77,7 @@
 
         <!-- Las 4 comidas del día. data-estado="hecha" muestra el ✓ y oculta "Lo comí" -->
         <div class="comidas">
-        <details class="comida" name="comidas" data-estado="pendiente" data-kcal="464" data-p="31" data-c="53" data-g="14">
+        <details class="comida" name="comidas" data-estado="pendiente" data-kcal="0" data-p="0" data-c="0" data-g="0">
           <summary class="comida__cabecera">
             <span class="comida__estado">
               <svg class="icono icono--grueso comida__icono-hecha" width="18" height="18" aria-hidden="true"><use href="#hecho"/></svg>
@@ -85,30 +85,23 @@
             </span>
             <span class="comida__textos">
               <span class="comida__titulo">Desayuno</span>
-              <span class="comida__detalle">Plan · 464 kcal · 1 alimento</span>
+              <span class="comida__detalle">0 alimentos</span>
             </span>
-            <span class="comida__kcal">464<span class="unidad"> kcal</span></span>
+            <span class="comida__kcal">0<span class="unidad"> kcal</span></span>
             <span class="comida__flecha"><svg class="icono" width="18" height="18" aria-hidden="true"><use href="#flecha-abajo"/></svg></span>
           </summary>
           <div class="comida__cuerpo">
-            <div class="reparto reparto--fino" aria-hidden="true"><span class="p" style="width: 27%"></span><span class="c" style="width: 46%"></span><span class="g" style="width: 27%"></span></div>
-            <span class="comida__macros">P 31 g · C 53 g · G 14 g</span>
-            <!-- Alimentos de la comida: una fila por alimento (vienen del plan y de la API de alimentos) -->
-            <div class="alimento-fila">
-              <a class="alimento-fila__nombre" href="cantidad.html?comida=Desayuno&amp;alimento=Avena+con+leche+y+fruta&amp;kcal=464&amp;p=31&amp;c=53&amp;g=14&amp;cantidad=1+porci%C3%B3n" aria-label="Cambiar la cantidad del alimento">
-                <span class="alimento-fila__titulo">Avena con leche y fruta</span>
-                <span class="alimento-fila__linea">464 kcal · P 31 · C 53 · G 14</span>
-              </a>
-              <span class="alimento-fila__cantidad">1 porción</span>
-              <a class="btn-reemplazar" href="reemplazar.html?comida=Desayuno&amp;alimento=Avena+con+leche+y+fruta&amp;kcal=464&amp;p=31&amp;c=53&amp;g=14&amp;gramos=250" aria-label="Reemplazar el alimento"><svg class="icono icono--grueso" width="20" height="20" aria-hidden="true"><use href="#reemplazar"/></svg></a>
-            </div>
+            <div class="reparto reparto--fino" aria-hidden="true"><span class="p" style="width: 0%"></span><span class="c" style="width: 0%"></span><span class="g" style="width: 0%"></span></div>
+            <span class="comida__macros">P 0 g · C 0 g · G 0 g</span>
+            <!-- Alimentos de la comida: vacíos por defecto, se registran con "+ Agregar alimento" -->
+            <div class="comida__alimentos"></div>
             <div class="comida__acciones">
               <button class="btn btn--chico btn--primario comida__lo-comi" type="button">Lo comí</button>
               <a class="btn btn--chico btn--secundario btn--verde" href="agregar.html?comida=Desayuno"><svg class="icono icono--grueso" width="16" height="16" aria-hidden="true"><use href="#mas"/></svg>Agregar alimento</a>
             </div>
           </div>
         </details>
-        <details class="comida" name="comidas" data-estado="pendiente" data-kcal="570" data-p="51" data-c="50" data-g="16">
+        <details class="comida" name="comidas" data-estado="pendiente" data-kcal="0" data-p="0" data-c="0" data-g="0">
           <summary class="comida__cabecera">
             <span class="comida__estado">
               <svg class="icono icono--grueso comida__icono-hecha" width="18" height="18" aria-hidden="true"><use href="#hecho"/></svg>
@@ -116,30 +109,23 @@
             </span>
             <span class="comida__textos">
               <span class="comida__titulo">Almuerzo</span>
-              <span class="comida__detalle">Plan · 570 kcal · 1 alimento</span>
+              <span class="comida__detalle">0 alimentos</span>
             </span>
-            <span class="comida__kcal">570<span class="unidad"> kcal</span></span>
+            <span class="comida__kcal">0<span class="unidad"> kcal</span></span>
             <span class="comida__flecha"><svg class="icono" width="18" height="18" aria-hidden="true"><use href="#flecha-abajo"/></svg></span>
           </summary>
           <div class="comida__cuerpo">
-            <div class="reparto reparto--fino" aria-hidden="true"><span class="p" style="width: 36%"></span><span class="c" style="width: 35%"></span><span class="g" style="width: 29%"></span></div>
-            <span class="comida__macros">P 51 g · C 50 g · G 16 g</span>
-            <!-- Alimentos de la comida: una fila por alimento (vienen del plan y de la API de alimentos) -->
-            <div class="alimento-fila">
-              <a class="alimento-fila__nombre" href="cantidad.html?comida=Almuerzo&amp;alimento=Pechuga+de+pollo+con+arroz&amp;kcal=570&amp;p=51&amp;c=50&amp;g=16&amp;cantidad=1+porci%C3%B3n" aria-label="Cambiar la cantidad del alimento">
-                <span class="alimento-fila__titulo">Pechuga de pollo con arroz</span>
-                <span class="alimento-fila__linea">570 kcal · P 51 · C 50 · G 16</span>
-              </a>
-              <span class="alimento-fila__cantidad">1 porción</span>
-              <a class="btn-reemplazar" href="reemplazar.html?comida=Almuerzo&amp;alimento=Pechuga+de+pollo+con+arroz&amp;kcal=570&amp;p=51&amp;c=50&amp;g=16&amp;gramos=350" aria-label="Reemplazar el alimento"><svg class="icono icono--grueso" width="20" height="20" aria-hidden="true"><use href="#reemplazar"/></svg></a>
-            </div>
+            <div class="reparto reparto--fino" aria-hidden="true"><span class="p" style="width: 0%"></span><span class="c" style="width: 0%"></span><span class="g" style="width: 0%"></span></div>
+            <span class="comida__macros">P 0 g · C 0 g · G 0 g</span>
+            <!-- Alimentos de la comida: vacíos por defecto, se registran con "+ Agregar alimento" -->
+            <div class="comida__alimentos"></div>
             <div class="comida__acciones">
               <button class="btn btn--chico btn--primario comida__lo-comi" type="button">Lo comí</button>
               <a class="btn btn--chico btn--secundario btn--verde" href="agregar.html?comida=Almuerzo"><svg class="icono icono--grueso" width="16" height="16" aria-hidden="true"><use href="#mas"/></svg>Agregar alimento</a>
             </div>
           </div>
         </details>
-        <details class="comida" name="comidas" data-estado="pendiente" data-kcal="388" data-p="21" data-c="38" data-g="19">
+        <details class="comida" name="comidas" data-estado="pendiente" data-kcal="0" data-p="0" data-c="0" data-g="0">
           <summary class="comida__cabecera">
             <span class="comida__estado">
               <svg class="icono icono--grueso comida__icono-hecha" width="18" height="18" aria-hidden="true"><use href="#hecho"/></svg>
@@ -147,30 +133,23 @@
             </span>
             <span class="comida__textos">
               <span class="comida__titulo">Merienda</span>
-              <span class="comida__detalle">Plan · 388 kcal · 1 alimento</span>
+              <span class="comida__detalle">0 alimentos</span>
             </span>
-            <span class="comida__kcal">388<span class="unidad"> kcal</span></span>
+            <span class="comida__kcal">0<span class="unidad"> kcal</span></span>
             <span class="comida__flecha"><svg class="icono" width="18" height="18" aria-hidden="true"><use href="#flecha-abajo"/></svg></span>
           </summary>
           <div class="comida__cuerpo">
-            <div class="reparto reparto--fino" aria-hidden="true"><span class="p" style="width: 22%"></span><span class="c" style="width: 39%"></span><span class="g" style="width: 39%"></span></div>
-            <span class="comida__macros">P 21 g · C 38 g · G 19 g</span>
-            <!-- Alimentos de la comida: una fila por alimento (vienen del plan y de la API de alimentos) -->
-            <div class="alimento-fila">
-              <a class="alimento-fila__nombre" href="cantidad.html?comida=Merienda&amp;alimento=Yogur+griego+con+frutos+secos&amp;kcal=388&amp;p=21&amp;c=38&amp;g=19&amp;cantidad=1+porci%C3%B3n" aria-label="Cambiar la cantidad del alimento">
-                <span class="alimento-fila__titulo">Yogur griego con frutos secos</span>
-                <span class="alimento-fila__linea">388 kcal · P 21 · C 38 · G 19</span>
-              </a>
-              <span class="alimento-fila__cantidad">1 porción</span>
-              <a class="btn-reemplazar" href="reemplazar.html?comida=Merienda&amp;alimento=Yogur+griego+con+frutos+secos&amp;kcal=388&amp;p=21&amp;c=38&amp;g=19&amp;gramos=200" aria-label="Reemplazar el alimento"><svg class="icono icono--grueso" width="20" height="20" aria-hidden="true"><use href="#reemplazar"/></svg></a>
-            </div>
+            <div class="reparto reparto--fino" aria-hidden="true"><span class="p" style="width: 0%"></span><span class="c" style="width: 0%"></span><span class="g" style="width: 0%"></span></div>
+            <span class="comida__macros">P 0 g · C 0 g · G 0 g</span>
+            <!-- Alimentos de la comida: vacíos por defecto, se registran con "+ Agregar alimento" -->
+            <div class="comida__alimentos"></div>
             <div class="comida__acciones">
               <button class="btn btn--chico btn--primario comida__lo-comi" type="button">Lo comí</button>
               <a class="btn btn--chico btn--secundario btn--verde" href="agregar.html?comida=Merienda"><svg class="icono icono--grueso" width="16" height="16" aria-hidden="true"><use href="#mas"/></svg>Agregar alimento</a>
             </div>
           </div>
         </details>
-        <details class="comida" name="comidas" data-estado="pendiente" data-kcal="545" data-p="38" data-c="52" data-g="20">
+        <details class="comida" name="comidas" data-estado="pendiente" data-kcal="0" data-p="0" data-c="0" data-g="0">
           <summary class="comida__cabecera">
             <span class="comida__estado">
               <svg class="icono icono--grueso comida__icono-hecha" width="18" height="18" aria-hidden="true"><use href="#hecho"/></svg>
@@ -178,23 +157,16 @@
             </span>
             <span class="comida__textos">
               <span class="comida__titulo">Cena</span>
-              <span class="comida__detalle">Plan · 545 kcal · 1 alimento</span>
+              <span class="comida__detalle">0 alimentos</span>
             </span>
-            <span class="comida__kcal">545<span class="unidad"> kcal</span></span>
+            <span class="comida__kcal">0<span class="unidad"> kcal</span></span>
             <span class="comida__flecha"><svg class="icono" width="18" height="18" aria-hidden="true"><use href="#flecha-abajo"/></svg></span>
           </summary>
           <div class="comida__cuerpo">
-            <div class="reparto reparto--fino" aria-hidden="true"><span class="p" style="width: 28%"></span><span class="c" style="width: 38%"></span><span class="g" style="width: 34%"></span></div>
-            <span class="comida__macros">P 38 g · C 52 g · G 20 g</span>
-            <!-- Alimentos de la comida: una fila por alimento (vienen del plan y de la API de alimentos) -->
-            <div class="alimento-fila">
-              <a class="alimento-fila__nombre" href="cantidad.html?comida=Cena&amp;alimento=Lomo+vacuno+con+batata&amp;kcal=545&amp;p=38&amp;c=52&amp;g=20&amp;cantidad=1+porci%C3%B3n" aria-label="Cambiar la cantidad del alimento">
-                <span class="alimento-fila__titulo">Lomo vacuno con batata</span>
-                <span class="alimento-fila__linea">545 kcal · P 38 · C 52 · G 20</span>
-              </a>
-              <span class="alimento-fila__cantidad">1 porción</span>
-              <a class="btn-reemplazar" href="reemplazar.html?comida=Cena&amp;alimento=Lomo+vacuno+con+batata&amp;kcal=545&amp;p=38&amp;c=52&amp;g=20&amp;gramos=300" aria-label="Reemplazar el alimento"><svg class="icono icono--grueso" width="20" height="20" aria-hidden="true"><use href="#reemplazar"/></svg></a>
-            </div>
+            <div class="reparto reparto--fino" aria-hidden="true"><span class="p" style="width: 0%"></span><span class="c" style="width: 0%"></span><span class="g" style="width: 0%"></span></div>
+            <span class="comida__macros">P 0 g · C 0 g · G 0 g</span>
+            <!-- Alimentos de la comida: vacíos por defecto, se registran con "+ Agregar alimento" -->
+            <div class="comida__alimentos"></div>
             <div class="comida__acciones">
               <button class="btn btn--chico btn--primario comida__lo-comi" type="button">Lo comí</button>
               <a class="btn btn--chico btn--secundario btn--verde" href="agregar.html?comida=Cena"><svg class="icono icono--grueso" width="16" height="16" aria-hidden="true"><use href="#mas"/></svg>Agregar alimento</a>
@@ -238,6 +210,19 @@
       <button class="barra-inferior__item" type="button"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#progreso"/></svg><span>Progreso</span></button>
       <button class="barra-inferior__item" type="button"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#ajustes"/></svg><span>Ajustes</span></button>
     </nav>
+
+    <!-- Plantilla reutilizable para filas de alimentos agregados dinámicamente -->
+    <template id="plantilla-alimento-fila">
+      <div class="alimento-fila">
+        <a class="alimento-fila__nombre" href="cantidad.html" aria-label="Cambiar la cantidad del alimento">
+          <span class="alimento-fila__titulo"></span>
+          <span class="alimento-fila__linea"></span>
+        </a>
+        <span class="alimento-fila__cantidad"></span>
+        <a class="btn-reemplazar" href="reemplazar.html" aria-label="Reemplazar el alimento"><svg class="icono icono--grueso" width="20" height="20" aria-hidden="true"><use href="#reemplazar"/></svg></a>
+      </div>
+    </template>
+
   </div>
   <script type="module" src="../../js/ui/dashboard-ui.js"></script>
 </body>

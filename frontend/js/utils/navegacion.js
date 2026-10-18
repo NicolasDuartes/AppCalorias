@@ -90,6 +90,8 @@ function adaptarCantidadContextual() {
   const g = params.get('g');
   const cantidad = params.get('cantidad');
 
+  const gramos = params.get('gramos');
+
   // Adaptar contexto de comida y alimento si vienen por parámetro
   if (comida) {
     const antetitulo = document.querySelector('.encabezado__textos .antetitulo--verde');
@@ -99,25 +101,69 @@ function adaptarCantidadContextual() {
     const titulo = document.querySelector('.encabezado__textos .titulo');
     if (titulo) titulo.textContent = alimento;
   }
-  if (cantidad) {
-    const inputCantidad = document.querySelector('.input--cantidad input');
-    if (inputCantidad) {
-      const matchNum = cantidad.match(/\d+/);
-      if (matchNum) inputCantidad.value = matchNum[0];
+
+  // Extraer gramos base
+  let baseGramos = 100;
+  if (gramos) {
+    baseGramos = parseFloat(gramos) || 100;
+  } else if (cantidad) {
+    const matchG = cantidad.match(/(\d+(?:[.,]\d+)?)\s*g\b/i);
+    if (matchG) {
+      baseGramos = parseFloat(matchG[1].replace(',', '.')) || 100;
+    } else {
+      const matchNum = cantidad.match(/\d+(?:[.,]\d+)?/);
+      if (matchNum) baseGramos = parseFloat(matchNum[0].replace(',', '.')) || 100;
     }
   }
-  if (kcal || p || c || g) {
+
+  const inputCantidad = document.querySelector('.input--cantidad input');
+  if (inputCantidad) {
+    inputCantidad.value = String(baseGramos);
+  }
+
+  const baseKcal = kcal ? (Number(kcal) || 0) : 0;
+  const baseP = p ? (Number(p) || 0) : 0;
+  const baseC = c ? (Number(c) || 0) : 0;
+  const baseG = g ? (Number(g) || 0) : 0;
+
+  const factor100 = baseGramos > 0 ? (100 / baseGramos) : 1;
+  const kcal100 = baseKcal * factor100;
+  const p100 = baseP * factor100;
+  const c100 = baseC * factor100;
+  const g100 = baseG * factor100;
+
+  function recalcularAportes(cantGramos) {
+    const gActual = Math.max(0, cantGramos);
+    const f = gActual / 100;
+    const kAct = Math.round(kcal100 * f);
+    const pAct = Math.round(p100 * f);
+    const cAct = Math.round(c100 * f);
+    const gAct = Math.round(g100 * f);
+
     const celdas = document.querySelectorAll('.aporte .aporte__celda .aporte__valor');
     if (celdas.length >= 4) {
-      if (kcal) celdas[0].textContent = kcal;
-      if (p) celdas[1].textContent = `${p} g`;
-      if (c) celdas[2].textContent = `${c} g`;
-      if (g) celdas[3].textContent = `${g} g`;
+      celdas[0].textContent = String(kAct);
+      celdas[1].textContent = `${pAct} g`;
+      celdas[2].textContent = `${cAct} g`;
+      celdas[3].textContent = `${gAct} g`;
     }
+  }
+
+  if (kcal || p || c || g) {
+    recalcularAportes(baseGramos);
+
     const valores100 = document.getElementById('valores-100');
-    if (valores100 && kcal && p && c && g) {
-      valores100.textContent = `Cada 100 g: ${kcal} kcal · P ${p} · C ${c} · G ${g}`;
+    if (valores100) {
+      valores100.textContent = `Cada 100 g: ${Math.round(kcal100)} kcal · P ${Math.round(p100)} · C ${Math.round(c100)} · G ${Math.round(g100)}`;
     }
+  }
+
+  if (inputCantidad && !inputCantidad.dataset.listenerCantidad) {
+    inputCantidad.dataset.listenerCantidad = 'true';
+    inputCantidad.addEventListener('input', () => {
+      const val = parseFloat(inputCantidad.value.replace(',', '.')) || 0;
+      recalcularAportes(val);
+    });
   }
 
   let origen = params.get('origen');
@@ -181,7 +227,8 @@ export const ALIMENTOS_PLAN_DEFECTO = {
     kcal: 464,
     p: 31,
     c: 53,
-    g: 14
+    g: 14,
+    gramos: 250
   },
   'Almuerzo': {
     titulo: 'Pechuga de pollo con arroz',
@@ -190,7 +237,8 @@ export const ALIMENTOS_PLAN_DEFECTO = {
     kcal: 570,
     p: 51,
     c: 50,
-    g: 16
+    g: 16,
+    gramos: 350
   },
   'Merienda': {
     titulo: 'Yogur griego con frutos secos',
@@ -199,7 +247,8 @@ export const ALIMENTOS_PLAN_DEFECTO = {
     kcal: 388,
     p: 21,
     c: 38,
-    g: 19
+    g: 19,
+    gramos: 200
   },
   'Cena': {
     titulo: 'Lomo vacuno con batata',
@@ -208,7 +257,8 @@ export const ALIMENTOS_PLAN_DEFECTO = {
     kcal: 545,
     p: 38,
     c: 52,
-    g: 20
+    g: 20,
+    gramos: 300
   }
 };
 
@@ -263,6 +313,11 @@ function adaptarAgregarContextual() {
       const filaPlan = seccionPlan?.querySelector('.alimento-fila');
       if (filaPlan) {
         filaPlan.dataset.kcal = String(info.kcal);
+        filaPlan.dataset.p = String(info.p);
+        filaPlan.dataset.c = String(info.c);
+        filaPlan.dataset.g = String(info.g);
+        filaPlan.dataset.gramos = String(info.gramos || 100);
+
         const titEl = filaPlan.querySelector('.alimento-fila__titulo');
         if (titEl) titEl.textContent = info.titulo;
         const linEl = filaPlan.querySelector('.alimento-fila__linea');
@@ -274,10 +329,30 @@ function adaptarAgregarContextual() {
         if (enlaceCant) {
           enlaceCant.setAttribute(
             'href',
-            `cantidad.html?origen=agregar&comida=${encodeURIComponent(comida)}&alimento=${encodeURIComponent(info.titulo)}&kcal=${info.kcal}&p=${info.p}&c=${info.c}&g=${info.g}&cantidad=${encodeURIComponent(info.cantidad)}`
+            `cantidad.html?origen=agregar&comida=${encodeURIComponent(comida)}&alimento=${encodeURIComponent(info.titulo)}&kcal=${info.kcal}&p=${info.p}&c=${info.c}&g=${info.g}&cantidad=${encodeURIComponent(info.cantidad)}&gramos=${info.gramos || 100}`
           );
         }
       }
+    }
+
+    // Sincronizar estado inicial de botones btn-agregar con sessionStorage si ya hay alimentos registrados
+    try {
+      const rawComidas = sessionStorage.getItem('comidas-diarias-alumno');
+      if (rawComidas) {
+        const comidasData = JSON.parse(rawComidas);
+        const guardados = comidasData[comida] || [];
+        const nombresGuardados = new Set(guardados.map((a) => a.nombre.toLowerCase().trim()));
+
+        document.querySelectorAll('.alimento-fila').forEach((fila) => {
+          const tit = fila.querySelector('.alimento-fila__titulo')?.textContent?.toLowerCase()?.trim();
+          const btn = fila.querySelector('.btn-agregar');
+          if (tit && btn && nombresGuardados.has(tit)) {
+            btn.setAttribute('aria-pressed', 'true');
+          }
+        });
+      }
+    } catch {
+      // Ignorar si sessionStorage no está disponible
     }
   }
 
@@ -397,6 +472,72 @@ export function iniciarNavegacion() {
         // Ignorar
       }
     }
+
+    const esBtnQuitar = evento.target.closest('.pie .btn--peligro-texto');
+    if (esBtnQuitar && (window.location.pathname.includes('cantidad.html') || document.querySelector('.input--cantidad'))) {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const comida = params.get('comida');
+        const alimento = params.get('alimento');
+        if (comida && alimento) {
+          const raw = sessionStorage.getItem('comidas-diarias-alumno');
+          if (raw) {
+            const guardadas = JSON.parse(raw);
+            if (guardadas[comida]) {
+              guardadas[comida] = guardadas[comida].filter((it) => it.nombre.toLowerCase() !== alimento.toLowerCase());
+              sessionStorage.setItem('comidas-diarias-alumno', JSON.stringify(guardadas));
+            }
+          }
+        }
+      } catch {
+        // Ignorar
+      }
+    }
+
+    const esBtnGuardarCantidad = evento.target.closest('.pie .btn--primario');
+    if (esBtnGuardarCantidad && (window.location.pathname.includes('cantidad.html') || document.querySelector('.input--cantidad'))) {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const comida = params.get('comida');
+        const alimento = params.get('alimento');
+        const inputCant = document.querySelector('.input--cantidad input');
+        const celdas = document.querySelectorAll('.aporte .aporte__celda .aporte__valor');
+
+        if (comida && alimento) {
+          const raw = sessionStorage.getItem('comidas-diarias-alumno');
+          const guardadas = raw ? JSON.parse(raw) : { Desayuno: [], Almuerzo: [], Merienda: [], Cena: [] };
+          if (!guardadas[comida]) guardadas[comida] = [];
+
+          const cantVal = parseFloat(inputCant?.value?.replace(',', '.')) || (Number(params.get('gramos')) || 100);
+          const kcalVal = celdas[0] ? parseInt(celdas[0].textContent.replace(/\D/g, ''), 10) || 0 : (Number(params.get('kcal')) || 0);
+          const pVal = celdas[1] ? parseInt(celdas[1].textContent.replace(/\D/g, ''), 10) || 0 : (Number(params.get('p')) || 0);
+          const cVal = celdas[2] ? parseInt(celdas[2].textContent.replace(/\D/g, ''), 10) || 0 : (Number(params.get('c')) || 0);
+          const gVal = celdas[3] ? parseInt(celdas[3].textContent.replace(/\D/g, ''), 10) || 0 : (Number(params.get('g')) || 0);
+          const textoCant = `${cantVal} g`;
+
+          const item = {
+            nombre: alimento,
+            linea: `${kcalVal} kcal · P ${pVal} · C ${cVal} · G ${gVal}`,
+            cantidad: textoCant,
+            kcal: kcalVal,
+            p: pVal,
+            c: cVal,
+            g: gVal,
+            gramos: cantVal
+          };
+
+          const idx = guardadas[comida].findIndex((it) => it.nombre.toLowerCase().trim() === alimento.toLowerCase().trim());
+          if (idx >= 0) {
+            guardadas[comida][idx] = item;
+          } else {
+            guardadas[comida].push(item);
+          }
+          sessionStorage.setItem('comidas-diarias-alumno', JSON.stringify(guardadas));
+        }
+      } catch {
+        // Ignorar
+      }
+    }
   });
 
   // 4. Quitar alimento en editor de planes
@@ -472,10 +613,77 @@ export function iniciarNavegacion() {
     if (!btnAgregar) return;
 
     const presionado = btnAgregar.getAttribute('aria-pressed') === 'true';
-    btnAgregar.setAttribute('aria-pressed', String(!presionado));
-    const nombreAlimento = btnAgregar.closest('.alimento-fila')?.querySelector('.alimento-fila__titulo')?.textContent?.trim() || 'Alimento';
-    mostrarAvisoFlotante(presionado ? `"${nombreAlimento}" quitado de la comida.` : `"${nombreAlimento}" agregado a la comida.`);
+    const nuevoEstado = !presionado;
+    btnAgregar.setAttribute('aria-pressed', String(nuevoEstado));
+    const fila = btnAgregar.closest('.alimento-fila');
+    const nombreAlimento = fila?.querySelector('.alimento-fila__titulo')?.textContent?.trim() || 'Alimento';
+    mostrarAvisoFlotante(nuevoEstado ? `"${nombreAlimento}" agregado a la comida.` : `"${nombreAlimento}" quitado de la comida.`);
     actualizarResumenPieAgregar();
+
+    // Sincronizar persistencia con sessionStorage
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const comida = params.get('comida') || document.querySelector('.encabezado__textos .antetitulo--verde')?.textContent?.trim();
+      if (comida && fila) {
+        const raw = sessionStorage.getItem('comidas-diarias-alumno');
+        const guardadas = raw ? JSON.parse(raw) : { Desayuno: [], Almuerzo: [], Merienda: [], Cena: [] };
+        if (!guardadas[comida]) guardadas[comida] = [];
+
+        if (nuevoEstado) {
+          const kcalAttr = Number(fila.dataset.kcal);
+          const pAttr = Number(fila.dataset.p);
+          const cAttr = Number(fila.dataset.c);
+          const gAttr = Number(fila.dataset.g);
+          const linea = fila.querySelector('.alimento-fila__linea')?.textContent?.trim() || '';
+          const cantidad = fila.querySelector('.alimento-fila__cantidad')?.textContent?.trim() || '1 porción';
+
+          let kcal = !Number.isNaN(kcalAttr) && kcalAttr >= 0 ? kcalAttr : 0;
+          let p = !Number.isNaN(pAttr) && pAttr >= 0 ? pAttr : 0;
+          let c = !Number.isNaN(cAttr) && cAttr >= 0 ? cAttr : 0;
+          let g = !Number.isNaN(gAttr) && gAttr >= 0 ? gAttr : 0;
+
+          if (kcal === 0 && linea) {
+            const mK = linea.match(/(\d+[\d.]*)\s*kcal/i);
+            if (mK) kcal = parseInt(mK[1].replace(/\./g, ''), 10);
+          }
+          if (p === 0 && linea) {
+            const mP = linea.match(/P\s*(\d+)/i);
+            if (mP) p = parseInt(mP[1], 10);
+          }
+          if (c === 0 && linea) {
+            const mC = linea.match(/C\s*(\d+)/i);
+            if (mC) c = parseInt(mC[1], 10);
+          }
+          if (g === 0 && linea) {
+            const mG = linea.match(/G\s*(\d+)/i);
+            if (mG) g = parseInt(mG[1], 10);
+          }
+
+          const matchG = cantidad.match(/(\d+(?:[.,]\d+)?)\s*g\b/i);
+          const gramos = matchG ? parseFloat(matchG[1].replace(',', '.')) : (Number(fila.dataset.gramos) || 100);
+
+          const existe = guardadas[comida].some((it) => it.nombre.toLowerCase().trim() === nombreAlimento.toLowerCase().trim());
+          if (!existe) {
+            guardadas[comida].push({
+              nombre: nombreAlimento,
+              linea: linea || `${kcal} kcal · P ${p} · C ${c} · G ${g}`,
+              cantidad,
+              kcal,
+              p,
+              c,
+              g,
+              gramos
+            });
+          }
+        } else {
+          guardadas[comida] = guardadas[comida].filter((it) => it.nombre.toLowerCase().trim() !== nombreAlimento.toLowerCase().trim());
+        }
+
+        sessionStorage.setItem('comidas-diarias-alumno', JSON.stringify(guardadas));
+      }
+    } catch {
+      // Ignorar si sessionStorage no está disponible
+    }
   });
 
   // 9. Micro-interacción accesible: pestañas (role="tab")

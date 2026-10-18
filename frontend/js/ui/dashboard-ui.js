@@ -29,6 +29,7 @@ export const SELECTORES = {
   macroGrasasBarra: '.resumen-kcal__datos .macro-linea:nth-child(3) .barra .g',
   contadorComidas: '[aria-labelledby="t-comidas"] .sub',
   comidas: '.comida',
+  contenedorAlimentos: '.comida__alimentos',
   botonLoComi: '.comida__lo-comi',
   avisoComida: '.aviso-flotante:not(.aviso-flotante--toast)',
   avisoComidaTexto: '.aviso-flotante:not(.aviso-flotante--toast) .crece',
@@ -199,62 +200,316 @@ calendario.addEventListener('change', () => {
 elegir(hoy);
 
 // ---------- Modelo y Resumen Nutricional Reactivo ----------
+export const CLAVE_STORAGE_COMIDAS = 'comidas-diarias-alumno';
+
 const avisoComida = document.querySelector(SELECTORES.avisoComida);
 let temporizadorComida = null;
 let ultimaComidaRegistrada = null;
 
 /**
+ * Obtiene el mapa de comidas y alimentos almacenados en la sesión del alumno.
+ * @returns {Record<string, Array<{nombre: string, linea: string, cantidad: string, kcal: number, p: number, c: number, g: number, gramos?: number}>>}
+ */
+export function obtenerComidasGuardadas() {
+  try {
+    const raw = sessionStorage.getItem(CLAVE_STORAGE_COMIDAS);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (typeof parsed === 'object' && parsed !== null) {
+        return parsed;
+      }
+    }
+  } catch {
+    // Si sessionStorage no está disponible o falla el parseo
+  }
+  return {
+    Desayuno: [],
+    Almuerzo: [],
+    Merienda: [],
+    Cena: []
+  };
+}
+
+/**
+ * Guarda las comidas y sus alimentos en sessionStorage.
+ * @param {Record<string, Array<*>>} comidas
+ */
+export function guardarComidasEnStorage(comidas) {
+  try {
+    sessionStorage.setItem(CLAVE_STORAGE_COMIDAS, JSON.stringify(comidas));
+  } catch {
+    // Ignorar si sessionStorage no está disponible
+  }
+}
+
+/**
+ * Procesa cualquier reemplazo pendiente guardado por reemplazar-ui.js en sessionStorage.
+ */
+export function procesarReemplazoPendiente() {
+  try {
+    const rawReemplazo = sessionStorage.getItem('alimento-reemplazado');
+    if (!rawReemplazo) return;
+
+    const datos = JSON.parse(rawReemplazo);
+    if (!datos || !datos.objetivo || !datos.reemplazo) return;
+
+    const comidas = obtenerComidasGuardadas();
+    const nombreComida = datos.objetivo.comida || 'Almuerzo';
+    const lista = comidas[nombreComida] || [];
+
+    const objetivoNombre = datos.objetivo.nombre.toLowerCase().trim();
+    const idx = lista.findIndex((item) => {
+      const nom = item.nombre.toLowerCase().trim();
+      return nom.includes(objetivoNombre) || objetivoNombre.includes(nom);
+    });
+
+    const aportes = datos.reemplazo.aportes || {};
+    const kVal = Math.round(aportes.kcal ?? 0);
+    const pVal = Math.round(aportes.p ?? aportes.proteinas ?? 0);
+    const cVal = Math.round(aportes.c ?? aportes.carbohidratos ?? 0);
+    const gVal = Math.round(aportes.g ?? aportes.grasas ?? 0);
+    const gramosVal = datos.reemplazo.gramos || 100;
+
+    const nuevoItem = {
+      nombre: datos.reemplazo.nombre,
+      linea: `${kVal} kcal · P ${pVal} · C ${cVal} · G ${gVal}`,
+      cantidad: datos.reemplazo.cantidad || `${gramosVal} g`,
+      kcal: kVal,
+      p: pVal,
+      c: cVal,
+      g: gVal,
+      gramos: gramosVal
+    };
+
+    if (idx >= 0) {
+      lista[idx] = nuevoItem;
+    } else {
+      lista.push(nuevoItem);
+    }
+    comidas[nombreComida] = lista;
+    guardarComidasEnStorage(comidas);
+    sessionStorage.removeItem('alimento-reemplazado');
+  } catch {
+    // Ignorar
+  }
+}
+
+/**
+ * Calcula y actualiza reactivamente la cabecera, detalle, macros y barra de reparto de una comida.
+ * Suma todos los .alimento-fila contenidos. Si la comida no contiene alimentos, establece 0 en todo.
+ * @param {HTMLElement} elComida
+ * @returns {{ kcal: number, p: number, c: number, g: number, cantidad: number }}
+ */
+export function actualizarComida(elComida) {
+  if (!elComida) return { kcal: 0, p: 0, c: 0, g: 0, cantidad: 0 };
+
+  const filas = elComida.querySelectorAll('.alimento-fila');
+  let totalKcal = 0;
+  let totalP = 0;
+  let totalC = 0;
+  let totalG = 0;
+
+  if (filas.length > 0) {
+    filas.forEach((fila) => {
+      const kAttr = Number(fila.dataset.kcal);
+      const pAttr = Number(fila.dataset.p);
+      const cAttr = Number(fila.dataset.c);
+      const gAttr = Number(fila.dataset.g);
+
+      if (!Number.isNaN(kAttr) && kAttr >= 0) {
+        totalKcal += kAttr;
+        totalP += (!Number.isNaN(pAttr) && pAttr >= 0) ? pAttr : 0;
+        totalC += (!Number.isNaN(cAttr) && cAttr >= 0) ? cAttr : 0;
+        totalG += (!Number.isNaN(gAttr) && gAttr >= 0) ? gAttr : 0;
+      } else {
+        const txt = fila.querySelector('.alimento-fila__linea')?.textContent || '';
+        const mK = txt.match(/(\d+[\d.]*)\s*kcal/i);
+        const mP = txt.match(/P\s*(\d+)/i);
+        const mC = txt.match(/C\s*(\d+)/i);
+        const mG = txt.match(/G\s*(\d+)/i);
+        if (mK) totalKcal += parseInt(mK[1].replace(/\./g, ''), 10);
+        if (mP) totalP += parseInt(mP[1], 10);
+        if (mC) totalC += parseInt(mC[1], 10);
+        if (mG) totalG += parseInt(mG[1], 10);
+      }
+    });
+
+    elComida.dataset.kcal = String(totalKcal);
+    elComida.dataset.p = String(Math.round(totalP));
+    elComida.dataset.c = String(Math.round(totalC));
+    elComida.dataset.g = String(Math.round(totalG));
+  } else {
+    totalKcal = 0;
+    totalP = 0;
+    totalC = 0;
+    totalG = 0;
+    elComida.dataset.kcal = '0';
+    elComida.dataset.p = '0';
+    elComida.dataset.c = '0';
+    elComida.dataset.g = '0';
+  }
+
+  // Actualizar cabecera de la comida
+  const elKcal = elComida.querySelector('.comida__kcal');
+  if (elKcal) {
+    elKcal.innerHTML = `${totalKcal > 0 ? totalKcal.toLocaleString('es-AR') : '0'}<span class="unidad"> kcal</span>`;
+  }
+
+  const elDetalle = elComida.querySelector('.comida__detalle');
+  if (elDetalle) {
+    const cant = filas.length;
+    elDetalle.textContent = cant === 0 ? '0 alimentos' : `${cant} ${cant === 1 ? 'alimento' : 'alimentos'}`;
+  }
+
+  const elMacros = elComida.querySelector('.comida__macros');
+  if (elMacros) {
+    elMacros.textContent = `P ${Math.round(totalP)} g · C ${Math.round(totalC)} g · G ${Math.round(totalG)} g`;
+  }
+
+  // Actualizar barra de reparto macro de la comida
+  const totalMacros = totalP + totalC + totalG;
+  const pBar = elComida.querySelector('.reparto .p');
+  const cBar = elComida.querySelector('.reparto .c');
+  const gBar = elComida.querySelector('.reparto .g');
+
+  if (totalMacros > 0) {
+    const pctP = Math.round((totalP / totalMacros) * 100);
+    const pctC = Math.round((totalC / totalMacros) * 100);
+    const pctG = Math.max(0, 100 - pctP - pctC);
+    if (pBar) pBar.style.width = `${pctP}%`;
+    if (cBar) cBar.style.width = `${pctC}%`;
+    if (gBar) gBar.style.width = `${pctG}%`;
+  } else {
+    if (pBar) pBar.style.width = '0%';
+    if (cBar) cBar.style.width = '0%';
+    if (gBar) gBar.style.width = '0%';
+  }
+
+  return { kcal: totalKcal, p: totalP, c: totalC, g: totalG, cantidad: filas.length };
+}
+
+/**
  * Extrae los valores nutricionales numéricos de un elemento de comida.
- * Prioriza atributos data-* explícitos y cuenta con fallback a selectores de texto.
  * @param {HTMLElement} elComida
  * @returns {{ kcal: number, p: number, c: number, g: number }}
  */
 export function obtenerNutricionComida(elComida) {
   if (!elComida) return { kcal: 0, p: 0, c: 0, g: 0 };
-
-  const kcalAttr = Number(elComida.dataset.kcal);
-  const pAttr = Number(elComida.dataset.p);
-  const cAttr = Number(elComida.dataset.c);
-  const gAttr = Number(elComida.dataset.g);
-
-  if (!Number.isNaN(kcalAttr) && kcalAttr > 0) {
-    return {
-      kcal: kcalAttr,
-      p: Number.isNaN(pAttr) ? 0 : pAttr,
-      c: Number.isNaN(cAttr) ? 0 : cAttr,
-      g: Number.isNaN(gAttr) ? 0 : gAttr
-    };
-  }
-
-  // Fallback: parsear texto en el DOM
-  const textoKcal = elComida.querySelector('.comida__kcal')?.textContent || '';
-  const matchKcal = textoKcal.match(/(\d+[\d.]*)/);
-  const kcal = matchKcal ? parseInt(matchKcal[1].replace(/\./g, ''), 10) : 0;
-
-  const textoMacros = elComida.querySelector('.comida__macros')?.textContent || '';
-  const matchP = textoMacros.match(/P\s*(\d+)/i);
-  const matchC = textoMacros.match(/C\s*(\d+)/i);
-  const matchG = textoMacros.match(/G\s*(\d+)/i);
-
+  const datos = actualizarComida(elComida);
   return {
-    kcal,
-    p: matchP ? parseInt(matchP[1], 10) : 0,
-    c: matchC ? parseInt(matchC[1], 10) : 0,
-    g: matchG ? parseInt(matchG[1], 10) : 0
+    kcal: datos.kcal,
+    p: datos.p,
+    c: datos.c,
+    g: datos.g
   };
 }
 
 /**
- * Calcula los totales consumidos y sincroniza el anillo SVG y las barras de macros.
+ * Renderiza los alimentos guardados en sessionStorage dentro de las tarjetas de comidas.
+ */
+export function renderizarAlimentosEnComidas() {
+  const comidasData = obtenerComidasGuardadas();
+  const elComidas = document.querySelectorAll(SELECTORES.comidas);
+
+  elComidas.forEach((elComida) => {
+    const titulo = elComida.querySelector('.comida__titulo')?.textContent?.trim();
+    if (!titulo) return;
+
+    let contenedor = elComida.querySelector(SELECTORES.contenedorAlimentos);
+    if (!contenedor) {
+      contenedor = document.createElement('div');
+      contenedor.className = 'comida__alimentos';
+      const cuerpo = elComida.querySelector('.comida__cuerpo');
+      const macrosEl = elComida.querySelector('.comida__macros');
+      if (macrosEl && macrosEl.nextSibling) {
+        cuerpo.insertBefore(contenedor, macrosEl.nextSibling);
+      } else if (cuerpo) {
+        cuerpo.prepend(contenedor);
+      }
+    }
+
+    const lista = comidasData[titulo] || [];
+    contenedor.replaceChildren();
+    if (lista.length > 0) {
+      lista.forEach((alimento) => {
+        const fila = document.createElement('div');
+        fila.className = 'alimento-fila';
+        fila.dataset.kcal = String(alimento.kcal || 0);
+        fila.dataset.p = String(alimento.p || 0);
+        fila.dataset.c = String(alimento.c || 0);
+        fila.dataset.g = String(alimento.g || 0);
+
+        let gCalc = alimento.gramos;
+        if (!gCalc && alimento.cantidad) {
+          const mG = alimento.cantidad.match(/(\d+(?:[.,]\d+)?)\s*g\b/i);
+          if (mG) gCalc = parseFloat(mG[1].replace(',', '.'));
+        }
+        const gramosVal = gCalc || 100;
+        fila.dataset.gramos = String(gramosVal);
+
+        const urlCantidad = `cantidad.html?origen=dashboard&comida=${encodeURIComponent(titulo)}&alimento=${encodeURIComponent(alimento.nombre)}&kcal=${alimento.kcal}&p=${alimento.p}&c=${alimento.c}&g=${alimento.g}&cantidad=${encodeURIComponent(alimento.cantidad || '1 porción')}&gramos=${gramosVal}`;
+        const urlReemplazar = `reemplazar.html?comida=${encodeURIComponent(titulo)}&alimento=${encodeURIComponent(alimento.nombre)}&kcal=${alimento.kcal}&p=${alimento.p}&c=${alimento.c}&g=${alimento.g}&gramos=${gramosVal}`;
+
+        fila.innerHTML = `
+          <a class="alimento-fila__nombre" href="${urlCantidad}" aria-label="Cambiar la cantidad del alimento">
+            <span class="alimento-fila__titulo">${alimento.nombre}</span>
+            <span class="alimento-fila__linea">${alimento.linea || `${alimento.kcal} kcal · P ${alimento.p} · C ${alimento.c} · G ${alimento.g}`}</span>
+          </a>
+          <span class="alimento-fila__cantidad">${alimento.cantidad || '1 porción'}</span>
+          <a class="btn-reemplazar" href="${urlReemplazar}" aria-label="Reemplazar el alimento"><svg class="icono icono--grueso" width="20" height="20" aria-hidden="true"><use href="#reemplazar"/></svg></a>
+        `;
+        contenedor.appendChild(fila);
+      });
+    }
+
+    actualizarComida(elComida);
+  });
+}
+
+/**
+ * Agrega un alimento a una comida y sincroniza interfaz, total acumulado y sessionStorage.
+ * @param {string} nombreComida
+ * @param {{ nombre: string, kcal: number, p: number, c: number, g: number, cantidad?: string, linea?: string, gramos?: number }} infoAlimento
+ */
+export function agregarAlimentoAComida(nombreComida, infoAlimento) {
+  const comidas = obtenerComidasGuardadas();
+  if (!comidas[nombreComida]) comidas[nombreComida] = [];
+  const yaExiste = comidas[nombreComida].some((it) => it.nombre.toLowerCase() === infoAlimento.nombre.toLowerCase());
+  if (!yaExiste) {
+    comidas[nombreComida].push(infoAlimento);
+    guardarComidasEnStorage(comidas);
+  }
+  renderizarAlimentosEnComidas();
+  actualizarResumenNutricional();
+}
+
+/**
+ * Quita un alimento de una comida y sincroniza interfaz, total acumulado y sessionStorage.
+ * @param {string} nombreComida
+ * @param {string} nombreAlimento
+ */
+export function quitarAlimentoDeComida(nombreComida, nombreAlimento) {
+  const comidas = obtenerComidasGuardadas();
+  if (!comidas[nombreComida]) return;
+  comidas[nombreComida] = comidas[nombreComida].filter(
+    (item) => item.nombre.toLowerCase() !== nombreAlimento.toLowerCase()
+  );
+  guardarComidasEnStorage(comidas);
+  renderizarAlimentosEnComidas();
+  actualizarResumenNutricional();
+}
+
+/**
+ * Calcula los totales acumulados de todas las comidas del día y sincroniza el anillo SVG y las barras de macros.
  */
 export function actualizarResumenNutricional() {
-  const comidasHechas = document.querySelectorAll(`${SELECTORES.comidas}[data-estado="hecha"]`);
+  const todasComidas = document.querySelectorAll(SELECTORES.comidas);
   let consumidoKcal = 0;
   let consumidoP = 0;
   let consumidoC = 0;
   let consumidoG = 0;
 
-  comidasHechas.forEach((comida) => {
+  todasComidas.forEach((comida) => {
     const nut = obtenerNutricionComida(comida);
     consumidoKcal += nut.kcal;
     consumidoP += nut.p;
@@ -325,10 +580,87 @@ export function actualizarContadorAgua() {
   contador.textContent = `${tomadosLitros} de ${metaLitros} L`;
 }
 
-// Inicialización de resúmenes
+export const CLAVE_STORAGE_ESTADOS = 'estados-comidas-alumno';
+export const CLAVE_STORAGE_AGUA = 'vasos-agua-alumno';
+
+export function obtenerEstadosComidas() {
+  try {
+    const raw = sessionStorage.getItem(CLAVE_STORAGE_ESTADOS);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (typeof parsed === 'object' && parsed !== null) return parsed;
+    }
+  } catch {
+    // Ignorar
+  }
+  return {};
+}
+
+export function guardarEstadosComidas(estados) {
+  try {
+    sessionStorage.setItem(CLAVE_STORAGE_ESTADOS, JSON.stringify(estados));
+  } catch {
+    // Ignorar
+  }
+}
+
+export function restaurarEstadosComidas() {
+  const estados = obtenerEstadosComidas();
+  document.querySelectorAll(SELECTORES.comidas).forEach((comida) => {
+    const tit = comida.querySelector('.comida__titulo')?.textContent?.trim();
+    if (tit && estados[tit]) {
+      comida.dataset.estado = estados[tit];
+    }
+  });
+}
+
+export function obtenerVasosAguaGuardados() {
+  try {
+    const raw = sessionStorage.getItem(CLAVE_STORAGE_AGUA);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return parsed;
+    }
+  } catch {
+    // Ignorar
+  }
+  return [];
+}
+
+export function guardarVasosAgua(indices) {
+  try {
+    sessionStorage.setItem(CLAVE_STORAGE_AGUA, JSON.stringify(indices));
+  } catch {
+    // Ignorar
+  }
+}
+
+export function restaurarVasosAgua() {
+  const indices = new Set(obtenerVasosAguaGuardados());
+  const vasos = document.querySelectorAll(SELECTORES.vasosAgua);
+  vasos.forEach((vaso, i) => {
+    vaso.setAttribute('aria-pressed', String(indices.has(i)));
+  });
+}
+
+// Inicialización de datos y resúmenes reactivos
+procesarReemplazoPendiente();
+renderizarAlimentosEnComidas();
+restaurarEstadosComidas();
 actualizarContadorComidas();
 actualizarResumenNutricional();
+restaurarVasosAgua();
 actualizarContadorAgua();
+
+window.addEventListener('pageshow', () => {
+  procesarReemplazoPendiente();
+  renderizarAlimentosEnComidas();
+  restaurarEstadosComidas();
+  actualizarContadorComidas();
+  actualizarResumenNutricional();
+  restaurarVasosAgua();
+  actualizarContadorAgua();
+});
 
 document.querySelectorAll(SELECTORES.botonLoComi).forEach((boton) => {
   boton.addEventListener('click', (evento) => {
@@ -337,8 +669,13 @@ document.querySelectorAll(SELECTORES.botonLoComi).forEach((boton) => {
     if (!comida) return;
     comida.dataset.estado = 'hecha';
     ultimaComidaRegistrada = comida;
+    const tit = comida.querySelector('.comida__titulo')?.textContent?.trim();
+    if (tit) {
+      const estados = obtenerEstadosComidas();
+      estados[tit] = 'hecha';
+      guardarEstadosComidas(estados);
+    }
     actualizarContadorComidas();
-    actualizarResumenNutricional();
 
     if (avisoComida) {
       const tituloComida = comida.querySelector('.comida__titulo')?.textContent?.trim() || 'Comida';
@@ -362,9 +699,14 @@ const botonDeshacer = avisoComida?.querySelector('.aviso-flotante__accion') || d
 botonDeshacer?.addEventListener('click', () => {
   if (ultimaComidaRegistrada) {
     ultimaComidaRegistrada.dataset.estado = 'pendiente';
+    const tit = ultimaComidaRegistrada.querySelector('.comida__titulo')?.textContent?.trim();
+    if (tit) {
+      const estados = obtenerEstadosComidas();
+      estados[tit] = 'pendiente';
+      guardarEstadosComidas(estados);
+    }
     ultimaComidaRegistrada = null;
     actualizarContadorComidas();
-    actualizarResumenNutricional();
   }
   if (avisoComida) avisoComida.hidden = true;
   if (temporizadorComida) {
@@ -374,10 +716,15 @@ botonDeshacer?.addEventListener('click', () => {
 });
 
 // ---------- Vasos de agua: alternar estado ----------
-document.querySelectorAll(SELECTORES.vasosAgua).forEach((vaso) => {
+document.querySelectorAll(SELECTORES.vasosAgua).forEach((vaso, idx) => {
   vaso.addEventListener('click', () => {
     const presionado = vaso.getAttribute('aria-pressed') === 'true';
     vaso.setAttribute('aria-pressed', String(!presionado));
+    const presionados = [];
+    document.querySelectorAll(SELECTORES.vasosAgua).forEach((v, i) => {
+      if (v.getAttribute('aria-pressed') === 'true') presionados.push(i);
+    });
+    guardarVasosAgua(presionados);
     actualizarContadorAgua();
   });
 });
