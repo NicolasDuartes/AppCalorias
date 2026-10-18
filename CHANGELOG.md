@@ -2,6 +2,20 @@
 
 Este documento registra los hitos de versiones **Mayores (Major)** y **Medianas (Minor)** de la aplicación con resúmenes ejecutivos concisos ($\le 10$ renglones). Los cambios atómicos y parches específicos se registran directamente en los commits de Git bajo la convención *Conventional Commits*.
 
+## [v0.5.0] — 18/10/2026
+- **Tipo:** Versión Mayor (Arquitectura Frontend 100% Modular, Conexión Supabase y Controladores de Ciclo de Vida de Planes)
+- **Fecha:** 18 de Octubre de 2026
+- **Resumen:**
+  1. Arquitectura 100% modular y desacoplada: Los 20 HTMLs poseen su controlador UI dedicado en `frontend/js/ui/` con mapas `SELECTORES` centralizados, permitiendo alterar el HTML libremente sin tocar la lógica.
+  2. Limpieza total de navegacion.js: Aislada como biblioteca utilitaria pura (toasts, historia inteligente, accesibilidad WCAG y sanitización decimal) con grafo acíclico en los 32 módulos JS.
+  3. Conexión nativa con Supabase: Capa de datos en `frontend/js/data/` (`alimentos-api.js`, `planes-api.js`, `registro-api.js`) conectada a RPCs (`buscar_alimentos`), tablas relacionales y RLS.
+  4. Hidratación asíncrona y resiliencia offline: Dashboard y Reemplazar sincronizan con Supabase en tiempo real conservando fallback transparente a `sessionStorage` para navegación sin conexión o modo prueba.
+  5. Ciclo de vida completo de planes para el Coach: Nuevos controladores para creación, edición reactiva (Atwater 4P+4C+9G), activación y archivado en línea de tiempo (`plan-activo-ui.js`, `historial-ui.js`, `plan-nuevo-ui.js`).
+  6. Motor metabólico en contexto energético: Cálculo interactivo de TMB (Mifflin-St Jeor), NEAT, entreno, TEF, TDEE y alertas de seguridad ante déficits excesivos.
+  7. Verificación integral automatizada: 10 suites de prueba superadas al 100% (validación sintáctica, integridad de enlaces, navegación en Chromium/Edge headless, estructura de APIs y suites de modularización).
+
+---
+
 ## [v0.4.4] — 17/10/2026
 - **Tipo:** Versión Menor (Tarjetas Vacías Iniciales en Cero, Redirección a Agregar y Total Acumulado en Dashboard Superior)
 - **Fecha:** 17 de Octubre de 2026
