@@ -11,9 +11,7 @@
 
 import { normalizarDecimal } from '../calc/formato-calc.js';
 
-// Re-exportaciones para preservar compatibilidad con código existente
-export { ALIMENTOS_PLAN_DEFECTO } from '../data/plan-defecto.js';
-export { actualizarResumenPieAgregar } from '../ui/agregar-ui.js';
+
 
 let temporizadorToast = null;
 
