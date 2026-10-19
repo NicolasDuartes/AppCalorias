@@ -2,6 +2,19 @@
 
 Este documento registra los hitos de versiones **Mayores (Major)** y **Medianas (Minor)** de la aplicación con resúmenes ejecutivos concisos ($\le 10$ renglones). Los cambios atómicos y parches específicos se registran directamente en los commits de Git bajo la convención *Conventional Commits*.
 
+## [v0.5.1] — 19/10/2026
+- **Tipo:** Versión Menor / Parche (Documentación Raíz y Estándares de Arquitectura)
+- **Fecha:** 19 de Octubre de 2026
+- **Resumen:**
+  1. README.md formal en la raíz: Visión del producto, arquitectura Vanilla Web, puesta en marcha con iniciar.bat e índice técnico.
+  2. Guía de contribución CONTRIBUTING.md: Estándares de desarrollo buildless, obligatoriedad del mapa SELECTORES y ciclo de validación.
+  3. Plantilla .env.example: Documentación de variables de Supabase con advertencias de seguridad y políticas RLS.
+  4. Capa de datos documentada: frontend/js/data/README.md detallando los contratos y fallbacks de los 7 módulos de persistencia.
+  5. Árbol de archivos sincronizado: Leemewacho.md actualizado al 100% reflejando los 33 módulos JS y las 20 pantallas HTML.
+  6. Diccionario de datos actualizado: supabase/ESQUEMA.md alineado con el estado real de tablas conectadas y deprecadas.
+
+---
+
 ## [v0.5.0] — 18/10/2026
 - **Tipo:** Versión Mayor (Arquitectura Frontend 100% Modular, Conexión Supabase y Controladores de Ciclo de Vida de Planes)
 - **Fecha:** 18 de Octubre de 2026

@@ -71,6 +71,11 @@ rutas de las páginas son relativas a esa carpeta.
   `plan-nuevo-ui.js`, `historial-ui.js`, `plan-archivado-ui.js`); y motor
   metabólico interactivo en `contexto.html` (Mifflin-St Jeor, NEAT, METs,
   TEF, TDEE y alertas de seguridad).
+- Documentación raíz formalizada (v0.5.1): creación de `README.md` principal,
+  `CONTRIBUTING.md` con estándares de arquitectura y mapas `SELECTORES`,
+  plantilla `.env.example`, documentación técnica en `frontend/js/data/README.md`,
+  actualización del árbol de 33 módulos en `Leemewacho.md` y sincronización de
+  tablas en `supabase/ESQUEMA.md`.
 
 ## 4. Pendiente (Tareas Priorizadas)
 
@@ -134,9 +139,8 @@ rutas de las páginas son relativas a esa carpeta.
    - Mover las 10 suites de `scratch/` a una carpeta `tests/` versionada en Git.
 2. **Integración Continua (CI):**
    - Configurar GitHub Actions (`.github/workflows/ci.yml`) para ejecutar validación sintáctica, integridad de enlaces y suites de modularización en cada PR.
-3. **Completar documentación raíz:**
-   - Crear `README.md` formal (reemplazando `Leemewacho.md`).
-   - Crear `.env.example` con instrucciones de conexión a Supabase.
-   - Crear `CONTRIBUTING.md` con los lineamientos del mapa `SELECTORES` y ciclo de testing.
+3. **Completar documentación raíz [Completado - 19/10/2026]:**
+   - Creados `README.md` formal, `CONTRIBUTING.md`, `.env.example` y `frontend/js/data/README.md`.
+   - Sincronizados `Leemewacho.md` y `supabase/ESQUEMA.md`.
 4. **Resiliencia offline del SDK de Supabase:**
    - Empaquetar copia estática local (`vendor/supabase-js.js`) para evitar dependencia exclusiva de CDN jsdelivr.
