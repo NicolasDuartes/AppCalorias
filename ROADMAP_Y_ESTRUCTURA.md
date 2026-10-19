@@ -56,34 +56,87 @@ rutas de las páginas son relativas a esa carpeta.
   el HTML; DESIGN.md reescrito; borrado el JS que no se usaba.
 - Responsive: sin marco de teléfono; desde 768 px menú lateral y contenido
   en una columna centrada.
+- Estabilización de navegación y feedback visual (v0.4.0 - v0.4.2): módulo
+  `navegacion.js` con historial inteligente, toasts inter-páginas persistidos
+  en `sessionStorage`, sanitización decimal transparente y validación Atwater
+  reactiva (4P + 4C + 9G).
+- Motor de equivalencias y datos reales (v0.4.3 - v0.4.4): cálculo analítico
+  de porciones equitativas en `reemplazar.html`, tarjetas vacías en cero sin
+  alimentos forzados, y acumulador total en dashboard superior.
+- Arquitectura 100% modular y conexión Supabase (v0.5.0): 20 HTMLs con
+  controladores UI dedicados en `frontend/js/ui/` y mapas `SELECTORES`
+  centralizados; capa de datos en `frontend/js/data/` (`alimentos-api.js`,
+  `planes-api.js`, `registro-api.js`) con fallback transparente; ciclo de
+  vida de planes para el coach (`plan-activo-ui.js`, `plan-editor-ui.js`,
+  `plan-nuevo-ui.js`, `historial-ui.js`, `plan-archivado-ui.js`); y motor
+  metabólico interactivo en `contexto.html` (Mifflin-St Jeor, NEAT, METs,
+  TEF, TDEE y alertas de seguridad).
 
-## 4. Pendiente
+## 4. Pendiente (Tareas Priorizadas)
 
-### Frontend
+### Prioridad 1: Seguridad y Robustez Inmediata (Bugs Críticos)
 
-1. **Onboarding del alumno:** 5 pasos (sexo, fecha de nacimiento, peso y
-   altura, actividad, objetivo) que arman el contexto energético.
-2. **Comidas (falta conectar datos):** las plantillas ya están (tarjetas del
-   dashboard, `cantidad.html`, `reemplazar.html`, `agregar.html`,
-   `crear-alimento.html` y `editar-alimento.html`), con "—" donde van los
-   datos. Falta la API de alimentos, el algoritmo de equivalencias y el JS
-   que llena las pantallas y guarda los cambios.
-3. **Perfil:** ID de cliente como chip, nombre en solo lectura y
-   preferencias guardadas.
-4. **Coach:** ficha de solo lectura del cliente, con "Editar" por bloque.
-5. **Contexto energético:** el alumno ve solo su meta diaria; el desglose
-   (BMR, NEAT, TDEE) queda para el coach.
-6. **Paleta:** decidir si se adopta la de PROPUESTADESIGN.md (Inter y
-   emerald) o se queda la actual.
+1. **Sanitización contra DOM-XSS:**
+   - Aplicar `escaparHtml()` en `dashboard-ui.js` (L592) y `buscar-alimento-ui.js` (L137) al interpolar nombres de alimentos y macronutrientes en `innerHTML`.
+2. **Corrección de flujo de archivado en `plan-activo-ui.js`:**
+   - Retener `res.plan.id` al consultar `obtenerPlanActivo(clienteId)` para que el botón "Finalizar plan" invoque efectivamente `archivarPlan()` en Supabase.
+3. **Corrección de vista vacía en `plan-editor-ui.js`:**
+   - Mover la configuración de los botones `SELECTORES.btnAnadir` fuera del condicional `if (!filaAlimento) return;` para que `plan-editor-vacio.html` propague el parámetro `?comida=...` a `buscar-alimento.html`.
+4. **Resolución asíncrona de sesión en Dashboard:**
+   - Asegurar `await exigirRol('alumno')` en la inicialización de `dashboard-ui.js` para prevenir condiciones de carrera al resolver `usuarioActualId`.
 
-### Base de datos
+### Prioridad 2: Conexión Integral de Stubs y Capa de Datos
 
-- **Alimentos:** migración `20261017120000_alimentos.sql` aplicada (alimentos
-  cada 100 g, categorías, revisión por el coach, correcciones y búsqueda),
-  con 165 alimentos de USDA cargados. Falta conectar las pantallas de comidas
-  y sumar productos envasados (Open Food Facts).
+1. **Creación del módulo `frontend/js/data/contexto-api.js`:**
+   - Desacoplar `contexto-ui.js` y persistir el cálculo metabólico en la tabla `contextos_energeticos` al presionar "Guardar contexto".
+   - Conectar lectura y actualización de `permisos_alumno`.
+2. **Ampliación de `planes-api.js`:**
+   - Implementar función `obtenerPlanPorId(planId)` con sus comidas e ítems para permitir la hidratación de `plan-archivado.html`.
+3. **Conexión real de `plan-ui.js` (Alumno):**
+   - Sustituir el stub `cargarPlanActivo()` que lee del DOM estático por el consumo asíncrono de `obtenerPlanActivo(alumnoId)` de `planes-api.js`.
+4. **Rediseño y conexión de formularios de alimentos (`crear-alimento.html` y `editar-alimento.html`):**
+   - Incorporar selector visual de `categoria` (campo obligatorio `NOT NULL` en PostgreSQL) y campo oculto `alimento_id`.
+   - Modificar `alimento-form-ui.js` para interceptar el `submit` con `preventDefault()` y ejecutar `crearAlimento()` o `proponerCorreccion()`.
+5. **Transferencia de alimentos al editor de planes:**
+   - Utilizar `sessionStorage` o query strings en `buscar-alimento-ui.js` para transferir el alimento seleccionado a `plan-editor.html` e insertarlo reactivamente en la comida.
+6. **Persistencia de pesajes en `objetivo-ui.js`:**
+   - Conectar la regla analógica de peso con una tabla histórica en Supabase para no perder el pesaje al recargar.
+7. **Estandarización de navegación del Coach:**
+   - Unificar el paso de parámetros en el panel del coach migrando de fragmentos hash (`#id=...`) a query strings (`?cliente=UUID`).
 
-- Migración que quite la tabla `antropometrias` y lo relacionado.
-- Preferencias del alumno en una tabla propia, visibles para el coach.
-- Criterios del coach (rangos, ajustes) en una tabla que solo él lea.
-- Restringir el alta de cuentas de coach (invitación o aprobación).
+### Prioridad 3: Flujos de Usuario Faltantes
+
+1. **Onboarding del alumno (`onboarding.html`):**
+   - Asistente de 5 pasos post-registro (sexo, fecha de nacimiento, peso y altura, actividad física NEAT/METs, objetivo calórico) para poblar el primer contexto energético.
+2. **Panel de moderación y revisión de alimentos del Coach:**
+   - Interfaz en el panel del coach para listar alimentos en estado `'pendiente'` y aprobarlos o rechazarlos usando los RPCs `revisar_alimento` y `revisar_correccion`.
+3. **Gestión visual de `permisos_alumno`:**
+   - Interfaz para que el coach habilite o deshabilite las secciones editables del alumno (`contexto`, `plan`).
+
+### Prioridad 4: Base de Datos y Robustez Transaccional
+
+1. **Migración de limpieza de tablas zombies:**
+   - Crear migración que aplique `DROP TABLE IF EXISTS public.antropometrias, public.alumnos CASCADE;`.
+2. **Migración baseline de planes y logs:**
+   - Crear archivo DDL formal en `supabase/migrations/` para versionar `meal_plans`, `plan_meals`, `plan_items`, `daily_logs` y `logged_items`.
+3. **RPC transaccional `guardar_plan_completo`:**
+   - Crear procedimiento almacenado en PostgreSQL para encapsular el borrado e inserción atómica de comidas e ítems protegiendo contra cortes de conexión.
+4. **Trigger PostgreSQL para totales diarios:**
+   - Migrar la sumatoria de `recalcularTotalesLog` a un trigger `AFTER INSERT OR UPDATE OR DELETE ON logged_items`.
+5. **Tabla histórica `registro_pesajes`:**
+   - Crear tabla liviana `(id, alumno_id, peso_kg, fecha, created_at)` con RLS.
+6. **Protección contra enumeración en `usuario_disponible`:**
+   - Implementar rate limiting o mover la verificación a endpoint protegido.
+
+### Prioridad 5: Infraestructura, Testing y Documentación
+
+1. **Versionar las suites de prueba:**
+   - Mover las 10 suites de `scratch/` a una carpeta `tests/` versionada en Git.
+2. **Integración Continua (CI):**
+   - Configurar GitHub Actions (`.github/workflows/ci.yml`) para ejecutar validación sintáctica, integridad de enlaces y suites de modularización en cada PR.
+3. **Completar documentación raíz:**
+   - Crear `README.md` formal (reemplazando `Leemewacho.md`).
+   - Crear `.env.example` con instrucciones de conexión a Supabase.
+   - Crear `CONTRIBUTING.md` con los lineamientos del mapa `SELECTORES` y ciclo de testing.
+4. **Resiliencia offline del SDK de Supabase:**
+   - Empaquetar copia estática local (`vendor/supabase-js.js`) para evitar dependencia exclusiva de CDN jsdelivr.
