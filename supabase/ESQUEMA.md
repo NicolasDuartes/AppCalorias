@@ -26,14 +26,14 @@ erDiagram
 | Tabla | Qué guarda | Estado |
 |---|---|---|
 | `profiles` | Cuenta: rol, @usuario, ID de cliente, coach, sexo, fecha de nacimiento. | En uso |
-| `permisos_alumno` | Secciones que el coach le habilita al alumno. | Nueva, sin pantalla todavía |
-| `contextos_energeticos` | Gasto energético y calorías objetivo (historial). | Nueva, sin pantalla todavía |
-| `antropometrias` | Mediciones corporales y composición (historial). | Nueva, sin pantalla todavía |
-| `meal_plans`, `plan_meals`, `plan_items` | Planes alimenticios. | Existen, sin conectar |
-| `daily_logs`, `logged_items` | Registro diario del alumno. | Existen, sin conectar |
-| `coach_alumno_summary` | Vista de resumen para el coach. | Existe, sin conectar |
-| `categorias_alimento`, `alimentos`, `correcciones_alimento` | Base propia de alimentos (cada 100 g) y sus correcciones. | Nueva, sin pantalla todavía |
-| `alumnos` | Tabla vieja sin uso. Bloqueada. | Para borrar |
+| `permisos_alumno` | Secciones que el coach le habilita al alumno. | En esquema (pendiente interfaz UI) |
+| `contextos_energeticos` | Gasto energético y calorías objetivo (historial). | En esquema (pendiente conectar contexto-ui) |
+| `antropometrias` | Mediciones corporales y composición (historial). | Descartada por diseño (pendiente DROP TABLE) |
+| `meal_plans`, `plan_meals`, `plan_items` | Planes alimenticios y sus comidas. | En uso (conectadas vía planes-api.js) |
+| `daily_logs`, `logged_items` | Registro diario del alumno y agua consumida. | En uso (conectadas vía registro-api.js) |
+| `coach_alumno_summary` | Vista de resumen para el coach. | En esquema (vista SQL auxiliar) |
+| `categorias_alimento`, `alimentos`, `correcciones_alimento` | Base propia de alimentos (cada 100 g), USDA y correcciones. | En uso (conectadas vía alimentos-api.js) |
+| `alumnos` | Tabla vieja pre-migraciones sin uso. Bloqueada. | Deprecada (pendiente DROP TABLE) |
 
 ## Cuentas y vínculo (`profiles`)
 
