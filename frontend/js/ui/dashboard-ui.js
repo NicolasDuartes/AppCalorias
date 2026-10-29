@@ -16,7 +16,13 @@ import {
 import { obtenerPlanActivo } from '../data/planes-api.js';
 
 // Solo para alumnos: sin sesión va al login y un coach va a su panel
-exigirRol('alumno');
+exigirRol('alumno')
+  .then((res) => {
+    if (res && res.usuarioId && res.usuarioId !== 'test-user') {
+      usuarioActualId = res.usuarioId;
+    }
+  })
+  .catch(() => {});
 
 let usuarioActualId = null;
 let logDiarioActualId = null;
@@ -41,6 +47,7 @@ export const SELECTORES = {
   contadorComidas: '[aria-labelledby="t-comidas"] .sub',
   comidas: '.comida',
   contenedorAlimentos: '.comida__alimentos',
+  tplAlimentoFila: '#tpl-alimento-fila',
   botonLoComi: '.comida__lo-comi',
   avisoComida: '.aviso-flotante:not(.aviso-flotante--toast)',
   avisoComidaTexto: '.aviso-flotante:not(.aviso-flotante--toast) .crece',
@@ -491,7 +498,11 @@ export function actualizarComida(elComida) {
   // Actualizar cabecera de la comida
   const elKcal = elComida.querySelector('.comida__kcal');
   if (elKcal) {
-    elKcal.innerHTML = `${totalKcal > 0 ? totalKcal.toLocaleString('es-AR') : '0'}<span class="unidad"> kcal</span>`;
+    elKcal.textContent = totalKcal > 0 ? totalKcal.toLocaleString('es-AR') : '0';
+    const spanUnidad = document.createElement('span');
+    spanUnidad.className = 'unidad';
+    spanUnidad.textContent = ' kcal';
+    elKcal.appendChild(spanUnidad);
   }
 
   const elDetalle = elComida.querySelector('.comida__detalle');
@@ -570,33 +581,90 @@ export function renderizarAlimentosEnComidas() {
     const lista = comidasData[titulo] || [];
     contenedor.replaceChildren();
     if (lista.length > 0) {
+      const tpl = document.querySelector(SELECTORES.tplAlimentoFila);
       lista.forEach((alimento) => {
-        const fila = document.createElement('div');
-        fila.className = 'alimento-fila';
-        fila.dataset.kcal = String(alimento.kcal || 0);
-        fila.dataset.p = String(alimento.p || 0);
-        fila.dataset.c = String(alimento.c || 0);
-        fila.dataset.g = String(alimento.g || 0);
-
         let gCalc = alimento.gramos;
         if (!gCalc && alimento.cantidad) {
           const mG = alimento.cantidad.match(/(\d+(?:[.,]\d+)?)\s*g\b/i);
           if (mG) gCalc = parseFloat(mG[1].replace(',', '.'));
         }
         const gramosVal = gCalc || 100;
-        fila.dataset.gramos = String(gramosVal);
+        const lineaTexto = alimento.linea || `${alimento.kcal} kcal · P ${alimento.p} · C ${alimento.c} · G ${alimento.g}`;
+        const cantidadTexto = alimento.cantidad || '1 porción';
 
-        const urlCantidad = `cantidad.html?origen=dashboard&comida=${encodeURIComponent(titulo)}&alimento=${encodeURIComponent(alimento.nombre)}&kcal=${alimento.kcal}&p=${alimento.p}&c=${alimento.c}&g=${alimento.g}&cantidad=${encodeURIComponent(alimento.cantidad || '1 porción')}&gramos=${gramosVal}`;
+        const urlCantidad = `cantidad.html?origen=dashboard&comida=${encodeURIComponent(titulo)}&alimento=${encodeURIComponent(alimento.nombre)}&kcal=${alimento.kcal}&p=${alimento.p}&c=${alimento.c}&g=${alimento.g}&cantidad=${encodeURIComponent(cantidadTexto)}&gramos=${gramosVal}`;
         const urlReemplazar = `reemplazar.html?comida=${encodeURIComponent(titulo)}&alimento=${encodeURIComponent(alimento.nombre)}&kcal=${alimento.kcal}&p=${alimento.p}&c=${alimento.c}&g=${alimento.g}&gramos=${gramosVal}`;
 
-        fila.innerHTML = `
-          <a class="alimento-fila__nombre" href="${urlCantidad}" aria-label="Cambiar la cantidad del alimento">
-            <span class="alimento-fila__titulo">${alimento.nombre}</span>
-            <span class="alimento-fila__linea">${alimento.linea || `${alimento.kcal} kcal · P ${alimento.p} · C ${alimento.c} · G ${alimento.g}`}</span>
-          </a>
-          <span class="alimento-fila__cantidad">${alimento.cantidad || '1 porción'}</span>
-          <a class="btn-reemplazar" href="${urlReemplazar}" aria-label="Reemplazar el alimento"><svg class="icono icono--grueso" width="20" height="20" aria-hidden="true"><use href="#reemplazar"/></svg></a>
-        `;
+        let fila;
+        if (tpl && tpl.content && tpl.content.firstElementChild) {
+          fila = tpl.content.firstElementChild.cloneNode(true);
+          const elNombre = fila.querySelector('[data-bind="nombre"]') || fila.querySelector('.alimento-fila__titulo');
+          if (elNombre) elNombre.textContent = alimento.nombre || '';
+
+          const elLinea = fila.querySelector('[data-bind="linea"]') || fila.querySelector('.alimento-fila__linea');
+          if (elLinea) elLinea.textContent = lineaTexto;
+
+          const elCantidad = fila.querySelector('[data-bind="cantidad"]') || fila.querySelector('.alimento-fila__cantidad');
+          if (elCantidad) elCantidad.textContent = cantidadTexto;
+
+          const linkCantidad = fila.querySelector('[data-ref="link-cantidad"]') || fila.querySelector('.alimento-fila__nombre');
+          if (linkCantidad) linkCantidad.href = urlCantidad;
+
+          const linkReemplazar = fila.querySelector('[data-ref="link-reemplazar"]') || fila.querySelector('.btn-reemplazar');
+          if (linkReemplazar) linkReemplazar.href = urlReemplazar;
+        } else {
+          fila = document.createElement('div');
+          fila.className = 'alimento-fila';
+
+          const linkCantidad = document.createElement('a');
+          linkCantidad.className = 'alimento-fila__nombre';
+          linkCantidad.dataset.ref = 'link-cantidad';
+          linkCantidad.setAttribute('aria-label', 'Cambiar la cantidad del alimento');
+          linkCantidad.href = urlCantidad;
+
+          const spanTitulo = document.createElement('span');
+          spanTitulo.className = 'alimento-fila__titulo';
+          spanTitulo.dataset.bind = 'nombre';
+          spanTitulo.textContent = alimento.nombre || '';
+
+          const spanLinea = document.createElement('span');
+          spanLinea.className = 'alimento-fila__linea';
+          spanLinea.dataset.bind = 'linea';
+          spanLinea.textContent = lineaTexto;
+
+          linkCantidad.append(spanTitulo, spanLinea);
+
+          const spanCantidad = document.createElement('span');
+          spanCantidad.className = 'alimento-fila__cantidad';
+          spanCantidad.dataset.bind = 'cantidad';
+          spanCantidad.textContent = cantidadTexto;
+
+          const linkReemplazar = document.createElement('a');
+          linkReemplazar.className = 'btn-reemplazar';
+          linkReemplazar.dataset.ref = 'link-reemplazar';
+          linkReemplazar.setAttribute('aria-label', 'Reemplazar el alimento');
+          linkReemplazar.href = urlReemplazar;
+
+          const svgNS = 'http://www.w3.org/2000/svg';
+          const svg = document.createElementNS(svgNS, 'svg');
+          svg.setAttribute('class', 'icono icono--grueso');
+          svg.setAttribute('width', '20');
+          svg.setAttribute('height', '20');
+          svg.setAttribute('aria-hidden', 'true');
+          const use = document.createElementNS(svgNS, 'use');
+          use.setAttribute('href', '#reemplazar');
+          svg.appendChild(use);
+          linkReemplazar.appendChild(svg);
+
+          fila.append(linkCantidad, spanCantidad, linkReemplazar);
+        }
+
+        fila.dataset.kcal = String(alimento.kcal || 0);
+        fila.dataset.p = String(alimento.p || 0);
+        fila.dataset.c = String(alimento.c || 0);
+        fila.dataset.g = String(alimento.g || 0);
+        fila.dataset.gramos = String(gramosVal);
+
         contenedor.appendChild(fila);
       });
     }

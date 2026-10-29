@@ -33,6 +33,7 @@ export const SELECTORES = {
   bloqueResultados: '.columna.gap-2xs',
   tituloResultados: '.columna.gap-2xs .antetitulo',
   contenedorReemplazos: '.reemplazos',
+  tplReemplazoOpcion: '#tpl-reemplazo-opcion',
   sinResultados: '.nota-centrada',
 
   // Pie y confirmación
@@ -161,12 +162,146 @@ export function renderizarEncabezado(alimentoObjetivo, mapaSelectores = SELECTOR
   }
 
   if (elTitulo) {
-    elTitulo.innerHTML = `${escaparHtml(alimentoObjetivo.nombre)} <span class="texto-gris">${alimentoObjetivo.gramos} g</span>`;
+    elTitulo.textContent = `${alimentoObjetivo.nombre} `;
+    const spanGris = document.createElement('span');
+    spanGris.className = 'texto-gris';
+    spanGris.textContent = `${alimentoObjetivo.gramos} g`;
+    elTitulo.appendChild(spanGris);
   }
 
   if (elSubtitulo) {
     elSubtitulo.textContent = `${alimentoObjetivo.kcal} kcal · P ${alimentoObjetivo.p} · C ${alimentoObjetivo.c} · G ${alimentoObjetivo.g}`;
   }
+}
+
+/**
+ * Crea un nodo DOM para una tarjeta de reemplazo individual clonando #tpl-reemplazo-opcion
+ * o construyendo los elementos de forma segura con textContent.
+ *
+ * @param {Object} candidato - Alimento alternativo.
+ * @param {Object} calculo - Resultado del cálculo de equivalencia directa.
+ * @param {boolean} [esSeleccionado=false] - Si la opción está marcada como activa.
+ * @param {Object} [mapaSelectores=SELECTORES]
+ * @returns {HTMLButtonElement}
+ */
+export function crearElementoTarjetaReemplazo(candidato, calculo, esSeleccionado = false, mapaSelectores = SELECTORES) {
+  const nivel = calculo.nivel || 'no';
+  let tagClase = 'tag--verde';
+  let nivelTexto = 'Equivalente';
+
+  if (nivel === 'parcial') {
+    tagClase = 'tag--naranja';
+    nivelTexto = 'Equivalencia parcial';
+  } else if (nivel === 'no') {
+    tagClase = 'tag--gris';
+    nivelTexto = 'No equivalente';
+  }
+
+  const macroLinea = `${calculo.aportes.kcal} kcal · P ${calculo.aportes.proteinas} · C ${calculo.aportes.carbohidratos} · G ${calculo.aportes.grasas}`;
+  const idValor = String(candidato.id || candidato.nombre || '');
+
+  const selectorTpl = (mapaSelectores && mapaSelectores.tplReemplazoOpcion) || SELECTORES.tplReemplazoOpcion;
+  const tpl = typeof document !== 'undefined' ? document.querySelector(selectorTpl) : null;
+
+  if (tpl && tpl.content && tpl.content.firstElementChild) {
+    const btn = tpl.content.firstElementChild.cloneNode(true);
+    btn.className = 'reemplazo';
+    btn.type = 'button';
+    btn.setAttribute('role', 'radio');
+    btn.setAttribute('aria-checked', esSeleccionado ? 'true' : 'false');
+    btn.setAttribute('tabindex', esSeleccionado ? '0' : '-1');
+    btn.dataset.nivel = nivel;
+    btn.dataset.id = idValor;
+
+    const elNombre = btn.querySelector('[data-bind="nombre"]') || btn.querySelector('.alimento-fila__titulo');
+    if (elNombre) elNombre.textContent = candidato.nombre || '';
+
+    const elNivel = btn.querySelector('[data-bind="nivel"]') || btn.querySelector('.reemplazo__nivel');
+    if (elNivel) elNivel.textContent = nivelTexto;
+
+    const elLinea = btn.querySelector('[data-bind="linea"]') || btn.querySelector('.alimento-fila__linea');
+    if (elLinea) elLinea.textContent = macroLinea;
+
+    const elDivergencia = btn.querySelector('[data-bind="divergencia"]') || btn.querySelector('.sub.texto-12');
+    if (elDivergencia) {
+      if (nivel === 'parcial' && calculo.mensajeDivergencia) {
+        elDivergencia.textContent = calculo.mensajeDivergencia;
+        elDivergencia.hidden = false;
+      } else {
+        elDivergencia.remove();
+      }
+    } else if (nivel === 'parcial' && calculo.mensajeDivergencia) {
+      const cuerpo = btn.querySelector('[data-ref="cuerpo"]') || btn.querySelector('.crece.columna');
+      if (cuerpo) {
+        const spanDiv = document.createElement('span');
+        spanDiv.className = 'sub texto-12';
+        spanDiv.textContent = calculo.mensajeDivergencia;
+        cuerpo.appendChild(spanDiv);
+      }
+    }
+
+    const elCantidad = btn.querySelector('[data-bind="cantidad"]') || btn.querySelector('.alimento-fila__cantidad');
+    if (elCantidad) elCantidad.textContent = calculo.textoCantidad || '';
+
+    const elTag = btn.querySelector('[data-bind="adherencia"]') || btn.querySelector('.tag');
+    if (elTag) {
+      elTag.className = `tag ${tagClase}`;
+      elTag.textContent = `${calculo.adherencia}%`;
+    }
+
+    return btn;
+  }
+
+  const btn = document.createElement('button');
+  btn.className = 'reemplazo';
+  btn.type = 'button';
+  btn.setAttribute('role', 'radio');
+  btn.setAttribute('aria-checked', esSeleccionado ? 'true' : 'false');
+  btn.setAttribute('tabindex', esSeleccionado ? '0' : '-1');
+  btn.dataset.nivel = nivel;
+  btn.dataset.id = idValor;
+
+  const spanRadio = document.createElement('span');
+  spanRadio.className = 'radio';
+
+  const spanCuerpo = document.createElement('span');
+  spanCuerpo.className = 'crece columna gap-2xs';
+
+  const spanTitulo = document.createElement('span');
+  spanTitulo.className = 'alimento-fila__titulo';
+  spanTitulo.textContent = candidato.nombre || '';
+
+  const spanNivel = document.createElement('span');
+  spanNivel.className = 'reemplazo__nivel';
+  spanNivel.textContent = nivelTexto;
+
+  const spanLinea = document.createElement('span');
+  spanLinea.className = 'alimento-fila__linea';
+  spanLinea.textContent = macroLinea;
+
+  spanCuerpo.append(spanTitulo, spanNivel, spanLinea);
+
+  if (nivel === 'parcial' && calculo.mensajeDivergencia) {
+    const spanDiv = document.createElement('span');
+    spanDiv.className = 'sub texto-12';
+    spanDiv.textContent = calculo.mensajeDivergencia;
+    spanCuerpo.appendChild(spanDiv);
+  }
+
+  const spanLado = document.createElement('span');
+  spanLado.className = 'reemplazo__lado';
+
+  const spanCantidad = document.createElement('span');
+  spanCantidad.className = 'alimento-fila__cantidad';
+  spanCantidad.textContent = calculo.textoCantidad || '';
+
+  const spanTag = document.createElement('span');
+  spanTag.className = `tag ${tagClase}`;
+  spanTag.textContent = `${calculo.adherencia}%`;
+
+  spanLado.append(spanCantidad, spanTag);
+  btn.append(spanRadio, spanCuerpo, spanLado);
+  return btn;
 }
 
 /**
@@ -178,6 +313,9 @@ export function renderizarEncabezado(alimentoObjetivo, mapaSelectores = SELECTOR
  * @returns {string} Markup HTML del botón con role="radio".
  */
 export function renderizarTarjetaReemplazo(candidato, calculo, esSeleccionado = false) {
+  if (typeof document !== 'undefined') {
+    return crearElementoTarjetaReemplazo(candidato, calculo, esSeleccionado).outerHTML;
+  }
   const nivel = calculo.nivel || 'no';
   let tagClase = 'tag--verde';
   let nivelTexto = 'Equivalente';
@@ -294,7 +432,7 @@ export function ejecutarBusqueda(termino, alimentoObjetivo, mapaSelectores = SEL
     if (elBloqueResultados) elBloqueResultados.hidden = true;
     if (elContenedorReemplazos) {
       elContenedorReemplazos.hidden = true;
-      elContenedorReemplazos.innerHTML = '';
+      elContenedorReemplazos.replaceChildren();
     }
     if (elSinResultados) elSinResultados.hidden = true;
 
@@ -311,7 +449,7 @@ export function ejecutarBusqueda(termino, alimentoObjetivo, mapaSelectores = SEL
       if (elBloqueResultados) elBloqueResultados.hidden = true;
       if (elContenedorReemplazos) {
         elContenedorReemplazos.hidden = true;
-        elContenedorReemplazos.innerHTML = '';
+        elContenedorReemplazos.replaceChildren();
       }
       if (elSinResultados) elSinResultados.hidden = false;
 
@@ -342,12 +480,12 @@ export function ejecutarBusqueda(termino, alimentoObjetivo, mapaSelectores = SEL
     if (elBloqueResultados) elBloqueResultados.hidden = false;
 
     if (elContenedorReemplazos) {
-      const htmlCards = resultados.map((item, index) => {
+      elContenedorReemplazos.replaceChildren();
+      resultados.forEach((item, index) => {
         const esSeleccionado = index === 0;
-        return renderizarTarjetaReemplazo(item.candidato, item.calculo, esSeleccionado);
-      }).join('\n');
-
-      elContenedorReemplazos.innerHTML = htmlCards;
+        const tarjetaNodo = crearElementoTarjetaReemplazo(item.candidato, item.calculo, esSeleccionado, mapaSelectores);
+        elContenedorReemplazos.appendChild(tarjetaNodo);
+      });
       elContenedorReemplazos.hidden = false;
     }
 

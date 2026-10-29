@@ -68,6 +68,22 @@
 
       <!-- Sin resultados para la búsqueda -->
       <p class="nota-centrada" hidden>No encontramos ese alimento. Probá con otro nombre.</p>
+
+      <template id="tpl-reemplazo-opcion">
+        <button class="reemplazo" type="button" role="radio" aria-checked="false" tabindex="-1" data-nivel="equivalente">
+          <span class="radio"></span>
+          <span class="crece columna gap-2xs" data-ref="cuerpo">
+            <span class="alimento-fila__titulo" data-bind="nombre"></span>
+            <span class="reemplazo__nivel" data-bind="nivel"></span>
+            <span class="alimento-fila__linea" data-bind="linea"></span>
+            <span class="sub texto-12" data-bind="divergencia" hidden></span>
+          </span>
+          <span class="reemplazo__lado">
+            <span class="alimento-fila__cantidad" data-bind="cantidad"></span>
+            <span class="tag tag--verde" data-bind="adherencia"></span>
+          </span>
+        </button>
+      </template>
     </main>
 
     <div class="pie pie--centrado pie--columna">

@@ -16,6 +16,10 @@ Esta guía detalla los estándares de arquitectura, código, pruebas y control d
 3. **Resiliencia y Modo Desconectado (Offline Fallback):**
    - Toda interacción que consulte o persista datos en Supabase debe envolver sus operaciones en bloques `try / catch`.
    - Cuando no exista sesión activa o falle la red, la interfaz debe operar con un respaldo transparente en `sessionStorage` o catálogos locales (`alimentos-locales.js`).
+4. **Las 3 Reglas de Oro para Iterar HTML sin Romper JS (Obligatorias):**
+   - **Regla 1 — Plantillas `<template>` nativas con `data-bind` y `data-ref` (Cero HTML en JS):** Queda estrictamente **prohibido el uso de `innerHTML`** con datos dinámicos o de usuario para prevenir vulnerabilidades **DOM-XSS** y evitar acoplar el diseño al código. Todo elemento repetible (filas de alimentos, opciones de reemplazo, tarjetas de historial o clientes) debe definirse en el `.html` dentro de un `<template id="tpl-...">`, clonarse con `tpl.content.cloneNode(true)` e hidratarse mediante `textContent` sobre nodos `[data-bind="..."]` y atributos seguros sobre `[data-ref="..."]`.
+   - **Regla 2 — Un solo `.html` por pantalla con conmutación `.vacio[hidden]`:** Prohibido duplicar páginas HTML para representar estados sin datos. "Vacío" y "Con datos" conviven en el mismo archivo `.html` y se alternan conmutando el atributo booleano `hidden` sobre el bloque `.vacio` y el contenedor de lista.
+   - **Regla 3 — Cascarón compartido, invariantes por rol y borradores MPA en `sessionStorage`:** `navegacion.js` preserva la consistencia del sprite SVG y la barra inferior. Al navegar entre pantallas MPA del flujo de edición (por ejemplo, de `plan-editor.html` a `buscar-alimento.html` y de regreso), el estado en curso o borrador del plan debe persistirse en `sessionStorage` para no perder los cambios no guardados en base de datos. Asimismo, se respetan las invariantes de rol: en `contexto.html` el alumno solo ve su objetivo (ocultando el desglose técnico BMR/NEAT/TEF), y en `dashboard.html` el flujo 1-Tap Check hidrata desde el plan activo del coach o permite carga libre.
 
 ---
 
@@ -33,13 +37,14 @@ Al añadir una nueva página o modificar una existente, seguí estrictamente est
   2. `../../css/base.css` (Tokens y tipografía).
   3. `../../css/components.css` (Componentes transversales).
   4. `../../css/pages/<seccion>.css` (Estilos específicos del rol).
+- Incluí en el mismo `.html` el estado vacío (`.vacio` con atributo `hidden` cuando corresponda) y las etiquetas `<template id="tpl-...">` con atributos `data-bind` y `data-ref` para cualquier lista dinámica.
 - Cargá el controlador como módulo ES nativo al final del `<body>`:
   ```html
   <script type="module" src="../../js/ui/mi-pantalla-ui.js"></script>
   ```
 
 ### 2. Estructura del Controlador UI (`frontend/js/ui/mi-pantalla-ui.js`)
-Cada controlador debe adherirse al siguiente formato:
+Cada controlador debe adherirse al siguiente formato (referenciando los `<template>`, conmutando `.vacio[hidden]`, hidratando con `textContent` sin usar `innerHTML` con datos de usuario y sincronizando borradores en `sessionStorage` durante la navegación MPA):
 
 ```javascript
 /* ==========================================================

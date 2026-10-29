@@ -10,7 +10,8 @@ export const SELECTORES = {
   elementosHrefAlumno: '[data-href-alumno]',
   elementosTextoAlumno: '[data-texto-alumno]',
   plantillaNavAlumno: '#nav-alumno',
-  navCoach: '.barra-inferior'
+  navCoach: '.barra-inferior',
+  seccionResultados: '[aria-labelledby="t-resultados"]'
 };
 
 // Única fuente del rol. Por ahora sale de la URL (#rol=alumno);
@@ -24,7 +25,15 @@ export function obtenerRol() {
 }
 
 export function aplicarRol(rol) {
-  if (rol !== 'alumno') return;
+  const esAlumno = rol === 'alumno';
+
+  // Invariante de producto: el método es del coach; el alumno ve solo su meta, nunca fórmulas ni desgloses BMR/NEAT/TDEE
+  const seccionResultados = document.querySelector(SELECTORES.seccionResultados);
+  if (seccionResultados) {
+    seccionResultados.hidden = esAlumno;
+  }
+
+  if (!esAlumno) return;
 
   document.querySelectorAll(SELECTORES.elementosHrefAlumno).forEach((el) => {
     el.setAttribute('href', el.dataset.hrefAlumno);

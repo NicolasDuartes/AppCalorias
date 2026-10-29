@@ -199,6 +199,22 @@
         <a class="btn btn--secundario btn--alto" href="plan-nuevo.html" data-volver>Cancelar</a>
         <a class="btn btn--primario btn--alto" href="plan-activo.html">Guardar y asignar plan</a>
       </div>
+
+      <!-- ===== Plantilla de alimento del editor (Regla 1) ===== -->
+      <template id="tpl-alimento-editor">
+        <div class="alimento">
+          <div class="alimento__cabecera">
+            <span class="alimento__nombre">Alimento</span>
+            <a class="btn-accion" href="buscar-alimento.html" aria-label="Cambiar alimento"><svg class="icono" width="20" height="20" aria-hidden="true"><use href="#cambiar"/></svg></a>
+            <button class="btn-accion btn-accion--peligro" type="button" aria-label="Quitar alimento"><svg class="icono" width="20" height="20" aria-hidden="true"><use href="#quitar"/></svg></button>
+          </div>
+          <div class="alimento__datos">
+            <span class="input input--derecha"><input type="text" inputmode="decimal" value="" placeholder="—" aria-label="Cantidad"><span class="unidad">g</span></span>
+            <span class="num num--s">— <span class="unidad">kcal</span></span>
+            <span class="alimento__macros">P — · C — · G —</span>
+          </div>
+        </div>
+      </template>
     </main>
 
     <!-- ===== Navegación del coach (igual en todas las pantallas del coach) ===== -->

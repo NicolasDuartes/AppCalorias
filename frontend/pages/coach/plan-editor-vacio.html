@@ -17,6 +17,8 @@
     <symbol id="volver" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></symbol>
     <symbol id="flecha-abajo" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
     <symbol id="mas" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="cambiar" viewBox="0 0 24 24"><path d="M7 7h11l-3-3M17 17H6l3 3"/></symbol>
+    <symbol id="quitar" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></symbol>
     <symbol id="gota" viewBox="0 0 24 24"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></symbol>
     <symbol id="clientes" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17" cy="9" r="2.5"/><path d="M16.5 14c2.9.2 5 2.3 5 5.5"/></symbol>
     <symbol id="plantillas" viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/></symbol>
@@ -149,6 +151,22 @@
         <a class="btn btn--secundario btn--alto" href="plan-nuevo.html" data-volver>Cancelar</a>
         <a class="btn btn--primario btn--alto" href="plan-activo.html">Guardar y asignar plan</a>
       </div>
+
+      <!-- ===== Plantilla de alimento del editor (Regla 1) ===== -->
+      <template id="tpl-alimento-editor">
+        <div class="alimento">
+          <div class="alimento__cabecera">
+            <span class="alimento__nombre">Alimento</span>
+            <a class="btn-accion" href="buscar-alimento.html" aria-label="Cambiar alimento"><svg class="icono" width="20" height="20" aria-hidden="true"><use href="#cambiar"/></svg></a>
+            <button class="btn-accion btn-accion--peligro" type="button" aria-label="Quitar alimento"><svg class="icono" width="20" height="20" aria-hidden="true"><use href="#quitar"/></svg></button>
+          </div>
+          <div class="alimento__datos">
+            <span class="input input--derecha"><input type="text" inputmode="decimal" value="" placeholder="—" aria-label="Cantidad"><span class="unidad">g</span></span>
+            <span class="num num--s">— <span class="unidad">kcal</span></span>
+            <span class="alimento__macros">P — · C — · G —</span>
+          </div>
+        </div>
+      </template>
     </main>
 
     <!-- ===== Navegación del coach (igual en todas las pantallas del coach) ===== -->

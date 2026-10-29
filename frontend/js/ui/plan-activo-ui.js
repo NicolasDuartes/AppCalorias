@@ -47,7 +47,7 @@ export async function iniciarPlanActivo() {
 
   const params = new URLSearchParams(window.location.search);
   const clienteId = params.get('cliente');
-  const planId = params.get('plan');
+  let planId = params.get('plan');
 
   // Si hay clienteId, intentar hidratar el plan activo desde Supabase
   if (clienteId) {
@@ -55,6 +55,9 @@ export async function iniciarPlanActivo() {
       const res = await obtenerPlanActivo(clienteId);
       if (res && res.plan) {
         const plan = res.plan;
+        if (plan.id) {
+          planId = plan.id;
+        }
         const totalKcalEl = document.querySelector(SELECTORES.totalKcal);
         if (totalKcalEl && plan.target_calories) {
           totalKcalEl.textContent = plan.target_calories.toLocaleString('es-AR');

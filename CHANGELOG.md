@@ -2,6 +2,20 @@
 
 Este documento registra los hitos de versiones **Mayores (Major)** y **Medianas (Minor)** de la aplicación con resúmenes ejecutivos concisos ($\le 10$ renglones). Los cambios atómicos y parches específicos se registran directamente en los commits de Git bajo la convención *Conventional Commits*.
 
+## [v0.5.2] — 29/10/2026
+- **Tipo:** Versión Menor (Arquitectura de Plantillas HTML Nativas `<template>`, Unificación de Estados y Blindaje DOM-XSS)
+- **Fecha:** 29 de Octubre de 2026
+- **Resumen:**
+  1. Formalización de las 3 Reglas de Oro de Desacoplamiento HTML/JS en `DESIGN.md`, `CONTRIBUTING.md`, `ROADMAP_Y_ESTRUCTURA.md` y `.loki/CONTINUITY.md`.
+  2. Regla 1 (Cero HTML en JS): Migración a `<template id="tpl-...">` nativos con `cloneNode(true)` y `.textContent` en `dashboard`, `reemplazar`, `buscar-alimento`, `plan-editor` e `historial`.
+  3. Erradicación total de vulnerabilidad DOM-XSS en `dashboard-ui.js` y `buscar-alimento-ui.js` eliminando la interpolación cruda en `innerHTML`.
+  4. Regla 2 (Estados unificados con `hidden`): Conmutación declarativa entre estados vacíos (`.vacio`) y listas pobladas sin divergencia estructural entre archivos HTML.
+  5. Regla 3 (Cascarón compartido e invariante por rol): Centralización del sprite SVG y barra inferior en `navegacion.js` (`asegurarCascaronCompartido`) y ocultamiento del desglose técnico BMR/NEAT/TEF para el rol `alumno` en `rol-ui.js`.
+  6. Puente de estado MPA y correcciones críticas: Persistencia en `sessionStorage` entre `buscar-alimento.html` y `plan-editor.html`, enlaces `+ Añadir alimento` activos en vistas vacías y retención de `planId` para archivado real en `plan-activo-ui.js`.
+  7. Verificación integral: 10 suites automatizadas (sintaxis, modularización, enlaces, cálculos y navegador real Edge Headless) superadas al 100%.
+
+---
+
 ## [v0.5.1] — 19/10/2026
 - **Tipo:** Versión Menor / Parche (Documentación Raíz y Estándares de Arquitectura)
 - **Fecha:** 19 de Octubre de 2026

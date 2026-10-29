@@ -76,19 +76,30 @@ rutas de las páginas son relativas a esa carpeta.
   plantilla `.env.example`, documentación técnica en `frontend/js/data/README.md`,
   actualización del árbol de 33 módulos en `Leemewacho.md` y sincronización de
   tablas en `supabase/ESQUEMA.md`.
+- Endurecimiento de Prioridad 1 y 3 Reglas de Oro de Plantillas HTML
+  [Completado - 29/10/2026]: erradicación de DOM-XSS mediante `<template>`
+  nativos con `data-bind`/`data-ref` y `textContent`, corrección de archivado
+  en `plan-activo-ui.js`, corrección de vista vacía y borradores MPA en
+  `plan-editor-ui.js`, resolución asíncrona de sesión (`await exigirRol`) en
+  `dashboard-ui.js`, y formalización de las 3 reglas en `DESIGN.md` (§9) y
+  `CONTRIBUTING.md`.
 
 ## 4. Pendiente (Tareas Priorizadas)
 
 ### Prioridad 1: Seguridad y Robustez Inmediata (Bugs Críticos)
 
-1. **Sanitización contra DOM-XSS:**
-   - Aplicar `escaparHtml()` en `dashboard-ui.js` (L592) y `buscar-alimento-ui.js` (L137) al interpolar nombres de alimentos y macronutrientes en `innerHTML`.
-2. **Corrección de flujo de archivado en `plan-activo-ui.js`:**
+1. **Sanitización contra DOM-XSS [Completado - 29/10/2026]:**
+   - Aplicar `escaparHtml()` y migrar a `<template>` nativos con `textContent` en `dashboard-ui.js` (L592) y `buscar-alimento-ui.js` (L137) al interpolar nombres de alimentos y macronutrientes, eliminando el uso de `innerHTML` con datos de usuario.
+2. **Corrección de flujo de archivado en `plan-activo-ui.js` [Completado - 29/10/2026]:**
    - Retener `res.plan.id` al consultar `obtenerPlanActivo(clienteId)` para que el botón "Finalizar plan" invoque efectivamente `archivarPlan()` en Supabase.
-3. **Corrección de vista vacía en `plan-editor-ui.js`:**
-   - Mover la configuración de los botones `SELECTORES.btnAnadir` fuera del condicional `if (!filaAlimento) return;` para que `plan-editor-vacio.html` propague el parámetro `?comida=...` a `buscar-alimento.html`.
-4. **Resolución asíncrona de sesión en Dashboard:**
+3. **Corrección de vista vacía en `plan-editor-ui.js` [Completado - 29/10/2026]:**
+   - Mover la configuración de los botones `SELECTORES.btnAnadir` fuera del condicional `if (!filaAlimento) return;` para que `plan-editor-vacio.html` y el estado vacío con `hidden` propaguen el parámetro `?comida=...` a `buscar-alimento.html`.
+4. **Resolución asíncrona de sesión en Dashboard [Completado - 29/10/2026]:**
    - Asegurar `await exigirRol('alumno')` en la inicialización de `dashboard-ui.js` para prevenir condiciones de carrera al resolver `usuarioActualId`.
+5. **Implementación de las 3 Reglas de Plantillas HTML y Desacoplamiento JS [Completado - 29/10/2026]:**
+   - **Regla 1:** Etiquetas `<template id="tpl-...">` con `data-bind` y `data-ref` hidratadas con `cloneNode(true)` y `textContent` (cero HTML en JS).
+   - **Regla 2:** Un solo `.html` por pantalla conmutando estados vacíos y listas mediante `.vacio[hidden]`.
+   - **Regla 3:** Cascarón compartido en `navegacion.js` (sprite SVG y barra inferior), persistencia de borradores en `sessionStorage` en flujos MPA del editor e invariantes conceptuales por rol (ocultamiento técnico BMR/NEAT/TEF para el alumno en `contexto.html` y 1-Tap Check en `dashboard.html`).
 
 ### Prioridad 2: Conexión Integral de Stubs y Capa de Datos
 

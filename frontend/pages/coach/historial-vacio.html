@@ -33,6 +33,9 @@
         </div>
       </header>
 
+      <!-- ===== Contenedor de línea de tiempo (Regla 2) ===== -->
+      <div class="linea-tiempo" hidden></div>
+
       <!-- ===== Estado vacío ===== -->
       <section class="vacio">
         <span class="vacio__icono"><svg class="icono" width="32" height="32" aria-hidden="true"><use href="#archivo"/></svg></span>
@@ -43,6 +46,23 @@
           <a class="btn btn--primario" href="plan-nuevo.html">Crear primer plan</a>
         </div>
       </section>
+
+      <!-- ===== Plantilla de ítem de historial (Regla 1) ===== -->
+      <template id="tpl-item-historial">
+        <li class="linea-tiempo__item">
+          <div class="linea-tiempo__eje"><span class="linea-tiempo__punto"></span><span class="linea-tiempo__trazo"></span></div>
+          <article class="card linea-tiempo__tarjeta">
+            <div class="card__fila"><span class="tag tag--gris">Archivado</span><span class="sub"></span></div>
+            <h2 class="seccion-titulo"></h2>
+            <p><span class="num num--m"></span> <span class="unidad">kcal/día</span></p>
+            <p class="sub"></p>
+            <div class="grilla-2">
+              <a class="btn btn--chico btn--secundario" href="plan-archivado.html">Ver detalle</a>
+              <a class="btn btn--chico btn--suave" href="plan-editor.html">Reutilizar como plantilla</a>
+            </div>
+          </article>
+        </li>
+      </template>
     </main>
 
     <!-- ===== Navegación del coach (igual en todas las pantallas del coach) ===== -->

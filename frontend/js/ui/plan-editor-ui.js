@@ -1,10 +1,10 @@
 /* ==========================================================
-   plan-editor-ui.js — Controlador UI del Editor de Planes para Coach (plan-editor.html)
+   plan-editor-ui.js — Controlador UI del Editor de Planes para Coach (plan-editor.html / plan-editor-vacio.html)
    - Permite al coach configurar comidas, porciones y notas para el plan de un alumno.
    - Cálculo reactivo e interactivo de macronutrientes y calorías por Atwater (4P + 4C + 9G).
    - Actualización en tiempo real del resumen fijo (.card--fija) con barra de progreso,
      diferencia con respecto al objetivo diario y suma acumulada de macros.
-   - Eliminación reactiva de alimentos y enlaces contextuales a búsqueda.
+   - Eliminación reactiva de alimentos, enlaces contextuales a búsqueda y recepción MPA.
    - Control de acceso por rol 'coach' con exigirRol.
    - Desacople completo del DOM mediante el mapa SELECTORES.
    Módulo ES nativo: sin dependencias externas.
@@ -17,7 +17,7 @@ import { mostrarAvisoFlotante, guardarAvisoToast } from '../utils/navegacion.js'
 import '../utils/navegacion.js';
 
 /**
- * Mapa centralizado de selectores del DOM para plan-editor.html.
+ * Mapa centralizado de selectores del DOM para plan-editor.html y plan-editor-vacio.html.
  */
 export const SELECTORES = {
   acordeon: '.acordeon',
@@ -46,20 +46,71 @@ export const SELECTORES = {
   btnCancelar: '.grilla-2 a.btn--secundario, [data-volver]',
   btnGuardar: '.grilla-2 a.btn--primario',
   inputAgua: 'input[name="agua"]',
-  textareaPautas: 'textarea[name="pautas"]'
+  textareaPautas: 'textarea[name="pautas"]',
+  tplAlimentoEditor: '#tpl-alimento-editor'
 };
 
 /** Objetivo calórico estándar por defecto para calcular progresos. */
 export const OBJETIVO_CALORICO_DEFECTO = 2060;
 
 /**
- * Inicializa los alimentos en el editor con datos de referencia si están vacíos.
+ * Helper seguro para actualizar un elemento numérico con su unidad sin usar innerHTML.
+ * @param {HTMLElement|null} el
+ * @param {number|string} valor
+ * @param {string} unidad
+ */
+function asignarValorConUnidad(el, valor, unidad) {
+  if (!el) return;
+  el.textContent = `${valor} `;
+  const spanUnidad = document.createElement('span');
+  spanUnidad.className = 'unidad';
+  spanUnidad.textContent = unidad;
+  el.appendChild(spanUnidad);
+}
+
+/**
+ * Vincula los eventos reactivos de una fila de alimento (cambio de gramos y botón quitar).
+ * @param {HTMLElement} filaAlimento
+ */
+export function vincularEventosAlimento(filaAlimento) {
+  if (!filaAlimento || filaAlimento.dataset.eventosVinculados === 'true') return;
+  filaAlimento.dataset.eventosVinculados = 'true';
+
+  const inputCant = filaAlimento.querySelector(SELECTORES.alimentoInputCantidad);
+  if (inputCant) {
+    inputCant.addEventListener('input', () => {
+      recalcularResumenPlan();
+    });
+  }
+
+  const btnQuitar = filaAlimento.querySelector(SELECTORES.btnQuitar);
+  if (btnQuitar) {
+    btnQuitar.addEventListener('click', (evento) => {
+      evento.stopPropagation();
+      if (!filaAlimento.isConnected) return;
+      filaAlimento.remove();
+      mostrarAvisoFlotante('Alimento quitado de la comida.');
+      recalcularResumenPlan();
+    });
+  }
+}
+
+/**
+ * Inicializa los acordeones y alimentos en el editor con datos de referencia si están vacíos.
  */
 export function hidratarAlimentosIniciales() {
   const acordeones = document.querySelectorAll(SELECTORES.acordeon);
 
   acordeones.forEach((acordeon) => {
     const titulo = acordeon.querySelector(SELECTORES.acordeonTitulo)?.textContent?.trim();
+    if (!titulo) return;
+
+    // Configurar siempre el botón "+ Añadir alimento" antes de verificar si hay filas (soporte vista vacía)
+    const btnAnadir = acordeon.querySelector(SELECTORES.btnAnadir);
+    if (btnAnadir) {
+      btnAnadir.setAttribute('href', `buscar-alimento.html?comida=${encodeURIComponent(titulo)}`);
+    }
+
     const infoDefecto = ALIMENTOS_PLAN_DEFECTO[titulo];
     if (!infoDefecto) return;
 
@@ -85,7 +136,7 @@ export function hidratarAlimentosIniciales() {
 
     const kcalEl = filaAlimento.querySelector(SELECTORES.alimentoKcal);
     if (kcalEl && kcalEl.textContent.includes('—')) {
-      kcalEl.innerHTML = `${infoDefecto.kcal} <span class="unidad">kcal</span>`;
+      asignarValorConUnidad(kcalEl, infoDefecto.kcal, 'kcal');
     }
 
     const macrosEl = filaAlimento.querySelector(SELECTORES.alimentoMacros);
@@ -93,16 +144,144 @@ export function hidratarAlimentosIniciales() {
       macrosEl.textContent = `P ${infoDefecto.p} · C ${infoDefecto.c} · G ${infoDefecto.g}`;
     }
 
-    // Vincular enlace de añadir con la comida correspondiente
-    const btnAnadir = acordeon.querySelector(SELECTORES.btnAnadir);
-    if (btnAnadir) {
-      btnAnadir.setAttribute('href', `buscar-alimento.html?comida=${encodeURIComponent(titulo)}`);
-    }
     const btnCambiar = filaAlimento.querySelector(SELECTORES.btnCambiar);
     if (btnCambiar) {
       btnCambiar.setAttribute('href', `buscar-alimento.html?comida=${encodeURIComponent(titulo)}&cambiar=1`);
     }
+
+    vincularEventosAlimento(filaAlimento);
   });
+}
+
+export { hidratarAlimentosIniciales as inicializarAcordeones };
+
+/**
+ * Procesa el alimento pendiente en sessionStorage ('appcalorias_alimento_editor_pendiente')
+ * proveniente de buscar-alimento.html y lo inserta en el acordeón correspondiente.
+ * @returns {boolean} true si se insertó un alimento pendiente
+ */
+export function procesarAlimentoPendienteSession() {
+  let raw = null;
+  try {
+    raw = sessionStorage.getItem('appcalorias_alimento_editor_pendiente');
+  } catch {
+    return false;
+  }
+
+  if (!raw) return false;
+
+  let pendiente;
+  try {
+    pendiente = JSON.parse(raw);
+  } catch {
+    sessionStorage.removeItem('appcalorias_alimento_editor_pendiente');
+    return false;
+  }
+
+  if (!pendiente || typeof pendiente !== 'object') {
+    sessionStorage.removeItem('appcalorias_alimento_editor_pendiente');
+    return false;
+  }
+
+  const comidaBuscada = (pendiente.comida || 'Almuerzo').trim().toLowerCase();
+  const acordeones = Array.from(document.querySelectorAll(SELECTORES.acordeon));
+  let acordeonDestino = acordeones.find((ac) => {
+    const t = ac.querySelector(SELECTORES.acordeonTitulo)?.textContent?.trim().toLowerCase();
+    return t === comidaBuscada;
+  });
+
+  if (!acordeonDestino) {
+    acordeonDestino = acordeones.find((ac) => ac.querySelector(SELECTORES.acordeonLineaKcal) || ac.querySelector(SELECTORES.btnAnadir));
+  }
+
+  if (!acordeonDestino) {
+    sessionStorage.removeItem('appcalorias_alimento_editor_pendiente');
+    return false;
+  }
+
+  const tpl = document.querySelector(SELECTORES.tplAlimentoEditor);
+  let nuevoAlimento;
+
+  if (tpl && tpl.content) {
+    const clon = tpl.content.cloneNode(true);
+    nuevoAlimento = clon.querySelector(SELECTORES.alimento) || clon.firstElementChild;
+  } else {
+    nuevoAlimento = document.createElement('div');
+    nuevoAlimento.className = 'alimento';
+
+    const cabecera = document.createElement('div');
+    cabecera.className = 'alimento__cabecera';
+    const spanNombre = document.createElement('span');
+    spanNombre.className = 'alimento__nombre';
+    const linkCambiar = document.createElement('a');
+    linkCambiar.className = 'btn-accion';
+    linkCambiar.href = 'buscar-alimento.html';
+    linkCambiar.setAttribute('aria-label', 'Cambiar alimento');
+    const btnQuitar = document.createElement('button');
+    btnQuitar.className = 'btn-accion btn-accion--peligro';
+    btnQuitar.type = 'button';
+    btnQuitar.setAttribute('aria-label', 'Quitar alimento');
+    cabecera.append(spanNombre, linkCambiar, btnQuitar);
+
+    const datos = document.createElement('div');
+    datos.className = 'alimento__datos';
+    const wrapInput = document.createElement('span');
+    wrapInput.className = 'input input--derecha';
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.inputMode = 'decimal';
+    input.setAttribute('aria-label', 'Cantidad');
+    const unidadG = document.createElement('span');
+    unidadG.className = 'unidad';
+    unidadG.textContent = 'g';
+    wrapInput.append(input, unidadG);
+
+    const spanKcal = document.createElement('span');
+    spanKcal.className = 'num num--s';
+    const spanMacros = document.createElement('span');
+    spanMacros.className = 'alimento__macros';
+    datos.append(wrapInput, spanKcal, spanMacros);
+
+    nuevoAlimento.append(cabecera, datos);
+  }
+
+  nuevoAlimento.dataset.kcal100 = String(aNumeroSeguro(pendiente.kcal100));
+  nuevoAlimento.dataset.p100 = String(aNumeroSeguro(pendiente.p100));
+  nuevoAlimento.dataset.c100 = String(aNumeroSeguro(pendiente.c100));
+  nuevoAlimento.dataset.g100 = String(aNumeroSeguro(pendiente.g100));
+
+  const nombreEl = nuevoAlimento.querySelector(SELECTORES.alimentoNombre);
+  if (nombreEl) {
+    nombreEl.textContent = pendiente.nombre || 'Alimento';
+  }
+
+  const inputCant = nuevoAlimento.querySelector(SELECTORES.alimentoInputCantidad);
+  if (inputCant) {
+    inputCant.value = String(Math.max(1, aNumeroSeguro(pendiente.gramos || 100)));
+  }
+
+  const tituloComida = acordeonDestino.querySelector(SELECTORES.acordeonTitulo)?.textContent?.trim() || pendiente.comida || 'Almuerzo';
+  const btnCambiar = nuevoAlimento.querySelector(SELECTORES.btnCambiar);
+  if (btnCambiar) {
+    btnCambiar.setAttribute('href', `buscar-alimento.html?comida=${encodeURIComponent(tituloComida)}&cambiar=1`);
+  }
+
+  const btnAnadir = acordeonDestino.querySelector(SELECTORES.btnAnadir);
+  const cuerpo = acordeonDestino.querySelector('.acordeon__cuerpo') || acordeonDestino;
+  if (btnAnadir && btnAnadir.parentNode) {
+    btnAnadir.parentNode.insertBefore(nuevoAlimento, btnAnadir);
+  } else {
+    cuerpo.appendChild(nuevoAlimento);
+  }
+
+  acordeonDestino.open = true;
+  vincularEventosAlimento(nuevoAlimento);
+
+  sessionStorage.removeItem('appcalorias_alimento_editor_pendiente');
+
+  recalcularComida(acordeonDestino);
+  recalcularResumenPlan();
+  return true;
 }
 
 /**
@@ -128,9 +307,7 @@ export function recalcularFilaAlimento(alimentoEl) {
   const kcalActual = atwater.kcalCalculadas;
 
   const kcalEl = alimentoEl.querySelector(SELECTORES.alimentoKcal);
-  if (kcalEl) {
-    kcalEl.innerHTML = `${kcalActual} <span class="unidad">kcal</span>`;
-  }
+  asignarValorConUnidad(kcalEl, kcalActual, 'kcal');
 
   const macrosEl = alimentoEl.querySelector(SELECTORES.alimentoMacros);
   if (macrosEl) {
@@ -166,7 +343,9 @@ export function recalcularComida(acordeonEl) {
 
   const lineaMacrosEl = acordeonEl.querySelector(SELECTORES.acordeonLineaMacros);
   if (lineaMacrosEl) {
-    lineaMacrosEl.textContent = `P ${sumaP} · C ${sumaC} · G ${sumaG}`;
+    lineaMacrosEl.textContent = alimentos.length > 0
+      ? `P ${sumaP} · C ${sumaC} · G ${sumaG}`
+      : 'Sin alimentos';
   }
 
   return { kcal: sumaKcal, p: sumaP, c: sumaC, g: sumaG };
@@ -228,14 +407,9 @@ export function recalcularResumenPlan() {
   }
 
   // 5. Macros acumulados
-  const pEl = document.querySelector(SELECTORES.macroProteina);
-  if (pEl) pEl.innerHTML = `${totalP} <span class="unidad">g</span>`;
-
-  const cEl = document.querySelector(SELECTORES.macroCarbos);
-  if (cEl) cEl.innerHTML = `${totalC} <span class="unidad">g</span>`;
-
-  const gEl = document.querySelector(SELECTORES.macroGrasas);
-  if (gEl) gEl.innerHTML = `${totalG} <span class="unidad">g</span>`;
+  asignarValorConUnidad(document.querySelector(SELECTORES.macroProteina), totalP, 'g');
+  asignarValorConUnidad(document.querySelector(SELECTORES.macroCarbos), totalC, 'g');
+  asignarValorConUnidad(document.querySelector(SELECTORES.macroGrasas), totalG, 'g');
 }
 
 /**
@@ -246,22 +420,23 @@ export async function iniciarPlanEditor() {
   if (!cuenta) return;
 
   hidratarAlimentosIniciales();
+  procesarAlimentoPendienteSession();
   recalcularResumenPlan();
 
-  // Escuchar cambios reactivos en inputs de gramos
+  // Escuchar cambios reactivos en inputs de gramos (delegación de respaldo)
   document.addEventListener('input', (evento) => {
     if (evento.target.closest(SELECTORES.alimentoInputCantidad)) {
       recalcularResumenPlan();
     }
   });
 
-  // Manejar eliminación de alimentos
+  // Manejar eliminación de alimentos (delegación de respaldo)
   document.addEventListener('click', (evento) => {
     const btnQuitar = evento.target.closest(SELECTORES.btnQuitar);
     if (!btnQuitar) return;
 
     const filaAlimento = btnQuitar.closest(SELECTORES.alimento);
-    if (filaAlimento) {
+    if (filaAlimento && filaAlimento.isConnected) {
       filaAlimento.remove();
       mostrarAvisoFlotante('Alimento quitado de la comida.');
       recalcularResumenPlan();

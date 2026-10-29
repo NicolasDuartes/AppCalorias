@@ -246,3 +246,66 @@ Van al final de `components.css` para ganarle a lo anterior.
 - **Paleta de PROPUESTADESIGN.md.** Decidir si se adopta Inter y la paleta
   emerald o se mantiene la actual (con los ajustes de contraste que
   necesita).
+
+
+## 9. Arquitectura de Plantillas HTML y Desacoplamiento JS
+
+Para poder iterar y rediseñar las vistas HTML libremente sin romper la lógica de los controladores en `frontend/js/ui/`, el sistema establece **3 Reglas de Oro de Desacoplamiento**:
+
+### Regla 1: Cero HTML en JavaScript — Etiquetas `<template>` nativas con `data-bind` y `data-ref`
+
+El marcado estructural de filas repetibles (alimentos en comidas, resultados de búsqueda, opciones de reemplazo, tarjetas de historial o clientes) **vive exclusivamente en el archivo `.html`** dentro de etiquetas `<template id="tpl-...">`.
+
+- **Prohibido construir marcado con `innerHTML`:** El JavaScript jamás concatena strings HTML con datos dinámicos ni de usuario.
+- **Clonado e hidratación segura:** El controlador clona el nodo (`template.content.cloneNode(true)`), localiza los puntos de inserción mediante atributos semánticos (`[data-bind="..."]` para textos y `[data-ref="..."]` para enlaces, botones o contenedores interactivos) e inyecta los valores usando exclusivamente `textContent` o atributos seguros (`href`, `dataset`).
+- **Beneficio doble:** Elimina de raíz las vulnerabilidades **DOM-XSS** y permite cambiar clases, orden de elementos o estructura visual en el `.html` sin modificar una sola línea de JavaScript.
+
+```html
+<!-- En el archivo .html -->
+<template id="tpl-alimento-busqueda">
+  <a class="fila-link fila-link--borde" data-ref="enlace" href="#">
+    <div class="columna gap-2xs crece">
+      <strong class="texto-15" data-bind="nombre"></strong>
+      <span class="sub" data-bind="porcion"></span>
+    </div>
+    <span class="sub" data-bind="macros"></span>
+    <span class="num--s" data-bind="kcal"></span>
+  </a>
+</template>
+```
+
+```javascript
+// En el controlador UI (frontend/js/ui/*-ui.js)
+const tpl = document.querySelector('#tpl-alimento-busqueda');
+const clon = tpl.content.cloneNode(true);
+clon.querySelector('[data-bind="nombre"]').textContent = item.nombre;
+clon.querySelector('[data-bind="kcal"]').textContent = `${item.kcal} kcal`;
+clon.querySelector('[data-ref="enlace"]').href = `cantidad.html?alimento=${encodeURIComponent(item.nombre)}`;
+contenedor.appendChild(clon);
+```
+
+### Regla 2: Un solo `.html` por pantalla con estados `hidden`
+
+"Vacío" y "Con datos" no son páginas distintas, sino **estados de datos de una misma pantalla**.
+
+- **Prohibido duplicar archivos `.html` para estados vacíos** (por ejemplo, evitar separar `plan-editor.html` y `plan-editor-vacio.html` o `clientes.html` y `clientes-vacio.html`).
+- **Conmutación por atributo `hidden`:** Toda pantalla con colecciones dinámicas incluye en el mismo documento tanto el bloque de estado vacío (`.vacio`) como el contenedor de datos (`.lista`, `.comidas`, etc.), alternando su visibilidad mediante el atributo nativo `hidden`:
+
+```html
+<!-- Estado vacío y contenedor conviven en el mismo .html -->
+<div class="vacio" data-ref="estado-vacio" hidden>
+  <p class="seccion-titulo">Todavía no hay elementos</p>
+  <p class="sub">Agregá el primero para comenzar.</p>
+</div>
+
+<div class="lista" data-ref="lista-datos">
+  <!-- Filas instanciadas desde <template> -->
+</div>
+```
+
+### Regla 3: Cascarón Compartido (Sprite SVG y Barra Inferior) e Invariantes Conceptuales por Rol
+
+El módulo transversal [`frontend/js/utils/navegacion.js`](file:///C:/Users/gian9/OneDrive/Desktop/AppCalorias/frontend/js/utils/navegacion.js) garantiza la consistencia del cascarón visual (hidratación de íconos del `<svg class="sprite">`, estado activo de `.barra-inferior`, historial de retorno y avisos flotantes en `sessionStorage`) y resguarda **dos invariantes conceptuales del producto**:
+
+1. **Invariante de Contexto (`contexto.html`):** El método técnico pertenece al coach. Cuando accede un **alumno**, solo visualiza su meta y objetivo; el desglose matemático de fórmulas y componentes técnicos (**BMR / TMB**, **NEAT**, **METs**, **TEF** y **TDEE**) permanece estrictamente oculto (`hidden`) para el rol alumno y solo se expone al **coach**.
+2. **Invariante de 1-Tap Check en el Dashboard (`dashboard.html`):** El tablero diario del alumno se hidrata desde el **plan activo prescripto por su coach** para permitir confirmar cada comida con un toque ("Lo comí" / 1-Tap Check), a la vez que habilita la **carga libre** o reemplazo equivalente de alimentos cuando el alumno come fuera del plan o aún no tiene un plan asignado.

@@ -28,6 +28,7 @@ export const SELECTORES = {
   hojaLista: '.hoja__lista',
   estadoVacio: '.hoja__lista .vacio',
   opcionAlimento: '.hoja__lista .opcion',
+  tplOpcionAlimento: '#tpl-opcion-alimento',
   pie: '.hoja__pie',
   pieNombre: '.hoja__pie .fila .crece.columna .negrita',
   pieMacros: '.hoja__pie .fila .crece.columna .sub',
@@ -113,7 +114,7 @@ export function actualizarPieSeleccion() {
 }
 
 /**
- * Renderiza la lista de resultados en la hoja modal.
+ * Renderiza la lista de resultados en la hoja modal clonando #tpl-opcion-alimento (Regla 1, sin DOM-XSS).
  * @param {Array<Object>} alimentos
  */
 export function renderizarResultados(alimentos) {
@@ -121,31 +122,90 @@ export function renderizarResultados(alimentos) {
   if (!contenedorLista) return;
 
   if (!alimentos || alimentos.length === 0) {
-    contenedorLista.innerHTML = `
-      <section class="vacio">
-        <span class="vacio__icono"><svg class="icono" width="32" height="32" aria-hidden="true"><use href="#buscar"/></svg></span>
-        <h2 class="titulo">Sin coincidencias</h2>
-        <p class="sub texto-14">Probá buscando con otro nombre o seleccionando otra categoría.</p>
-      </section>
-    `;
+    const seccionVacio = document.createElement('section');
+    seccionVacio.className = 'vacio';
+
+    const spanIcono = document.createElement('span');
+    spanIcono.className = 'vacio__icono';
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('class', 'icono');
+    svg.setAttribute('width', '32');
+    svg.setAttribute('height', '32');
+    svg.setAttribute('aria-hidden', 'true');
+    const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+    use.setAttribute('href', '#buscar');
+    svg.appendChild(use);
+    spanIcono.appendChild(svg);
+
+    const h2 = document.createElement('h2');
+    h2.className = 'titulo';
+    h2.textContent = 'Sin coincidencias';
+
+    const p = document.createElement('p');
+    p.className = 'sub texto-14';
+    p.textContent = 'Probá buscando con otro nombre o seleccionando otra categoría.';
+
+    seccionVacio.append(spanIcono, h2, p);
+    contenedorLista.replaceChildren(seccionVacio);
     return;
   }
 
-  let html = '';
+  const tpl = document.querySelector(SELECTORES.tplOpcionAlimento);
+  const fragmento = document.createDocumentFragment();
+
   alimentos.forEach((alim) => {
     const esActivo = alimentoSeleccionado && alimentoSeleccionado.id === alim.id;
-    html += `
-      <button class="opcion" type="button" role="option" aria-selected="${esActivo ? 'true' : 'false'}" data-id="${alim.id}">
-        <span class="opcion__textos">
-          <span class="negrita texto-15">${alim.nombre}</span>
-          <span class="sub">Cada 100 g: P ${Math.round(alim.proteinas)} · C ${Math.round(alim.carbohidratos)} · G ${Math.round(alim.grasas)}</span>
-        </span>
-        <span class="num num--s">${alim.kcal} <span class="unidad">kcal</span></span>
-      </button>
-    `;
+    let btn;
+
+    if (tpl && tpl.content) {
+      const clon = tpl.content.cloneNode(true);
+      btn = clon.querySelector('.opcion') || clon.firstElementChild;
+    } else {
+      btn = document.createElement('button');
+      btn.className = 'opcion';
+      btn.type = 'button';
+      btn.setAttribute('role', 'option');
+
+      const spanTextos = document.createElement('span');
+      spanTextos.className = 'opcion__textos';
+      const spanNombre = document.createElement('span');
+      spanNombre.className = 'negrita texto-15';
+      const spanSub = document.createElement('span');
+      spanSub.className = 'sub';
+      spanTextos.append(spanNombre, spanSub);
+
+      const spanNum = document.createElement('span');
+      spanNum.className = 'num num--s';
+
+      btn.append(spanTextos, spanNum);
+    }
+
+    btn.setAttribute('aria-selected', esActivo ? 'true' : 'false');
+    btn.dataset.id = alim.id;
+
+    const nombreEl = btn.querySelector('.negrita');
+    if (nombreEl) {
+      nombreEl.textContent = alim.nombre;
+    }
+
+    const subEl = btn.querySelector('.sub');
+    if (subEl) {
+      subEl.textContent = `Cada 100 g: P ${Math.round(alim.proteinas)} · C ${Math.round(alim.carbohidratos)} · G ${Math.round(alim.grasas)}`;
+    }
+
+    const numEl = btn.querySelector('.num');
+    if (numEl) {
+      numEl.textContent = `${alim.kcal} `;
+      const spanUnidad = document.createElement('span');
+      spanUnidad.className = 'unidad';
+      spanUnidad.textContent = 'kcal';
+      numEl.appendChild(spanUnidad);
+    }
+
+    fragmento.appendChild(btn);
   });
 
-  contenedorLista.innerHTML = html;
+  contenedorLista.replaceChildren(fragmento);
 
   // Registrar listeners de selección en cada opción renderizada
   contenedorLista.querySelectorAll(SELECTORES.opcionAlimento).forEach((btn) => {
@@ -228,6 +288,28 @@ export async function iniciarBuscarAlimento() {
         mostrarAvisoFlotante('Elegí un alimento de la lista para continuar.');
         return;
       }
+
+      const tagEl = document.querySelector(SELECTORES.tagComida);
+      const comidaDestino = (comidaParam || tagEl?.textContent || 'Almuerzo').trim();
+      const gramos = Math.max(1, aNumeroSeguro(inputCantidad?.value || 100));
+      const payload = {
+        id: alimentoSeleccionado.id,
+        nombre: alimentoSeleccionado.nombre,
+        gramos,
+        comida: comidaDestino,
+        cambiar: params.get('cambiar') === '1',
+        kcal100: aNumeroSeguro(alimentoSeleccionado.kcal),
+        p100: aNumeroSeguro(alimentoSeleccionado.proteinas),
+        c100: aNumeroSeguro(alimentoSeleccionado.carbohidratos),
+        g100: aNumeroSeguro(alimentoSeleccionado.grasas)
+      };
+
+      try {
+        sessionStorage.setItem('appcalorias_alimento_editor_pendiente', JSON.stringify(payload));
+      } catch {
+        // Fallback silencioso si sessionStorage no está disponible
+      }
+
       guardarAvisoToast(`"${alimentoSeleccionado.nombre}" agregado a la comida.`);
     });
   }

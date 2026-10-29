@@ -194,6 +194,16 @@
         <button class="vaso" type="button" aria-pressed="false" aria-label="Vaso 8"><svg width="28" height="36" aria-hidden="true"><use href="#vaso"/></svg></button>
         </div>
       </section>
+      <template id="tpl-alimento-fila">
+        <div class="alimento-fila">
+          <a class="alimento-fila__nombre" data-ref="link-cantidad" aria-label="Cambiar la cantidad del alimento">
+            <span class="alimento-fila__titulo" data-bind="nombre"></span>
+            <span class="alimento-fila__linea" data-bind="linea"></span>
+          </a>
+          <span class="alimento-fila__cantidad" data-bind="cantidad"></span>
+          <a class="btn-reemplazar" data-ref="link-reemplazar" aria-label="Reemplazar el alimento"><svg class="icono icono--grueso" width="20" height="20" aria-hidden="true"><use href="#reemplazar"/></svg></a>
+        </div>
+      </template>
     </main>
 
     <!-- Aparece al tocar "Lo comí" y se va solo; "Deshacer" vuelve la comida a pendiente -->
