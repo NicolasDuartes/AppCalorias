@@ -35,7 +35,10 @@ export const SELECTORES = {
   btnCambiar: '.alimento__cabecera .btn-accion[aria-label="Cambiar alimento"]',
   btnQuitar: '.alimento__cabecera .btn-accion--peligro, button[aria-label="Quitar alimento"]',
   btnAnadir: '.btn--punteado[href*="buscar-alimento.html"]',
-  btnColacion: 'button.btn--punteado[data-aviso]',
+  btnAnadirColacion: '#boton-anadir-colacion',
+  tplComidaColacion: '#tpl-comida-colacion',
+  btnQuitarComida: '.btn-quitar-comida',
+  btnColacion: '#boton-anadir-colacion',
   textareaNota: '.acordeon__cuerpo textarea',
   cardFija: '.card--fija',
   totalKcal: '.card--fija .num--m',
@@ -134,11 +137,99 @@ export function vincularEventosAlimento(filaAlimento) {
 }
 
 /**
+ * Determina el siguiente nombre correlativo para una colación ('Colación 1', 'Colación 2', etc.).
+ * @returns {string}
+ */
+export function obtenerSiguienteNombreColacion() {
+  const colaciones = document.querySelectorAll('details[data-comida="colacion"]');
+  const numeros = [];
+  colaciones.forEach((col) => {
+    const titulo = col.querySelector(SELECTORES.acordeonTitulo)?.textContent || '';
+    const match = titulo.match(/Colaci[oó]n\s*(\d+)/i);
+    if (match) {
+      numeros.push(parseInt(match[1], 10));
+    }
+  });
+
+  if (numeros.length === 0) {
+    return `Colación ${colaciones.length + 1}`;
+  }
+  const maxNum = Math.max(...numeros);
+  return `Colación ${maxNum + 1}`;
+}
+
+/**
+ * Añade un nuevo acordeón de colación al plan insertándolo justo antes del botón de añadir colación.
+ * @param {string|null} [nombrePersonalizado=null]
+ * @returns {HTMLElement|null} El acordeón insertado
+ */
+export function anadirColacion(nombrePersonalizado = null) {
+  const tpl = document.querySelector(SELECTORES.tplComidaColacion);
+  const btnColacion = document.querySelector(SELECTORES.btnAnadirColacion);
+  if (!tpl || !tpl.content || !btnColacion) return null;
+
+  const clon = tpl.content.cloneNode(true);
+  const nuevoAcordeon = clon.querySelector(SELECTORES.acordeon) || clon.firstElementChild;
+  if (!nuevoAcordeon) return null;
+
+  const nombreColacion = (nombrePersonalizado && String(nombrePersonalizado).trim()) || obtenerSiguienteNombreColacion();
+  const tituloEl = nuevoAcordeon.querySelector(SELECTORES.acordeonTitulo) || nuevoAcordeon.querySelector('[data-ref="titulo"]');
+  if (tituloEl) {
+    tituloEl.textContent = nombreColacion;
+  }
+
+  const clienteId = extraerClienteId();
+  const btnAnadir = nuevoAcordeon.querySelector('[data-ref="btn-anadir-alimento"]') || nuevoAcordeon.querySelector(SELECTORES.btnAnadir);
+  if (btnAnadir) {
+    const queryCliente = clienteId ? `&cliente=${encodeURIComponent(clienteId)}` : '';
+    btnAnadir.setAttribute('href', `buscar-alimento.html?comida=${encodeURIComponent(nombreColacion)}${queryCliente}`);
+  }
+
+  const btnQuitar = nuevoAcordeon.querySelector(SELECTORES.btnQuitarComida);
+  if (btnQuitar) {
+    btnQuitar.addEventListener('click', (evento) => {
+      evento.preventDefault();
+      evento.stopPropagation();
+      if (!nuevoAcordeon.isConnected) return;
+      nuevoAcordeon.remove();
+      mostrarAvisoFlotante('Comida eliminada del plan.');
+      recalcularResumenPlan();
+    });
+  }
+
+  if (btnColacion.parentNode) {
+    btnColacion.parentNode.insertBefore(nuevoAcordeon, btnColacion);
+  }
+
+  recalcularResumenPlan();
+  mostrarAvisoFlotante('Nueva colación agregada al plan.');
+
+  return nuevoAcordeon;
+}
+
+/**
  * Inicializa los acordeones y alimentos en el editor con datos de referencia si están vacíos.
  */
 export function hidratarAlimentosIniciales() {
   const acordeones = document.querySelectorAll(SELECTORES.acordeon);
   const clienteActual = extraerClienteId();
+
+  // Precarga opcional de plantilla desde sessionStorage si se accede con ?plantilla= o plantilla seleccionada
+  let plantillaActiva = null;
+  const params = new URLSearchParams(window.location.search);
+  const plantillaId = params.get('plantilla');
+
+  try {
+    const rawPlantilla = sessionStorage.getItem('appcalorias_plantilla_seleccionada');
+    if (rawPlantilla) {
+      const parsed = JSON.parse(rawPlantilla);
+      if (parsed && (!plantillaId || parsed.id === plantillaId)) {
+        plantillaActiva = parsed;
+      }
+    }
+  } catch {
+    // Ignorar error al leer sessionStorage
+  }
 
   acordeones.forEach((acordeon) => {
     const titulo = acordeon.querySelector(SELECTORES.acordeonTitulo)?.textContent?.trim();
@@ -153,37 +244,48 @@ export function hidratarAlimentosIniciales() {
       btnAnadir.setAttribute('href', `buscar-alimento.html?comida=${encodeURIComponent(titulo)}${paramCliente}`);
     }
 
-    const infoDefecto = ALIMENTOS_PLAN_DEFECTO[titulo];
-    if (!infoDefecto) return;
+    const infoComida = (plantillaActiva && plantillaActiva.comidas && plantillaActiva.comidas[titulo])
+      ? plantillaActiva.comidas[titulo]
+      : ALIMENTOS_PLAN_DEFECTO[titulo];
+
+    if (!infoComida) return;
 
     const filaAlimento = acordeon.querySelector(SELECTORES.alimento);
     if (!filaAlimento) return;
 
     // Guardar referencia por 100g para recálculo dinámico
-    const factor = infoDefecto.gramos > 0 ? (100 / infoDefecto.gramos) : 1;
-    filaAlimento.dataset.kcal100 = String(infoDefecto.kcal * factor);
-    filaAlimento.dataset.p100 = String(infoDefecto.p * factor);
-    filaAlimento.dataset.c100 = String(infoDefecto.c * factor);
-    filaAlimento.dataset.g100 = String(infoDefecto.g * factor);
+    const factor = infoComida.gramos > 0 ? (100 / infoComida.gramos) : 1;
+    filaAlimento.dataset.kcal100 = String(infoComida.kcal * factor);
+    filaAlimento.dataset.p100 = String(infoComida.p * factor);
+    filaAlimento.dataset.c100 = String(infoComida.c * factor);
+    filaAlimento.dataset.g100 = String(infoComida.g * factor);
 
     const nombreEl = filaAlimento.querySelector(SELECTORES.alimentoNombre);
-    if (nombreEl && (nombreEl.textContent.trim() === 'Alimento' || !nombreEl.textContent.trim())) {
-      nombreEl.textContent = infoDefecto.titulo;
+    if (nombreEl) {
+      if (plantillaActiva || nombreEl.textContent.trim() === 'Alimento' || !nombreEl.textContent.trim()) {
+        nombreEl.textContent = infoComida.titulo;
+      }
     }
 
     const inputCant = filaAlimento.querySelector(SELECTORES.alimentoInputCantidad);
-    if (inputCant && !inputCant.value) {
-      inputCant.value = String(infoDefecto.gramos);
+    if (inputCant) {
+      if (plantillaActiva || !inputCant.value) {
+        inputCant.value = String(infoComida.gramos);
+      }
     }
 
     const kcalEl = filaAlimento.querySelector(SELECTORES.alimentoKcal);
-    if (kcalEl && kcalEl.textContent.includes('—')) {
-      asignarValorConUnidad(kcalEl, infoDefecto.kcal, 'kcal');
+    if (kcalEl) {
+      if (plantillaActiva || kcalEl.textContent.includes('—')) {
+        asignarValorConUnidad(kcalEl, infoComida.kcal, 'kcal');
+      }
     }
 
     const macrosEl = filaAlimento.querySelector(SELECTORES.alimentoMacros);
-    if (macrosEl && macrosEl.textContent.includes('—')) {
-      macrosEl.textContent = `P ${infoDefecto.p} · C ${infoDefecto.c} · G ${infoDefecto.g}`;
+    if (macrosEl) {
+      if (plantillaActiva || macrosEl.textContent.includes('—')) {
+        macrosEl.textContent = `P ${infoComida.p} · C ${infoComida.c} · G ${infoComida.g}`;
+      }
     }
 
     const btnCambiar = filaAlimento.querySelector(SELECTORES.btnCambiar);
@@ -193,6 +295,13 @@ export function hidratarAlimentosIniciales() {
 
     vincularEventosAlimento(filaAlimento);
   });
+
+  if (plantillaActiva) {
+    const pautasEl = document.querySelector(SELECTORES.textareaPautas);
+    if (pautasEl && !pautasEl.value.trim()) {
+      pautasEl.value = `Basado en plantilla: ${plantillaActiva.nombre || plantillaActiva.id}`;
+    }
+  }
 }
 
 export { hidratarAlimentosIniciales as inicializarAcordeones };
@@ -231,6 +340,10 @@ export function procesarAlimentoPendienteSession() {
     const t = ac.querySelector(SELECTORES.acordeonTitulo)?.textContent?.trim().toLowerCase();
     return t === comidaBuscada;
   });
+
+  if (!acordeonDestino && /colaci[oó]n/i.test(comidaBuscada)) {
+    acordeonDestino = anadirColacion(pendiente.comida);
+  }
 
   if (!acordeonDestino) {
     acordeonDestino = acordeones.find((ac) => ac.querySelector(SELECTORES.acordeonLineaKcal) || ac.querySelector(SELECTORES.btnAnadir));
@@ -310,7 +423,10 @@ export function procesarAlimentoPendienteSession() {
 
   const btnAnadir = acordeonDestino.querySelector(SELECTORES.btnAnadir);
   const cuerpo = acordeonDestino.querySelector('.acordeon__cuerpo') || acordeonDestino;
-  if (btnAnadir && btnAnadir.parentNode) {
+  const contenedorAlimentos = acordeonDestino.querySelector('[data-ref="contenedor-alimentos"]');
+  if (contenedorAlimentos) {
+    contenedorAlimentos.appendChild(nuevoAlimento);
+  } else if (btnAnadir && btnAnadir.parentNode) {
     btnAnadir.parentNode.insertBefore(nuevoAlimento, btnAnadir);
   } else {
     cuerpo.appendChild(nuevoAlimento);
@@ -388,7 +504,7 @@ export function recalcularComida(acordeonEl) {
   if (lineaMacrosEl) {
     lineaMacrosEl.textContent = alimentos.length > 0
       ? `P ${sumaP} · C ${sumaC} · G ${sumaG}`
-      : 'Sin alimentos';
+      : (acordeonEl.dataset.comida === 'colacion' ? '0P · 0C · 0G' : 'Sin alimentos');
   }
 
   return { kcal: sumaKcal, p: sumaP, c: sumaC, g: sumaG };
@@ -520,10 +636,19 @@ export function serializarComidasDOM() {
   let ordenComida = 0;
 
   acordeones.forEach((acordeon) => {
-    const filasAlimento = acordeon.querySelectorAll(SELECTORES.alimento);
-    if (filasAlimento.length === 0) return;
+    const esComida = Boolean(
+      acordeon.dataset.comida ||
+      acordeon.querySelector(SELECTORES.acordeonLineaKcal) ||
+      acordeon.querySelector(SELECTORES.btnAnadir)
+    );
+    if (!esComida) return;
 
-    const tituloEl = acordeon.querySelector(SELECTORES.acordeonTitulo);
+    const filasAlimento = acordeon.querySelectorAll(SELECTORES.alimento);
+    const esColacion = acordeon.dataset.comida === 'colacion' || acordeon.classList.contains('acordeon--colacion');
+
+    if (filasAlimento.length === 0 && !esColacion) return;
+
+    const tituloEl = acordeon.querySelector(SELECTORES.acordeonTitulo) || acordeon.querySelector('[data-ref="titulo"]');
     const nombreComida = tituloEl?.textContent?.trim() || `Comida ${ordenComida + 1}`;
 
     const notaEl = acordeon.querySelector(SELECTORES.textareaNota);
@@ -672,6 +797,30 @@ export async function iniciarPlanEditor() {
     if (filaAlimento && filaAlimento.isConnected) {
       filaAlimento.remove();
       mostrarAvisoFlotante('Alimento quitado de la comida.');
+      recalcularResumenPlan();
+    }
+  });
+
+  // Evento interactivo para Añadir colación / comida extra
+  const btnAnadirColacion = document.querySelector(SELECTORES.btnAnadirColacion);
+  if (btnAnadirColacion) {
+    btnAnadirColacion.addEventListener('click', (evento) => {
+      evento.preventDefault();
+      anadirColacion();
+    });
+  }
+
+  // Delegación de eventos para eliminación de comidas (colaciones)
+  document.addEventListener('click', (evento) => {
+    const btnQuitarComida = evento.target.closest(SELECTORES.btnQuitarComida);
+    if (!btnQuitarComida) return;
+
+    evento.preventDefault();
+    evento.stopPropagation();
+    const acordeon = btnQuitarComida.closest(SELECTORES.acordeon);
+    if (acordeon && acordeon.isConnected) {
+      acordeon.remove();
+      mostrarAvisoFlotante('Comida eliminada del plan.');
       recalcularResumenPlan();
     }
   });

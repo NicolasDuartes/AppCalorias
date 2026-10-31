@@ -50,7 +50,9 @@ PAGE_MAP_FALLBACK = {
     'rol-ui.js': ['pages/shared/contexto.html'],
     'contexto-ui.js': ['pages/shared/contexto.html'],
     'onboarding-ui.js': ['pages/alumno/onboarding.html'],
-    'alimentos-revision-ui.js': ['pages/coach/alimentos-revision.html']
+    'progreso-ui.js': ['pages/alumno/progreso.html'],
+    'alimentos-revision-ui.js': ['pages/coach/alimentos-revision.html'],
+    'plantillas-ui.js': ['pages/coach/plantillas.html']
 }
 
 

@@ -138,6 +138,12 @@ rutas de las páginas son relativas a esa carpeta.
    - Plantilla `<template id="tpl-cliente-fila">` en `clientes.html` y eliminación de todo `innerHTML` en `clientes-ui.js`, `agregar-ui.js`, `contexto-ui.js` y `reemplazar-ui.js`.
 8. **Búsqueda y filtrado reactivo de alimentos en `agregar.html` [Completado - 30/10/2026]:**
    - Filtrado en tiempo real con debounce de 300 ms, búsqueda remota en Supabase (`buscarAlimentos`), plantilla `<template id="tpl-alimento-busqueda">` y recálculo interactivo en el pie.
+9. **Panel de Progreso y Hábitos del Alumno (`progreso.html` y `progreso-ui.js`) [Completado - 30/10/2026]:**
+   - Panel de evolución de peso hacia la meta, tarjeta de pesajes recientes, adherencia calórica e hidratación diaria, con enlace activo en la barra inferior del alumno.
+10. **Catálogo de Plantillas de Planes del Coach (`plantillas.html` y `plantillas-ui.js`) [Completado - 30/10/2026]:**
+    - Catálogo interactivo de 4 plantillas maestras Atwater, conexión con la barra inferior del coach y precarga automática en el editor de planes.
+11. **Adición Dinámica de Colaciones en el Editor de Planes [Completado - 30/10/2026]:**
+    - Soporte interactivo para agregar y eliminar colaciones correlativas ("Colación 1", "Colación 2") mediante plantilla `<template id="tpl-comida-colacion">` y recálculo reactivo.
 
 ### Prioridad 4: Base de Datos y Robustez Transaccional
 

@@ -41,6 +41,7 @@ frontend/
 │       ├── agregar-ui.js          # alumno/agregar.html
 │       ├── reemplazar-ui.js       # alumno/reemplazar.html
 │       ├── alimento-form-ui.js    # alumno/crear-alimento.html y editar-alimento.html
+│       ├── progreso-ui.js         # alumno/progreso.html (evolución y peso)
 │       ├── perfil-ui.js           # alumno/perfil.html (datos y coach)
 │       ├── objetivo-ui.js         # alumno/perfil.html (regla analógica de peso)
 │       ├── clientes-ui.js         # coach/clientes.html (lista y vinculación)
@@ -53,6 +54,7 @@ frontend/
 │       ├── historial-ui.js        # coach/historial.html y historial-vacio.html
 │       ├── buscar-alimento-ui.js  # coach/buscar-alimento.html
 │       ├── alimentos-revision-ui.js # coach/alimentos-revision.html (moderación)
+│       ├── plantillas-ui.js       # coach/plantillas.html (catálogo de plantillas)
 │       ├── contexto-ui.js         # shared/contexto.html (cálculo BMR/TDEE)
 │       └── rol-ui.js              # shared/contexto.html (conmutador por rol)
 └── pages/

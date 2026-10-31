@@ -18,7 +18,7 @@ export const SELECTORES = {
   caloriasObjetivo: '.card--oscura .num--xl',
   linkRevisarContexto: '.card--oscura a.link-claro',
   btnCrearDesdeCero: 'a[href*="plan-editor-vacio.html"]',
-  btnCargarPlantilla: 'button[data-aviso]',
+  btnCargarPlantilla: 'a[href*="plantillas.html"]',
   btnVerPlanActual: 'a[href*="plan-activo.html"]',
   btnVerHistorial: 'a[href*="historial.html"]'
 };
@@ -39,7 +39,7 @@ export async function iniciarPlanNuevo() {
     if (sub) sub.textContent = cliente;
 
     // Propagar parámetro cliente a los enlaces hijos
-    const enlaces = document.querySelectorAll(`${SELECTORES.btnCrearDesdeCero}, ${SELECTORES.btnVerPlanActual}, ${SELECTORES.btnVerHistorial}`);
+    const enlaces = document.querySelectorAll(`${SELECTORES.btnCrearDesdeCero}, ${SELECTORES.btnCargarPlantilla}, ${SELECTORES.btnVerPlanActual}, ${SELECTORES.btnVerHistorial}`);
     enlaces.forEach((enlace) => {
       const href = enlace.getAttribute('href');
       if (href && !href.includes('cliente=')) {

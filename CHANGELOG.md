@@ -2,6 +2,20 @@
 
 Este documento registra los hitos de versiones **Mayores (Major)** y **Medianas (Minor)** de la aplicación con resúmenes ejecutivos concisos ($\le 10$ renglones). Los cambios atómicos y parches específicos se registran directamente en los commits de Git bajo la convención *Conventional Commits*.
 
+## [v0.5.7] — 30/10/2026
+- **Tipo:** Versión Menor (Panel de Progreso del Alumno, Catálogo de Plantillas del Coach y Colaciones Dinámicas)
+- **Fecha:** 30 de Octubre de 2026
+- **Resumen:**
+  1. Progreso del Alumno (`progreso.html` y `progreso-ui.js`): Evolución corporal, seguimiento de peso hacia la meta con barra porcentual, adherencia calórica y de hidratación diaria.
+  2. Conexión de navegación de alumno: Enlace activo a `progreso.html` en la barra inferior de `dashboard.html`, `perfil.html` y `plan.html`.
+  3. Catálogo de Plantillas del Coach (`plantillas.html` y `plantillas-ui.js`): 4 plantillas predefinidas (Déficit, Hipertrofia, Recomposición y Definición) con cálculo Atwater exacto.
+  4. Precarga de plantillas en el Editor: Al presionar "Usar plantilla", `sessionStorage` y `?plantilla=` inyectan comidas y macronutrientes en `plan-editor.html`.
+  5. Conexión de navegación del coach: Enlace activo en las 11 páginas del coach hacia `plantillas.html` y conexión desde `plan-nuevo.html`.
+  6. Colaciones dinámicas en el editor: Botón `#boton-anadir-colacion` con plantilla nativa `<template id="tpl-comida-colacion">`, agregando colaciones correlativas con botón de borrado, notas y enlaces contextuales de búsqueda.
+  7. Verificación total: 24 HTMLs y 38 módulos JS con 0 ciclos, 100% de enlaces estáticos resueltos y 48 pruebas en navegador real Headless Edge/Chromium superadas.
+
+---
+
 ## [v0.5.6] — 30/10/2026
 - **Tipo:** Versión Menor (Persistencia Real del Plan en Editor del Coach, Erradicación Total de innerHTML y Búsqueda Reactiva)
 - **Fecha:** 30 de Octubre de 2026

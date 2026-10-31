@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Progreso · Alumno</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../../css/base.css">
+  <link rel="stylesheet" href="../../css/components.css">
+  <link rel="stylesheet" href="../../css/pages/alumno.css">
+</head>
+<body>
+  <!-- Sprite SVG con los símbolos requeridos -->
+  <svg class="sprite" aria-hidden="true">
+    <symbol id="progreso" viewBox="0 0 24 24"><path d="M5 20V11M12 20V5M19 20v-6M3 20h18"/></symbol>
+    <symbol id="perfil" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></symbol>
+    <symbol id="dashboard" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="9" rx="1.5"/><rect x="13" y="4" width="7" height="5" rx="1.5"/><rect x="13" y="11" width="7" height="9" rx="1.5"/><rect x="4" y="15" width="7" height="5" rx="1.5"/></symbol>
+    <symbol id="volver" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></symbol>
+    <symbol id="flecha-derecha" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+    <symbol id="mas" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="check" viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></symbol>
+    <symbol id="fuego" viewBox="0 0 24 24"><path d="M12 3c1 3.5 5 5.5 5 10a5 5 0 0 1-10 0c0-2.5 1.5-4 2.5-5 .3 1.7 1 2.7 2 3 0-3 .5-5.5.5-8z"/></symbol>
+    <symbol id="agua" viewBox="0 0 24 24"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></symbol>
+    <symbol id="ajustes" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></symbol>
+  </svg>
+
+  <div class="pantalla">
+    <main class="contenido contenido--holgado gap-l">
+      <!-- Encabezado semántico con subtítulo de objetivo -->
+      <header class="encabezado gap-l">
+        <a class="btn-icono" href="dashboard.html" aria-label="Volver"><svg class="icono" width="20" height="20" aria-hidden="true"><use href="#volver"/></svg></a>
+        <div class="encabezado__textos gap-2xs">
+          <h1 class="titulo">Progreso</h1>
+          <p class="sub" id="objetivo-subtitulo">Descenso de peso</p>
+        </div>
+      </header>
+
+      <!-- Sección de Evolución de Peso Corporal -->
+      <section class="card" id="seccion-peso" aria-labelledby="t-seccion-peso">
+        <div class="card__fila">
+          <div class="columna">
+            <h2 class="seccion-titulo" id="t-seccion-peso">Evolución de peso corporal</h2>
+            <span class="sub" id="peso-resumen">Progreso hacia tu meta</span>
+          </div>
+          <a class="btn btn--chico btn--secundario btn--pesaje" id="btn-registrar-peso" href="perfil.html#regla">
+            <svg class="icono icono--grueso" width="16" height="16" aria-hidden="true"><use href="#mas"/></svg>
+            <span>Registrar peso</span>
+          </a>
+        </div>
+
+        <!-- Muestra peso inicial, peso actual y peso objetivo -->
+        <div class="fila fila--entre objetivo__pesos">
+          <div class="columna">
+            <span class="sub">Inicial</span>
+            <span class="negrita texto-15" id="peso-inicial">78 kg</span>
+          </div>
+          <div class="columna columna--centro">
+            <span class="sub">Actual</span>
+            <span class="num num--m" id="peso-actual">72,4 kg</span>
+          </div>
+          <div class="columna derecha">
+            <span class="sub">Meta</span>
+            <span class="negrita texto-15" id="peso-meta">70 kg</span>
+          </div>
+        </div>
+
+        <!-- Indicador de progreso: diferencia respecto a la meta y porcentaje completado -->
+        <div class="columna gap-2xs">
+          <div class="fila fila--entre">
+            <span class="sub" id="peso-diferencia">Faltan 2,4 kg</span>
+            <span class="negrita texto-14" id="peso-porcentaje">70%</span>
+          </div>
+          <div class="barra" id="barra-progreso-peso" role="progressbar" aria-label="Progreso hacia la meta" aria-valuemin="0" aria-valuemax="100" aria-valuenow="70">
+            <span style="width: 70%"></span>
+          </div>
+        </div>
+
+        <!-- Historial de pesajes recientes -->
+        <div class="columna gap-s" id="bloque-historial">
+          <div class="fila fila--entre">
+            <h3 class="negrita texto-14" id="t-historial">Historial de pesajes</h3>
+            <span class="sub" id="total-pesajes">Últimos registros</span>
+          </div>
+          <ul class="lista" id="lista-pesajes" aria-labelledby="t-historial">
+            <!-- Filas inyectadas dinámicamente con tpl-pesaje-fila -->
+          </ul>
+          <p class="sub" id="sin-pesajes" hidden>No hay registros de pesajes aún.</p>
+        </div>
+      </section>
+
+      <!-- Sección de Adherencia y Hábitos -->
+      <section class="card" id="seccion-habitos" aria-labelledby="t-seccion-habitos">
+        <div class="columna gap-2xs">
+          <h2 class="seccion-titulo" id="t-seccion-habitos">Adherencia y hábitos</h2>
+          <span class="sub" id="habitos-subtitulo">Resumen semanal de constancia</span>
+        </div>
+
+        <!-- Gráfico / resumen de cumplimiento semanal -->
+        <div class="grilla-2" id="resumen-semanal">
+          <div class="columna gap-2xs">
+            <div class="fila gap-xs">
+              <svg class="icono" width="18" height="18" aria-hidden="true" style="color: var(--verde);"><use href="#check"/></svg>
+              <span class="sub">Días en objetivo</span>
+            </div>
+            <span class="num num--s" id="dias-en-objetivo">5 <span class="unidad">/ 7</span></span>
+          </div>
+          <div class="columna gap-2xs">
+            <div class="fila gap-xs">
+              <svg class="icono" width="18" height="18" aria-hidden="true" style="color: var(--naranja);"><use href="#fuego"/></svg>
+              <span class="sub">Promedio calórico</span>
+            </div>
+            <span class="num num--s" id="promedio-kcal">2.040 <span class="unidad">kcal</span></span>
+          </div>
+        </div>
+
+        <!-- Promedio de hidratación diaria -->
+        <div class="card__fila" id="resumen-hidratacion">
+          <div class="fila gap-s">
+            <span class="tile tile--azul"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#agua"/></svg></span>
+            <div class="columna gap-3xs">
+              <span class="negrita texto-15">Hidratación diaria</span>
+              <span class="sub" id="promedio-agua-sub">Promedio de vasos consumidos</span>
+            </div>
+          </div>
+          <span class="num num--s" id="promedio-agua">7 <span class="unidad">vasos/día</span></span>
+        </div>
+      </section>
+
+      <!-- Enlace a calibración y perfil -->
+      <section class="lista" aria-label="Ajustes de objetivos">
+        <a class="fila-link" href="perfil.html">
+          <span class="tile"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#perfil"/></svg></span>
+          <span class="fila-link__textos">
+            <span class="fila-link__linea"><span class="fila-link__nombre">Ajustar meta y biometría</span></span>
+            <span class="sub">Ir al perfil para calibrar peso objetivo o registrar pesaje con regla</span>
+          </span>
+          <span class="chevron"><svg class="icono" width="20" height="20" aria-hidden="true"><use href="#flecha-derecha"/></svg></span>
+        </a>
+      </section>
+    </main>
+
+    <!-- Barra inferior de navegación con links -->
+    <nav class="barra-inferior" aria-label="Navegación principal">
+      <a class="barra-inferior__item" href="perfil.html"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#perfil"/></svg><span>Perfil</span></a>
+      <a class="barra-inferior__item" href="dashboard.html"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#dashboard"/></svg><span>Dashboard</span></a>
+      <a class="barra-inferior__item" href="progreso.html" aria-current="page"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#progreso"/></svg><span>Progreso</span></a>
+      <button class="barra-inferior__item" type="button"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#ajustes"/></svg><span>Ajustes</span></button>
+    </nav>
+
+    <!-- Plantilla de fila de pesaje para el historial -->
+    <template id="tpl-pesaje-fila">
+      <li class="item-lectura">
+        <span class="item-lectura__textos">
+          <span class="negrita texto-15" data-bind="fecha"></span>
+          <span class="sub" data-bind="variacion"></span>
+        </span>
+        <span class="num num--s"><span data-bind="peso"></span> <span class="unidad">kg</span></span>
+      </li>
+    </template>
+  </div>
+
+  <script type="module" src="../../js/ui/progreso-ui.js"></script>
+</body>
+</html>
