@@ -15,6 +15,9 @@
 import { aNumeroSeguro } from '../calc/nutricion-calc.js';
 import { guardarAvisoToast } from '../utils/navegacion.js';
 import '../utils/navegacion.js';
+import * as sesion from '../data/sesion.js';
+import { supabase } from '../data/supabase.js';
+import { guardarContextoEnergetico, obtenerUltimoContexto } from '../data/contexto-api.js';
 
 /**
  * Mapa centralizado de selectores del DOM para contexto.html.
@@ -300,9 +303,135 @@ function actualizarCardObjetivo(tdeeTermo) {
 }
 
 /**
+ * Obtiene el ID del alumno contextual (por query param ?cliente= en coach o sesión activa en alumno).
+ * @returns {Promise<string|null>}
+ */
+export async function obtenerAlumnoIdContexto() {
+  const params = new URLSearchParams(window.location.search);
+  const clienteParam = params.get('cliente');
+  if (clienteParam) return clienteParam;
+
+  if (window.location.hash) {
+    const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+    const hashCliente = hashParams.get('cliente') || hashParams.get('id');
+    if (hashCliente) return hashCliente;
+  }
+
+  if (typeof window !== 'undefined' && window.__TEST_BYPASS_AUTH__) {
+    return 'test-user';
+  }
+
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user?.id) {
+      return session.user.id;
+    }
+  } catch (err) {
+    console.warn('Error al obtener sesión en contexto-ui:', err);
+  }
+
+  return null;
+}
+
+/**
+ * Pobla los controles de entrada y opciones de dieta con un contexto previo.
+ * @param {Object} datos
+ */
+export function poblarContextoEnDOM(datos) {
+  if (!datos) return;
+
+  if (datos.peso_kg != null || datos.peso != null) {
+    const el = document.querySelector(SELECTORES.inputPeso);
+    if (el) el.value = String(datos.peso_kg ?? datos.peso);
+  }
+  if (datos.altura_cm != null || datos.altura != null) {
+    const el = document.querySelector(SELECTORES.inputAltura);
+    if (el) el.value = String(datos.altura_cm ?? datos.altura);
+  }
+  if (datos.edad_anios != null || datos.edad != null) {
+    const el = document.querySelector(SELECTORES.inputEdad);
+    if (el) el.value = String(datos.edad_anios ?? datos.edad);
+  }
+  if (datos.pasos_diarios != null || datos.pasos != null) {
+    const el = document.querySelector(SELECTORES.inputPasos);
+    if (el) el.value = String(datos.pasos_diarios ?? datos.pasos);
+  }
+  if (datos.met != null) {
+    const el = document.querySelector(SELECTORES.inputMet);
+    if (el) el.value = String(datos.met);
+  }
+  if (datos.duracion_horas != null || datos.duracion != null) {
+    const el = document.querySelector(SELECTORES.inputDuracion);
+    if (el) el.value = String(datos.duracion_horas ?? datos.duracion);
+  }
+  if (datos.sesiones_semana != null || datos.entrenos != null) {
+    const el = document.querySelector(SELECTORES.inputEntrenos);
+    if (el) el.value = String(datos.sesiones_semana ?? datos.entrenos);
+  }
+
+  if (datos.sexo) {
+    const esFem = String(datos.sexo).toUpperCase().startsWith('F');
+    const botones = document.querySelectorAll(SELECTORES.botonesGenero);
+    botones.forEach((btn) => {
+      const esBtnFem = btn.textContent.toLowerCase().includes('fem');
+      const activo = esFem ? esBtnFem : !esBtnFem;
+      btn.setAttribute('aria-pressed', activo ? 'true' : 'false');
+      btn.setAttribute('aria-checked', activo ? 'true' : 'false');
+    });
+  }
+
+  if (datos.tipo_dieta) {
+    const t = String(datos.tipo_dieta).toLowerCase();
+    if (t.includes('personalizado')) {
+      opcionDietaSeleccionada.tipo = 'personalizado';
+      opcionDietaSeleccionada.nombre = 'Personalizar';
+      opcionDietaSeleccionada.esPersonalizado = true;
+      if (datos.peso_objetivo_kg != null || datos.pesoObjetivo != null) {
+        const inObj = document.querySelector(SELECTORES.inputPesoObjetivo);
+        if (inObj) inObj.value = String(datos.peso_objetivo_kg ?? datos.pesoObjetivo);
+      }
+      if (datos.plazo_semanas != null || datos.semanas != null) {
+        const inSem = document.querySelector(SELECTORES.rangoSemanas);
+        if (inSem) inSem.value = String(datos.plazo_semanas ?? datos.semanas);
+      }
+    } else {
+      opcionDietaSeleccionada.esPersonalizado = false;
+      if (t.includes('leve') && t.includes('def')) {
+        opcionDietaSeleccionada.tipo = 'deficit_leve';
+        opcionDietaSeleccionada.nombre = 'Déficit leve';
+        opcionDietaSeleccionada.ajuste = -300;
+      } else if (t.includes('mod') && t.includes('def')) {
+        opcionDietaSeleccionada.tipo = 'deficit_moderado';
+        opcionDietaSeleccionada.nombre = 'Déficit moderado';
+        opcionDietaSeleccionada.ajuste = -500;
+      } else if (t.includes('mantenimiento')) {
+        opcionDietaSeleccionada.tipo = 'mantenimiento';
+        opcionDietaSeleccionada.nombre = 'Mantenimiento';
+        opcionDietaSeleccionada.ajuste = 0;
+      } else if (t.includes('leve') && t.includes('sup')) {
+        opcionDietaSeleccionada.tipo = 'superavit_leve';
+        opcionDietaSeleccionada.nombre = 'Superávit leve';
+        opcionDietaSeleccionada.ajuste = 300;
+      } else if (t.includes('mod') && t.includes('sup')) {
+        opcionDietaSeleccionada.tipo = 'superavit_moderado';
+        opcionDietaSeleccionada.nombre = 'Superávit moderado';
+        opcionDietaSeleccionada.ajuste = 500;
+      }
+    }
+
+    const opciones = document.querySelectorAll(SELECTORES.opcionesDieta);
+    opciones.forEach((op) => {
+      const tit = op.querySelector('.negrita')?.textContent?.trim() || '';
+      const coincide = tit.toLowerCase().includes(opcionDietaSeleccionada.nombre.toLowerCase());
+      op.setAttribute('aria-selected', coincide ? 'true' : 'false');
+    });
+  }
+}
+
+/**
  * Inicializa el controlador del contexto energético.
  */
-export function iniciarContexto() {
+export async function iniciarContexto() {
   recalcularGastoEnergetico();
 
   // Escuchar inputs biométricos y de entrenamiento
@@ -341,11 +470,26 @@ export function iniciarContexto() {
       opcionDietaSeleccionada.nombre = tit;
       opcionDietaSeleccionada.esPersonalizado = false;
 
-      if (tit.includes('Déficit leve')) opcionDietaSeleccionada.ajuste = -300;
-      else if (tit.includes('Déficit moderado')) opcionDietaSeleccionada.ajuste = -500;
-      else if (tit.includes('Mantenimiento')) opcionDietaSeleccionada.ajuste = 0;
-      else if (tit.includes('Superávit leve')) opcionDietaSeleccionada.ajuste = 300;
-      else if (tit.includes('Superávit moderado')) opcionDietaSeleccionada.ajuste = 500;
+      if (tit.includes('Déficit leve')) {
+        opcionDietaSeleccionada.tipo = 'deficit_leve';
+        opcionDietaSeleccionada.ajuste = -300;
+      } else if (tit.includes('Déficit moderado')) {
+        opcionDietaSeleccionada.tipo = 'deficit_moderado';
+        opcionDietaSeleccionada.ajuste = -500;
+      } else if (tit.includes('Mantenimiento')) {
+        opcionDietaSeleccionada.tipo = 'mantenimiento';
+        opcionDietaSeleccionada.ajuste = 0;
+      } else if (tit.includes('Superávit leve')) {
+        opcionDietaSeleccionada.tipo = 'superavit_leve';
+        opcionDietaSeleccionada.ajuste = 300;
+      } else if (tit.includes('Superávit moderado')) {
+        opcionDietaSeleccionada.tipo = 'superavit_moderado';
+        opcionDietaSeleccionada.ajuste = 500;
+      }
+
+      document.querySelectorAll(SELECTORES.opcionesDieta).forEach((b) => {
+        b.setAttribute('aria-selected', b === op ? 'true' : 'false');
+      });
 
       recalcularGastoEnergetico();
     });
@@ -355,16 +499,98 @@ export function iniciarContexto() {
   const summaryPersonalizar = document.querySelector(SELECTORES.summaryPersonalizar);
   if (summaryPersonalizar) {
     summaryPersonalizar.addEventListener('click', () => {
+      opcionDietaSeleccionada.tipo = 'personalizado';
       opcionDietaSeleccionada.esPersonalizado = true;
       opcionDietaSeleccionada.nombre = 'Personalizar';
       recalcularGastoEnergetico();
     });
   }
 
+  // Carga reactiva de último contexto si hay alumnoId
+  const alumnoId = await obtenerAlumnoIdContexto();
+  if (alumnoId) {
+    try {
+      const ultimo = await obtenerUltimoContexto(alumnoId);
+      if (ultimo) {
+        poblarContextoEnDOM(ultimo);
+        recalcularGastoEnergetico();
+      }
+    } catch (err) {
+      console.warn('Error al cargar último contexto:', err);
+    }
+  }
+
   // Guardar contexto
   const btnGuardar = document.querySelector(SELECTORES.btnGuardar);
   if (btnGuardar) {
-    btnGuardar.addEventListener('click', () => {
+    btnGuardar.addEventListener('click', async () => {
+      const genero = obtenerGeneroSeleccionado();
+      const peso = aNumeroSeguro(document.querySelector(SELECTORES.inputPeso)?.value || 78);
+      const altura = aNumeroSeguro(document.querySelector(SELECTORES.inputAltura)?.value || 178);
+      const edad = aNumeroSeguro(document.querySelector(SELECTORES.inputEdad)?.value || 30);
+      const pasos = aNumeroSeguro(document.querySelector(SELECTORES.inputPasos)?.value || 8000);
+
+      const met = aNumeroSeguro(document.querySelector(SELECTORES.inputMet)?.value || 6);
+      const duracion = aNumeroSeguro(document.querySelector(SELECTORES.inputDuracion)?.value || 1);
+      const entrenos = aNumeroSeguro(document.querySelector(SELECTORES.inputEntrenos)?.value || 4);
+
+      const bmr = calcularBMR(genero, peso, altura, edad);
+      const neat = Math.round(FACTOR_NEAT_PASO * peso * pasos);
+      const neatBmr = bmr + neat;
+      const gastoSesion = Math.round(met * peso * duracion);
+      const entrenoDiario = Math.round((gastoSesion * entrenos) / 7);
+      const tdee = neatBmr + entrenoDiario;
+      const tdeeTermo = Math.round(tdee * FACTOR_TERMOGENESIS);
+
+      const tipoDieta = opcionDietaSeleccionada.esPersonalizado
+        ? 'personalizado'
+        : (opcionDietaSeleccionada.tipo || 'deficit_moderado');
+
+      const pesoObj = opcionDietaSeleccionada.esPersonalizado
+        ? aNumeroSeguro(document.querySelector(SELECTORES.inputPesoObjetivo)?.value || (peso - 6))
+        : null;
+
+      const plazoSem = opcionDietaSeleccionada.esPersonalizado
+        ? Math.max(1, aNumeroSeguro(document.querySelector(SELECTORES.rangoSemanas)?.value || 12))
+        : null;
+
+      const ajuste = opcionDietaSeleccionada.ajuste;
+      const caloriasObjetivo = opcionDietaSeleccionada.esPersonalizado
+        ? (opcionDietaSeleccionada.calorias || Math.max(800, tdeeTermo + ajuste))
+        : Math.max(800, tdeeTermo + ajuste);
+
+      const datosContexto = {
+        sexo: genero === 'femenino' ? 'F' : 'M',
+        edad_anios: edad,
+        peso_kg: peso,
+        altura_cm: altura,
+        pasos_diarios: pasos,
+        met,
+        duracion_horas: duracion,
+        sesiones_semana: entrenos,
+        tipo_dieta: tipoDieta,
+        peso_objetivo_kg: pesoObj,
+        plazo_semanas: plazoSem,
+        bmr_kcal: bmr,
+        neat_kcal: neat,
+        gasto_sesion_kcal: gastoSesion,
+        gastoSesion_kcal: gastoSesion,
+        entreno_diario_kcal: entrenoDiario,
+        tdee_kcal: tdee,
+        tdee_termogenesis_kcal: tdeeTermo,
+        ajuste_kcal: ajuste,
+        calorias_objetivo: caloriasObjetivo,
+        version_calculo: '1'
+      };
+
+      const idDestino = await obtenerAlumnoIdContexto();
+      if (idDestino) {
+        try {
+          await guardarContextoEnergetico(idDestino, datosContexto);
+        } catch (guardarErr) {
+          console.warn('Error al guardar contexto energético:', guardarErr);
+        }
+      }
       guardarAvisoToast('Contexto energético guardado con éxito.');
     });
   }

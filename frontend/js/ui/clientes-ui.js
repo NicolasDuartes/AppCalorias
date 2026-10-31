@@ -63,7 +63,7 @@ function filaCliente(cliente, indice) {
       </span>
       <span class="chevron"><svg class="icono" width="20" height="20" aria-hidden="true"><use href="#flecha-derecha"/></svg></span>
     </a>`;
-  li.querySelector('.fila-link').href = `cliente.html#id=${cliente.id}`;
+  li.querySelector('.fila-link').href = `cliente.html?cliente=${encodeURIComponent(cliente.id)}`;
   const avatar = li.querySelector('.avatar');
   avatar.classList.add(COLORES_AVATAR[indice % COLORES_AVATAR.length]);
   avatar.textContent = iniciales(nombre);

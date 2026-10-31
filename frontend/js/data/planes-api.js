@@ -15,7 +15,7 @@ import { supabase } from './supabase.js';
  * @param {number} idx
  * @returns {Object}
  */
-function normalizarItemPlan(it, idx) {
+export function normalizarItemPlan(it, idx) {
   return {
     id: it.id,
     plan_meal_id: it.plan_meal_id,
@@ -39,6 +39,71 @@ function normalizarItemPlan(it, idx) {
     orden: it.sort_order ?? it.orden ?? idx,
     sort_order: it.sort_order ?? it.orden ?? idx
   };
+}
+
+/**
+ * Obtiene un plan nutricional específico por su ID junto con sus comidas e ítems vinculados.
+ * Consulta meal_plans por id = planId, plan_meals y plan_items vinculados (ordenados por sort_order),
+ * y normaliza las comidas e ítems usando normalizarItemPlan.
+ *
+ * @param {string} planId - UUID del plan nutricional
+ * @returns {Promise<{plan: Object, comidas: Array<{id: string, plan_id: string, nombre: string, meal_type: string, orden: number, sort_order: number, notas: string, items: Array<Object>}>} | null>} Plan estructurado o null si no existe
+ */
+export async function obtenerPlanPorId(planId) {
+  if (!planId) return null;
+
+  try {
+    const { data: plan, error: errPlan } = await supabase
+      .from('meal_plans')
+      .select('*')
+      .eq('id', planId)
+      .limit(1)
+      .maybeSingle();
+
+    if (errPlan || !plan) {
+      if (errPlan) {
+        console.warn('Error en obtenerPlanPorId al consultar meal_plans:', errPlan);
+      }
+      return null;
+    }
+
+    // Consultar las comidas y sus ítems vinculados ordenados por sort_order
+    const { data: meals, error: errMeals } = await supabase
+      .from('plan_meals')
+      .select('*, plan_items(*)')
+      .eq('plan_id', plan.id)
+      .order('sort_order', { ascending: true });
+
+    if (errMeals || !Array.isArray(meals)) {
+      if (errMeals) {
+        console.warn('Error en obtenerPlanPorId al consultar plan_meals:', errMeals);
+      }
+      return { plan, comidas: [] };
+    }
+
+    const comidas = meals.map((m, mIdx) => {
+      const rawItems = Array.isArray(m.plan_items) ? m.plan_items : [];
+      const items = rawItems
+        .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
+        .map(normalizarItemPlan);
+
+      return {
+        id: m.id,
+        plan_id: m.plan_id,
+        nombre: m.meal_type,
+        meal_type: m.meal_type,
+        orden: m.sort_order ?? mIdx,
+        sort_order: m.sort_order ?? mIdx,
+        notas: m.notes || '',
+        items
+      };
+    });
+
+    return { plan, comidas };
+  } catch (err) {
+    console.warn('Excepción en obtenerPlanPorId:', err);
+    return null;
+  }
 }
 
 /**

@@ -2,6 +2,20 @@
 
 Este documento registra los hitos de versiones **Mayores (Major)** y **Medianas (Minor)** de la aplicación con resúmenes ejecutivos concisos ($\le 10$ renglones). Los cambios atómicos y parches específicos se registran directamente en los commits de Git bajo la convención *Conventional Commits*.
 
+## [v0.5.3] — 30/10/2026
+- **Tipo:** Versión Menor (Conexión Integral de Capa de Datos, Persistencia Metabólica y Formularios de Alimentos)
+- **Fecha:** 30 de Octubre de 2026
+- **Resumen:**
+  1. Módulo `contexto-api.js`: Alta y consulta en `public.contextos_energeticos` con fallback resiliente en `sessionStorage` y gestión de `permisos_alumno`.
+  2. Persistencia metabólica en `contexto-ui.js`: Hidratación automática de biometría y guardado completo de BMR, NEAT, TDEE y calorías objetivo.
+  3. Ampliación de `planes-api.js`: Implementación de `obtenerPlanPorId()` con normalización jerárquica de comidas e ítems.
+  4. Hidratación en `plan-archivado-ui.js` y conexión real en `plan-ui.js`: El plan del alumno consume `obtenerPlanActivo()` preservando fallback offline.
+  5. Formularios de alimentos completos: Incorporación del selector de las 12 categorías y campo oculto `alimento_id` en `crear-alimento.html` y `editar-alimento.html`.
+  6. Conexión de `alimento-form-ui.js`: Validación obligatoria de categoría y submit conectado a `crearAlimento()` y `proponerCorreccion()`.
+  7. Estandarización de navegación del Coach: Migración de hash a query string `?cliente=UUID` en `clientes-ui.js` y `cliente-ui.js`, y persistencia de pesaje en `objetivo-ui.js`.
+
+---
+
 ## [v0.5.2] — 29/10/2026
 - **Tipo:** Versión Menor (Arquitectura de Plantillas HTML Nativas `<template>`, Unificación de Estados y Blindaje DOM-XSS)
 - **Fecha:** 29 de Octubre de 2026

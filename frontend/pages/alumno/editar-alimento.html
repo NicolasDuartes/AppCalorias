@@ -30,6 +30,7 @@
       </header>
 
       <form class="columna gap-l" id="form-alimento" action="cantidad.html" method="get" novalidate>
+        <input type="hidden" name="alimento_id">
         <label class="campo">
           <span class="campo__etiqueta campo__etiqueta--fuerte">Nombre</span>
           <span class="input"><input type="text" name="nombre" autocomplete="off" placeholder="Ej.: Galletitas de avena" required></span>
@@ -49,6 +50,27 @@
             <button type="button" role="radio" aria-checked="true">Listo para comer</button>
           </div>
         </fieldset>
+
+        <label class="campo">
+          <span class="campo__etiqueta campo__etiqueta--fuerte">Categoría</span>
+          <span class="input select-contenedor">
+            <select name="categoria" required>
+              <option value="" disabled selected>Elegí una categoría…</option>
+              <option value="carnes">Carnes</option>
+              <option value="pescados">Pescados y mariscos</option>
+              <option value="huevos">Huevos</option>
+              <option value="lacteos">Lácteos</option>
+              <option value="cereales">Cereales, panes y pastas</option>
+              <option value="legumbres">Legumbres</option>
+              <option value="verduras">Verduras</option>
+              <option value="frutas">Frutas</option>
+              <option value="grasas">Grasas, aceites y frutos secos</option>
+              <option value="dulces">Dulces y azúcares</option>
+              <option value="bebidas">Bebidas</option>
+              <option value="preparaciones">Preparaciones</option>
+            </select>
+          </span>
+        </label>
 
         <fieldset class="campo">
           <legend class="campo__etiqueta campo__etiqueta--fuerte">Valores cada 100 g</legend>

@@ -15,9 +15,10 @@ frontend/
 │       ├── coach.css              # Lista de clientes, línea de tiempo e historial
 │       └── cuenta.css             # Formularios de login y registro
 ├── js/
-│   ├── data/                      # Capa de datos y persistencia (7 módulos)
+│   ├── data/                      # Capa de datos y persistencia (8 módulos)
 │   │   ├── supabase.js            # Cliente Singleton de Supabase (ESM)
 │   │   ├── sesion.js              # Control de sesión, roles (exigirRol) y rutas
+│   │   ├── contexto-api.js        # Gasto energético (contextos_energeticos) y permisos
 │   │   ├── alimentos-api.js       # Búsqueda RPC trigram y CRUD de alimentos
 │   │   ├── planes-api.js          # Ciclo de vida de planes (meal_plans)
 │   │   ├── registro-api.js        # Registro de ingesta diaria y agua (daily_logs)

@@ -26,7 +26,9 @@ export const SELECTORES = {
   botonEliminar: '#boton-eliminar',
   confirmarEliminar: '#confirmar-eliminar',
   mensajeEliminar: '#mensaje-eliminar',
-  nombreCliente: '.nombre-cliente'
+  nombreCliente: '.nombre-cliente',
+  enlaceContexto: 'a[href*="contexto.html"]',
+  enlacePlan: 'a[href*="plan-nuevo.html"], a[href*="plan-activo.html"]'
 };
 
 const el = (sel) => document.querySelector(sel);
@@ -40,7 +42,7 @@ function mostrarMensaje(nodo, texto) {
 
 // El id viene en el enlace; si no (volviendo de otra pantalla), el último abierto
 function idDelCliente() {
-  const delEnlace = new URLSearchParams(window.location.hash.slice(1)).get('id');
+  const delEnlace = new URLSearchParams(window.location.search).get('cliente') || new URLSearchParams(window.location.search).get('id') || new URLSearchParams(window.location.hash.slice(1)).get('id');
   try {
     if (delEnlace) sessionStorage.setItem(CLAVE_GUARDADA, delEnlace);
     return delEnlace || sessionStorage.getItem(CLAVE_GUARDADA);
@@ -100,6 +102,14 @@ async function iniciar() {
   const cod = el(SELECTORES.clienteCodigo);
   if (cod) cod.textContent = `ID ${cliente.client_code}`;
   document.querySelectorAll(SELECTORES.nombreCliente).forEach((n) => { n.textContent = `@${usuario}`; });
+  const enlaceContexto = el(SELECTORES.enlaceContexto);
+  if (enlaceContexto) {
+    enlaceContexto.href = `../shared/contexto.html?cliente=${encodeURIComponent(cliente.id)}`;
+  }
+  const enlacePlan = el(SELECTORES.enlacePlan);
+  if (enlacePlan) {
+    enlacePlan.href = `plan-activo.html?cliente=${encodeURIComponent(cliente.id)}`;
+  }
   const btnEliminar = el(SELECTORES.botonEliminar);
   if (btnEliminar) btnEliminar.hidden = false;
 

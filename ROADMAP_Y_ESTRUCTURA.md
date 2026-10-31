@@ -103,22 +103,22 @@ rutas de las páginas son relativas a esa carpeta.
 
 ### Prioridad 2: Conexión Integral de Stubs y Capa de Datos
 
-1. **Creación del módulo `frontend/js/data/contexto-api.js`:**
-   - Desacoplar `contexto-ui.js` y persistir el cálculo metabólico en la tabla `contextos_energeticos` al presionar "Guardar contexto".
-   - Conectar lectura y actualización de `permisos_alumno`.
-2. **Ampliación de `planes-api.js`:**
-   - Implementar función `obtenerPlanPorId(planId)` con sus comidas e ítems para permitir la hidratación de `plan-archivado.html`.
-3. **Conexión real de `plan-ui.js` (Alumno):**
-   - Sustituir el stub `cargarPlanActivo()` que lee del DOM estático por el consumo asíncrono de `obtenerPlanActivo(alumnoId)` de `planes-api.js`.
-4. **Rediseño y conexión de formularios de alimentos (`crear-alimento.html` y `editar-alimento.html`):**
-   - Incorporar selector visual de `categoria` (campo obligatorio `NOT NULL` en PostgreSQL) y campo oculto `alimento_id`.
-   - Modificar `alimento-form-ui.js` para interceptar el `submit` con `preventDefault()` y ejecutar `crearAlimento()` o `proponerCorreccion()`.
-5. **Transferencia de alimentos al editor de planes:**
-   - Utilizar `sessionStorage` o query strings en `buscar-alimento-ui.js` para transferir el alimento seleccionado a `plan-editor.html` e insertarlo reactivamente en la comida.
-6. **Persistencia de pesajes en `objetivo-ui.js`:**
-   - Conectar la regla analógica de peso con una tabla histórica en Supabase para no perder el pesaje al recargar.
-7. **Estandarización de navegación del Coach:**
-   - Unificar el paso de parámetros en el panel del coach migrando de fragmentos hash (`#id=...`) a query strings (`?cliente=UUID`).
+1. **Creación del módulo `frontend/js/data/contexto-api.js` [Completado - 30/10/2026]:**
+   - Desacoplar `contexto-ui.js` y persistir el cálculo metabólico en la tabla `contextos_energeticos` al presionar "Guardar contexto" con fallback en `sessionStorage`.
+   - Conectar lectura y actualización de `permisos_alumno` (`obtenerPermisosAlumno`, `actualizarPermisoAlumno`).
+2. **Ampliación de `planes-api.js` [Completado - 30/10/2026]:**
+   - Implementar función `obtenerPlanPorId(planId)` con sus comidas e ítems ordenados para permitir la hidratación de `plan-archivado.html`.
+3. **Conexión real de `plan-ui.js` (Alumno) [Completado - 30/10/2026]:**
+   - Sustituir el stub `cargarPlanActivo()` que leía del DOM estático por el consumo asíncrono de `obtenerPlanActivo(alumnoId)` de `planes-api.js`, manteniendo fallback transparente a `leerDatosPlanDOM()`.
+4. **Rediseño y conexión de formularios de alimentos (`crear-alimento.html` y `editar-alimento.html`) [Completado - 30/10/2026]:**
+   - Incorporar selector visual de las 12 categorías nutricionales (campo obligatorio `NOT NULL` en PostgreSQL) y campo oculto `alimento_id`.
+   - Modificar `alimento-form-ui.js` para interceptar el `submit` con `preventDefault()`, validar consistencia calórica y ejecutar `crearAlimento()` o `proponerCorreccion()`.
+5. **Transferencia de alimentos al editor de planes [Completado - 29/10/2026]:**
+   - Utilizar `sessionStorage` (`appcalorias_alimento_editor_pendiente`) en `buscar-alimento-ui.js` para transferir el alimento seleccionado a `plan-editor.html` e insertarlo reactivamente en la comida.
+6. **Persistencia de pesajes en `objetivo-ui.js` [Completado - 30/10/2026]:**
+   - Conectar la regla analógica de pesaje con persistencia en `sessionStorage` (`appcalorias_peso_actual`, `appcalorias_historial_pesajes`) restaurando el progreso en cada carga.
+7. **Estandarización de navegación del Coach [Completado - 30/10/2026]:**
+   - Unificar el paso de parámetros en el panel del coach migrando de fragmentos hash (`#id=...`) a query strings (`?cliente=UUID`) en `clientes-ui.js` y `cliente-ui.js`.
 
 ### Prioridad 3: Flujos de Usuario Faltantes
 

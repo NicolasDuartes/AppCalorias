@@ -185,9 +185,41 @@ if (form) {
   form.addEventListener('submit', (evento) => {
     evento.preventDefault();
     actual = pesoDeMarca(marcaElegida);
+    try {
+      sessionStorage.setItem('appcalorias_peso_actual', String(actual));
+      let historial = [];
+      const previo = sessionStorage.getItem('appcalorias_historial_pesajes');
+      if (previo) {
+        try {
+          const parseado = JSON.parse(previo);
+          if (Array.isArray(parseado)) historial = parseado;
+        } catch {
+          historial = [];
+        }
+      }
+      historial.push({
+        peso: actual,
+        fecha: new Date().toISOString()
+      });
+      sessionStorage.setItem('appcalorias_historial_pesajes', JSON.stringify(historial));
+    } catch {
+      // Ignorar si sessionStorage no está disponible
+    }
     dibujarAvance();
     cerrar();
   });
+}
+
+try {
+  const guardado = sessionStorage.getItem('appcalorias_peso_actual');
+  if (guardado !== null && guardado !== '') {
+    const num = Number(guardado);
+    if (!Number.isNaN(num)) {
+      actual = num;
+    }
+  }
+} catch {
+  // Ignorar si sessionStorage no está disponible
 }
 
 if (pista && tarjeta) {

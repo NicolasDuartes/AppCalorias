@@ -27,17 +27,27 @@ Esta carpeta contiene los módulos encargados de la interacción con la base de 
   - `proponerCorreccion(alimentoId, cambios, motivo)`: Registra una propuesta de modificación sobre un alimento aprobado en `correcciones_alimento`.
   - `obtenerCategorias()`: Lista las 12 categorías oficiales ordenadas.
 
-### 4. `planes-api.js`
+### 4. `contexto-api.js`
+- **Responsabilidad:** Gestión integral del contexto energético del alumno (`contextos_energeticos`) y administración de permisos granulares por sección otorgados por el coach (`permisos_alumno`).
+- **Funciones principales:**
+  - `guardarContextoEnergetico(alumnoId, datosContexto)`: Inserta en `public.contextos_energeticos` las variables biométricas, actividad y cálculos metabólicos (BMR, NEAT, TDEE, objetivo calórico). Si Supabase falla o la app opera offline, persiste el registro en `sessionStorage` bajo la clave `'appcalorias_contexto_ultimo_' + alumnoId`. Retorna `{ success, data, error }`.
+  - `obtenerUltimoContexto(alumnoId)`: Consulta el contexto energético más reciente de un alumno ordenado descendentemente por fecha (`created_at`). Si falla la conexión, recupera el estado desde `sessionStorage`.
+  - `obtenerPermisosAlumno(alumnoId)`: Consulta en `public.permisos_alumno` y retorna un array con las secciones habilitadas para el alumno (ej. `['contexto', 'plan']`).
+  - `actualizarPermisoAlumno(alumnoId, seccion, habilitar)`: Otorga (`habilitar = true`) o revoca (`habilitar = false`) el permiso de edición de una sección para un alumno, registrando al coach autenticado. Retorna `{ success, error }`.
+
+### 5. `planes-api.js`
 - **Responsabilidad:** Gestión del ciclo de vida de los planes alimenticios (`meal_plans`, `plan_meals`, `plan_items`).
 - **Funciones principales:**
-  - `obtenerPlanActivo(alumnoId)`: Recupera el plan vigente del alumno con sus comidas e ítems ordenados.
+  - `obtenerPlanActivo(alumnoId)`: Recupera el plan vigente del alumno con sus comidas e ítems ordenados y normalizados.
+  - `obtenerPlanPorId(planId)`: Consulta un plan nutricional específico por su ID junto con sus comidas (`plan_meals`) y alimentos vinculados (`plan_items`) ordenados por `sort_order`, normalizados vía `normalizarItemPlan`. Retorna `{ plan, comidas }` o `null`.
   - `crearPlan(alumnoId, coachId, modalidad, comidas)`: Da de alta un nuevo plan y sus comidas asociadas.
   - `actualizarPlan(planId, comidas)`: Actualiza las comidas y alimentos de un plan borrador o activo.
   - `activarPlan(planId)`: Pasa un plan a estado `'activo'`.
   - `archivarPlan(planId)`: Archiva un plan finalizado para conservarlo en el historial.
   - `obtenerHistorialPlanes(alumnoId)`: Obtiene la lista cronológica de planes de un alumno.
+  - `normalizarItemPlan(it, idx)`: Normaliza ítems individuales garantizando compatibilidad de propiedades y valores numéricos seguros.
 
-### 5. `registro-api.js`
+### 6. `registro-api.js`
 - **Responsabilidad:** Registro diario de ingesta de alimentos e hidratación del alumno (`daily_logs`, `logged_items`).
 - **Funciones principales:**
   - `obtenerOCrearRegistroDiario(alumnoId, fecha)`: Obtiene el registro diario para una fecha específica o lo inicializa si no existe.
@@ -46,11 +56,11 @@ Esta carpeta contiene los módulos encargados de la interacción con la base de 
   - `obtenerConsumoDiario(alumnoId, fecha)`: Devuelve el resumen diario agrupado por comida (Desayuno, Almuerzo, Merienda, Cena) con totales de kcal y macros.
   - `actualizarAgua(logId, litros)`: Actualiza la cantidad de agua registrada en el día.
 
-### 6. `alimentos-locales.js`
+### 7. `alimentos-locales.js`
 - **Responsabilidad:** Catálogo local en memoria de 24 alimentos comunes con valores nutricionales estandarizados cada 100 g, categorías y pesos de unidades discretas.
 - **Uso:** Utilizado como motor de búsqueda local en `reemplazar-ui.js` y como respaldo desconectado (offline).
 
-### 7. `plan-defecto.js`
+### 8. `plan-defecto.js`
 - **Responsabilidad:** Estructura fija de comidas y alimentos predeterminados para demostraciones o inicializaciones sin plan asignado.
 
 ---
