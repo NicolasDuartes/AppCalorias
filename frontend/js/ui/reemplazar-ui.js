@@ -380,11 +380,23 @@ export function actualizarPieConfirmacion(seleccion, mapaSelectores = SELECTORES
 
   if (!btnConfirmar) return;
 
+  const crearIcono = () => {
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('class', 'icono icono--grueso');
+    svg.setAttribute('width', '18');
+    svg.setAttribute('height', '18');
+    svg.setAttribute('aria-hidden', 'true');
+    const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+    use.setAttribute('href', '#reemplazar');
+    svg.appendChild(use);
+    return svg;
+  };
+
   if (!seleccion) {
     if (elNota) elNota.hidden = true;
     btnConfirmar.classList.remove('btn--secundario');
     btnConfirmar.classList.add('btn--primario');
-    btnConfirmar.innerHTML = `<svg class="icono icono--grueso" width="18" height="18" aria-hidden="true"><use href="#reemplazar"/></svg>Reemplazar`;
+    btnConfirmar.replaceChildren(crearIcono(), document.createTextNode('Reemplazar'));
     return;
   }
 
@@ -396,13 +408,13 @@ export function actualizarPieConfirmacion(seleccion, mapaSelectores = SELECTORES
     if (elNota) elNota.hidden = false;
     btnConfirmar.classList.remove('btn--primario');
     btnConfirmar.classList.add('btn--secundario');
-    btnConfirmar.innerHTML = `<svg class="icono icono--grueso" width="18" height="18" aria-hidden="true"><use href="#reemplazar"/></svg>Cambiar igual por ${escaparHtml(nombreCandidato)}`;
+    btnConfirmar.replaceChildren(crearIcono(), document.createTextNode(`Cambiar igual por ${nombreCandidato}`));
   } else {
     // Casos Equivalente o Parcial: aviso oculto y botón primario "Reemplazar"
     if (elNota) elNota.hidden = true;
     btnConfirmar.classList.remove('btn--secundario');
     btnConfirmar.classList.add('btn--primario');
-    btnConfirmar.innerHTML = `<svg class="icono icono--grueso" width="18" height="18" aria-hidden="true"><use href="#reemplazar"/></svg>Reemplazar`;
+    btnConfirmar.replaceChildren(crearIcono(), document.createTextNode('Reemplazar'));
   }
 }
 

@@ -132,6 +132,12 @@ rutas de las páginas son relativas a esa carpeta.
    - Conexión de la barra inferior en las 10 páginas HTML del coach y `contexto.html` con enlace activo hacia `alimentos-revision.html`.
 5. **Guardia de sesión con redirección inteligente y calibración [Completado - 30/10/2026]:**
    - Captura de `redirect_to` al redirigir al login en `sesion.js`, redirección a la ruta segura solicitada en `login-ui.js`, derivación automática a `onboarding.html` para alumnos nuevos en `cuenta-ui.js`/`login-ui.js`, y acceso a calibración desde `perfil.html`.
+6. **Persistencia real en el editor de planes del coach [Completado - 30/10/2026]:**
+   - Serialización DOM completa de comidas, ítems y notas en `plan-editor-ui.js`, invocación de `crearPlan()` y `activarPlan()`, y respaldo resiliente en `sessionStorage`.
+7. **Erradicación definitiva de residuos de `innerHTML` (Regla de Oro 1) [Completado - 30/10/2026]:**
+   - Plantilla `<template id="tpl-cliente-fila">` en `clientes.html` y eliminación de todo `innerHTML` en `clientes-ui.js`, `agregar-ui.js`, `contexto-ui.js` y `reemplazar-ui.js`.
+8. **Búsqueda y filtrado reactivo de alimentos en `agregar.html` [Completado - 30/10/2026]:**
+   - Filtrado en tiempo real con debounce de 300 ms, búsqueda remota en Supabase (`buscarAlimentos`), plantilla `<template id="tpl-alimento-busqueda">` y recálculo interactivo en el pie.
 
 ### Prioridad 4: Base de Datos y Robustez Transaccional
 

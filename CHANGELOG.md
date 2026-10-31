@@ -2,6 +2,20 @@
 
 Este documento registra los hitos de versiones **Mayores (Major)** y **Medianas (Minor)** de la aplicación con resúmenes ejecutivos concisos ($\le 10$ renglones). Los cambios atómicos y parches específicos se registran directamente en los commits de Git bajo la convención *Conventional Commits*.
 
+## [v0.5.6] — 30/10/2026
+- **Tipo:** Versión Menor (Persistencia Real del Plan en Editor del Coach, Erradicación Total de innerHTML y Búsqueda Reactiva)
+- **Fecha:** 30 de Octubre de 2026
+- **Resumen:**
+  1. Persistencia real en el editor de planes (`plan-editor-ui.js`): Serialización reactiva completa del DOM e invocación de `crearPlan()` y `activarPlan()` con fallback en `sessionStorage`.
+  2. Propagación contextual del cliente: Inyección de `clienteId` en enlaces de búsqueda y retorno, y redirección inmediata a `plan-activo.html` con aviso toast.
+  3. Erradicación total de `innerHTML` (Regla de Oro 1 al 100%): Incorporación de `<template id="tpl-cliente-fila">` en `clientes.html` y refactorización segura en `clientes-ui.js`.
+  4. Blindaje anti-DOM-XSS: Limpieza completa de `innerHTML` en `agregar-ui.js` (pie de resumen), `contexto-ui.js` (cálculo de plazos y biometría) y `reemplazar-ui.js` (SVG seguro vía `createElementNS`).
+  5. Búsqueda y filtrado reactivo en `agregar.html`: Input accesible con debounce de 300 ms, filtrado en vivo de alimentos locales y búsqueda remota vía `buscarAlimentos()` con `<template id="tpl-alimento-busqueda">`.
+  6. Selección interactiva: Los resultados remotos clonados soportan adición/remoción a la comida y recálculo reactivo en tiempo real del pie de resumen.
+  7. Validación integral: 100% de pruebas unitarias y E2E superadas (12/12 en persistencia de planes, 25/25 en búsqueda en navegador headless Edge).
+
+---
+
 ## [v0.5.5] — 30/10/2026
 - **Tipo:** Versión Menor (Navegación Unificada del Coach, Guardia de Sesión con Redirección y Acceso a Calibración)
 - **Fecha:** 30 de Octubre de 2026

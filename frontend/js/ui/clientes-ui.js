@@ -25,7 +25,8 @@ export const SELECTORES = {
   sinResultados: '#sin-resultados',
   cargandoClientes: '#cargando-clientes',
   mensajeClientes: '#mensaje-clientes',
-  mensajeAnadir: '#mensaje-anadir'
+  mensajeAnadir: '#mensaje-anadir',
+  tplClienteFila: '#tpl-cliente-fila'
 };
 
 const el = (sel) => document.querySelector(sel);
@@ -53,22 +54,64 @@ function normalizarId(texto) {
 // ---------- Lista ----------
 function filaCliente(cliente, indice) {
   const nombre = nombreDe(cliente);
+  const tpl = el(SELECTORES.tplClienteFila);
+  if (tpl && tpl.content) {
+    const clon = tpl.content.cloneNode(true);
+    const li = clon.firstElementChild || clon.querySelector('li');
+    const enlace = li.querySelector('[data-ref="enlace"]');
+    const avatar = li.querySelector('[data-ref="avatar"]');
+    const nombreEl = li.querySelector('[data-ref="nombre"]');
+    const codigoEl = li.querySelector('[data-ref="codigo"]');
+
+    if (enlace) enlace.href = `cliente.html?cliente=${encodeURIComponent(cliente.id)}`;
+    if (avatar) {
+      avatar.classList.add(COLORES_AVATAR[indice % COLORES_AVATAR.length]);
+      avatar.textContent = iniciales(nombre);
+    }
+    if (nombreEl) nombreEl.textContent = nombre;
+    if (codigoEl) codigoEl.textContent = `ID ${cliente.client_code}`;
+    return li;
+  }
+
+  // Fallback seguro sin innerHTML en caso de ausencia de template
   const li = document.createElement('li');
-  li.innerHTML = `
-    <a class="fila-link">
-      <span class="avatar"></span>
-      <span class="fila-link__textos">
-        <span class="fila-link__nombre"></span>
-        <span class="sub"></span>
-      </span>
-      <span class="chevron"><svg class="icono" width="20" height="20" aria-hidden="true"><use href="#flecha-derecha"/></svg></span>
-    </a>`;
-  li.querySelector('.fila-link').href = `cliente.html?cliente=${encodeURIComponent(cliente.id)}`;
-  const avatar = li.querySelector('.avatar');
-  avatar.classList.add(COLORES_AVATAR[indice % COLORES_AVATAR.length]);
+  const a = document.createElement('a');
+  a.className = 'fila-link';
+  a.href = `cliente.html?cliente=${encodeURIComponent(cliente.id)}`;
+
+  const avatar = document.createElement('span');
+  avatar.className = `avatar ${COLORES_AVATAR[indice % COLORES_AVATAR.length]}`;
   avatar.textContent = iniciales(nombre);
-  li.querySelector('.fila-link__nombre').textContent = nombre;
-  li.querySelector('.sub').textContent = `ID ${cliente.client_code}`;
+
+  const textos = document.createElement('span');
+  textos.className = 'fila-link__textos';
+
+  const spanNombre = document.createElement('span');
+  spanNombre.className = 'fila-link__nombre';
+  spanNombre.textContent = nombre;
+
+  const spanCodigo = document.createElement('span');
+  spanCodigo.className = 'sub';
+  spanCodigo.textContent = `ID ${cliente.client_code}`;
+
+  textos.append(spanNombre, spanCodigo);
+
+  const chevron = document.createElement('span');
+  chevron.className = 'chevron';
+
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('class', 'icono');
+  svg.setAttribute('width', '20');
+  svg.setAttribute('height', '20');
+  svg.setAttribute('aria-hidden', 'true');
+
+  const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+  use.setAttribute('href', '#flecha-derecha');
+  svg.appendChild(use);
+  chevron.appendChild(svg);
+
+  a.append(avatar, textos, chevron);
+  li.appendChild(a);
   return li;
 }
 

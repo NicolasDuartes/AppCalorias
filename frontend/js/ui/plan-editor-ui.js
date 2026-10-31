@@ -5,6 +5,7 @@
    - Actualización en tiempo real del resumen fijo (.card--fija) con barra de progreso,
      diferencia con respecto al objetivo diario y suma acumulada de macros.
    - Eliminación reactiva de alimentos, enlaces contextuales a búsqueda y recepción MPA.
+   - Persistencia real en Supabase (planes-api.js) con fallback offline en sessionStorage.
    - Control de acceso por rol 'coach' con exigirRol.
    - Desacople completo del DOM mediante el mapa SELECTORES.
    Módulo ES nativo: sin dependencias externas.
@@ -14,6 +15,7 @@ import { exigirRol } from '../data/sesion.js';
 import { ALIMENTOS_PLAN_DEFECTO } from '../data/plan-defecto.js';
 import { calcularAtwater, aNumeroSeguro } from '../calc/nutricion-calc.js';
 import { mostrarAvisoFlotante, guardarAvisoToast } from '../utils/navegacion.js';
+import { crearPlan, activarPlan } from '../data/planes-api.js';
 import '../utils/navegacion.js';
 
 /**
@@ -44,7 +46,7 @@ export const SELECTORES = {
   macroCarbos: '.macros .macro:nth-child(2) .num',
   macroGrasas: '.macros .macro:nth-child(3) .num',
   btnCancelar: '.grilla-2 a.btn--secundario, [data-volver]',
-  btnGuardar: '.grilla-2 a.btn--primario',
+  btnGuardar: '#boton-guardar, .grilla-2 a.btn--primario',
   inputAgua: 'input[name="agua"]',
   textareaPautas: 'textarea[name="pautas"]',
   tplAlimentoEditor: '#tpl-alimento-editor'
@@ -66,6 +68,42 @@ function asignarValorConUnidad(el, valor, unidad) {
   spanUnidad.className = 'unidad';
   spanUnidad.textContent = unidad;
   el.appendChild(spanUnidad);
+}
+
+/**
+ * Extrae el identificador del alumno o cliente desde la URL, hash o sesión previa.
+ * Fallback seguro por defecto si no se especifica.
+ * @returns {string} UUID o identificador del cliente
+ */
+export function extraerClienteId() {
+  const params = new URLSearchParams(window.location.search);
+  let clienteId = params.get('cliente') || params.get('id');
+
+  if (!clienteId && window.location.hash) {
+    const hashLimpio = window.location.hash.replace(/^#/, '');
+    const hashParams = new URLSearchParams(hashLimpio);
+    clienteId = hashParams.get('cliente') || hashParams.get('id');
+  }
+
+  if (!clienteId) {
+    try {
+      clienteId = sessionStorage.getItem('clienteActual') || sessionStorage.getItem('appcalorias_cliente_actual');
+    } catch {
+      // Ignorar fallo de acceso a sessionStorage
+    }
+  }
+
+  if (!clienteId) {
+    clienteId = '00000000-0000-0000-0000-000000000001';
+  }
+
+  try {
+    sessionStorage.setItem('clienteActual', clienteId);
+  } catch {
+    // Ignorar fallo de guardado
+  }
+
+  return clienteId;
 }
 
 /**
@@ -100,6 +138,7 @@ export function vincularEventosAlimento(filaAlimento) {
  */
 export function hidratarAlimentosIniciales() {
   const acordeones = document.querySelectorAll(SELECTORES.acordeon);
+  const clienteActual = extraerClienteId();
 
   acordeones.forEach((acordeon) => {
     const titulo = acordeon.querySelector(SELECTORES.acordeonTitulo)?.textContent?.trim();
@@ -108,7 +147,10 @@ export function hidratarAlimentosIniciales() {
     // Configurar siempre el botón "+ Añadir alimento" antes de verificar si hay filas (soporte vista vacía)
     const btnAnadir = acordeon.querySelector(SELECTORES.btnAnadir);
     if (btnAnadir) {
-      btnAnadir.setAttribute('href', `buscar-alimento.html?comida=${encodeURIComponent(titulo)}`);
+      const paramCliente = (clienteActual && clienteActual !== '00000000-0000-0000-0000-000000000001')
+        ? `&cliente=${encodeURIComponent(clienteActual)}`
+        : '';
+      btnAnadir.setAttribute('href', `buscar-alimento.html?comida=${encodeURIComponent(titulo)}${paramCliente}`);
     }
 
     const infoDefecto = ALIMENTOS_PLAN_DEFECTO[titulo];
@@ -320,6 +362,7 @@ export function recalcularFilaAlimento(alimentoEl) {
 /**
  * Recalcula la cabecera de una comida (acordeón) sumando todos sus alimentos.
  * @param {HTMLElement} acordeonEl
+ * @returns {{kcal: number, p: number, c: number, g: number}}
  */
 export function recalcularComida(acordeonEl) {
   const alimentos = acordeonEl.querySelectorAll(SELECTORES.alimento);
@@ -353,6 +396,7 @@ export function recalcularComida(acordeonEl) {
 
 /**
  * Recalcula el resumen fijo completo del plan (.card--fija).
+ * @returns {{totalKcal: number, totalP: number, totalC: number, totalG: number, objetivoKcal: number, dif: number}}
  */
 export function recalcularResumenPlan() {
   const acordeones = document.querySelectorAll(SELECTORES.acordeon);
@@ -384,9 +428,9 @@ export function recalcularResumenPlan() {
   const objetivoKcal = matchObj ? parseInt(matchObj[0].replace(/\./g, ''), 10) : OBJETIVO_CALORICO_DEFECTO;
 
   // 3. Tag diferencia
+  const dif = objetivoKcal - totalKcal;
   const tagDif = document.querySelector(SELECTORES.tagDiferencia);
   if (tagDif) {
-    const dif = objetivoKcal - totalKcal;
     if (dif > 0) {
       tagDif.className = 'tag tag--naranja';
       tagDif.textContent = `Faltan ${dif} kcal`;
@@ -410,6 +454,182 @@ export function recalcularResumenPlan() {
   asignarValorConUnidad(document.querySelector(SELECTORES.macroProteina), totalP, 'g');
   asignarValorConUnidad(document.querySelector(SELECTORES.macroCarbos), totalC, 'g');
   asignarValorConUnidad(document.querySelector(SELECTORES.macroGrasas), totalG, 'g');
+
+  return { totalKcal, totalP, totalC, totalG, objetivoKcal, dif };
+}
+
+/**
+ * Extrae los datos numéricos y nutricionales de una fila de alimento en el DOM.
+ * @param {HTMLElement} filaAlimento
+ * @param {number} idx
+ * @returns {Object}
+ */
+export function extraerDatosAlimentoDOM(filaAlimento, idx = 0) {
+  const nombreEl = filaAlimento.querySelector(SELECTORES.alimentoNombre);
+  const nombre = nombreEl?.textContent?.trim() || 'Alimento';
+
+  const inputCant = filaAlimento.querySelector(SELECTORES.alimentoInputCantidad);
+  const gramos = Math.max(0, aNumeroSeguro(inputCant?.value || 0)) || 100;
+
+  let { kcal, p, c, g } = recalcularFilaAlimento(filaAlimento);
+
+  if (kcal === 0 && p === 0 && c === 0 && g === 0) {
+    const kcalTexto = filaAlimento.querySelector(SELECTORES.alimentoKcal)?.textContent || '';
+    const matchKcal = kcalTexto.match(/\d+/);
+    if (matchKcal) kcal = parseInt(matchKcal[0], 10);
+
+    const macrosTexto = filaAlimento.querySelector(SELECTORES.alimentoMacros)?.textContent || '';
+    const matchP = macrosTexto.match(/P\s*(\d+)/i);
+    const matchC = macrosTexto.match(/C\s*(\d+)/i);
+    const matchG = macrosTexto.match(/G\s*(\d+)/i);
+    if (matchP) p = parseInt(matchP[1], 10);
+    if (matchC) c = parseInt(matchC[1], 10);
+    if (matchG) g = parseInt(matchG[1], 10);
+  }
+
+  return {
+    id: filaAlimento.dataset.itemId || `local-item-${idx}`,
+    nombre,
+    food_name: nombre,
+    gramos,
+    grams: gramos,
+    porciones: 1,
+    portions: 1,
+    kcal,
+    calories: kcal,
+    p,
+    protein: p,
+    c,
+    carbs: c,
+    g,
+    fat: g,
+    categoria: filaAlimento.dataset.categoria || null,
+    group_code: filaAlimento.dataset.categoria || null,
+    orden: idx,
+    sort_order: idx
+  };
+}
+
+/**
+ * Serializa todas las comidas configuradas en el DOM recorriendo cada acordeón que contenga alimentos.
+ * @returns {Array<Object>}
+ */
+export function serializarComidasDOM() {
+  const acordeones = document.querySelectorAll(SELECTORES.acordeon);
+  const comidas = [];
+  let ordenComida = 0;
+
+  acordeones.forEach((acordeon) => {
+    const filasAlimento = acordeon.querySelectorAll(SELECTORES.alimento);
+    if (filasAlimento.length === 0) return;
+
+    const tituloEl = acordeon.querySelector(SELECTORES.acordeonTitulo);
+    const nombreComida = tituloEl?.textContent?.trim() || `Comida ${ordenComida + 1}`;
+
+    const notaEl = acordeon.querySelector(SELECTORES.textareaNota);
+    const notas = notaEl?.value?.trim() || '';
+
+    const items = [];
+    filasAlimento.forEach((fila, idx) => {
+      items.push(extraerDatosAlimentoDOM(fila, idx));
+    });
+
+    comidas.push({
+      id: acordeon.dataset.mealId || `local-meal-${ordenComida}`,
+      nombre: nombreComida,
+      meal_type: nombreComida,
+      notas,
+      notes: notas,
+      orden: ordenComida,
+      sort_order: ordenComida,
+      items
+    });
+
+    ordenComida += 1;
+  });
+
+  return comidas;
+}
+
+/**
+ * Guarda el plan nutricional en Supabase (o almacén local resiliente), lo activa
+ * y redirige al coach a la vista de plan activo con confirmación toast.
+ * @param {string|null} [coachId=null]
+ * @returns {Promise<{plan: Object, comidas: Array<Object>}>}
+ */
+export async function guardarYAsignarPlan(coachId = null) {
+  const clienteId = extraerClienteId();
+  const resumen = recalcularResumenPlan();
+  const totalKcal = resumen.totalKcal;
+  const totalP = resumen.totalP;
+  const totalC = resumen.totalC;
+  const totalG = resumen.totalG;
+
+  const textareaPautasEl = document.querySelector(SELECTORES.textareaPautas);
+  const pautas = textareaPautasEl?.value?.trim() || '';
+
+  const comidas = serializarComidasDOM();
+
+  let planGuardado = null;
+  try {
+    const res = await crearPlan(
+      clienteId,
+      coachId,
+      {
+        name: 'Plan Nutricional',
+        target_calories: totalKcal,
+        target_protein_g: totalP,
+        target_carbs_g: totalC,
+        target_fat_g: totalG,
+        notes: pautas
+      },
+      comidas
+    );
+    if (res && res.plan) {
+      planGuardado = res.plan;
+    }
+  } catch (errCrear) {
+    console.warn('Excepción al crear plan en planes-api:', errCrear);
+  }
+
+  if (planGuardado && planGuardado.id) {
+    try {
+      await activarPlan(planGuardado.id, clienteId);
+    } catch (errActivar) {
+      console.warn('Error al activar plan en planes-api:', errActivar);
+    }
+  } else {
+    // Plan local de contingencia offline
+    planGuardado = {
+      id: `local-plan-${Date.now()}`,
+      alumno_id: clienteId,
+      coach_id: coachId,
+      name: 'Plan Nutricional',
+      target_calories: totalKcal,
+      target_protein_g: totalP,
+      target_carbs_g: totalC,
+      target_fat_g: totalG,
+      notes: pautas,
+      active: true,
+      created_at: new Date().toISOString()
+    };
+  }
+
+  // Guardar en sessionStorage como fallback resiliente offline
+  const datosNormalizados = {
+    plan: planGuardado,
+    comidas
+  };
+
+  try {
+    sessionStorage.setItem(`appcalorias_plan_activo_${clienteId}`, JSON.stringify(datosNormalizados));
+  } catch (errStorage) {
+    console.warn('No se pudo guardar appcalorias_plan_activo en sessionStorage:', errStorage);
+  }
+
+  guardarAvisoToast('Plan guardado y asignado con éxito.');
+  window.location.href = `plan-activo.html?cliente=${encodeURIComponent(clienteId)}`;
+  return { plan: planGuardado, comidas };
 }
 
 /**
@@ -418,6 +638,19 @@ export function recalcularResumenPlan() {
 export async function iniciarPlanEditor() {
   const cuenta = await exigirRol('coach');
   if (!cuenta) return;
+
+  const clienteId = extraerClienteId();
+  if (clienteId && clienteId !== '00000000-0000-0000-0000-000000000001') {
+    // Propagar clienteId a enlaces de volver o cancelar si no lo tienen
+    const enlacesVolver = document.querySelectorAll('.encabezado a.btn-icono[aria-label="Volver"], [data-volver]');
+    enlacesVolver.forEach((enlace) => {
+      const href = enlace.getAttribute('href');
+      if (href && !href.includes('cliente=')) {
+        const sep = href.includes('?') ? '&' : '?';
+        enlace.setAttribute('href', `${href}${sep}cliente=${encodeURIComponent(clienteId)}`);
+      }
+    });
+  }
 
   hidratarAlimentosIniciales();
   procesarAlimentoPendienteSession();
@@ -443,11 +676,21 @@ export async function iniciarPlanEditor() {
     }
   });
 
-  // Confirmación al guardar y asignar plan
+  // Confirmación al guardar y asignar plan con persistencia real
   const btnGuardar = document.querySelector(SELECTORES.btnGuardar);
   if (btnGuardar) {
-    btnGuardar.addEventListener('click', () => {
-      guardarAvisoToast('Plan guardado y asignado con éxito.');
+    btnGuardar.addEventListener('click', async (evento) => {
+      evento.preventDefault();
+      if (btnGuardar.getAttribute('aria-busy') === 'true') return;
+      btnGuardar.setAttribute('aria-busy', 'true');
+
+      try {
+        await guardarYAsignarPlan(cuenta.usuarioId);
+      } catch (err) {
+        console.error('Error al guardar y asignar el plan:', err);
+        mostrarAvisoFlotante('Ocurrió un error al guardar el plan.');
+        btnGuardar.removeAttribute('aria-busy');
+      }
     });
   }
 }

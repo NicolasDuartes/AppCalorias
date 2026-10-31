@@ -31,11 +31,18 @@
         <a class="btn-icono btn-icono--primario" href="crear-alimento.html" aria-label="Crear un alimento nuevo" title="Crear un alimento nuevo"><svg class="icono icono--grueso" width="22" height="22" aria-hidden="true"><use href="#mas"/></svg></a>
       </header>
 
-      <label class="buscador">
+      <label class="buscador" for="buscar-alimento">
         <span class="texto-gris"><svg class="icono" width="20" height="20" aria-hidden="true"><use href="#buscar"/></svg></span>
         <span class="sr-only">Buscar alimento</span>
-        <input type="search" name="buscar" placeholder="Buscar alimento">
+        <input type="search" name="buscar" id="buscar-alimento" placeholder="Buscar alimento o ingrediente…">
       </label>
+
+      <!-- Resultados de búsqueda remota o base de datos -->
+      <section class="columna gap-s" id="seccion-busqueda" aria-labelledby="t-busqueda" hidden>
+        <h2 class="antetitulo" id="t-busqueda">Resultados</h2>
+        <ul class="grupo grupo--filas" id="lista-busqueda"></ul>
+        <p class="nota-centrada" id="busqueda-sin-resultados" hidden>No encontramos ese alimento. Probá con otro nombre o creá uno nuevo.</p>
+      </section>
 
       <!-- Con búsqueda, estas dos secciones se cambian por "Resultados" -->
       <section class="columna gap-s" aria-labelledby="t-plan">
@@ -73,6 +80,19 @@
           </div>
         </div>
       </section>
+
+      <template id="tpl-alimento-busqueda">
+        <li class="alimento-fila" data-kcal="" data-p="" data-c="" data-g="">
+          <a class="alimento-fila__nombre" href="cantidad.html">
+            <span class="alimento-fila__titulo" data-ref="nombre"></span>
+            <span class="alimento-fila__linea" data-ref="macros"></span>
+          </a>
+          <span class="alimento-fila__cantidad" data-ref="porciones"></span>
+          <button class="btn-agregar" type="button" aria-pressed="false" aria-label="Agregar">
+            <svg class="icono icono--grueso" width="16" height="16" aria-hidden="true"><use href="#mas"/></svg>
+          </button>
+        </li>
+      </template>
     </main>
 
     <div class="pie pie--centrado">

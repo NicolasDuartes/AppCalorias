@@ -225,7 +225,10 @@ function recalcularPanelPersonalizar(tdeeTermo, pesoActualBase) {
   const meses = Math.round((semanas / 4.333) * 10) / 10;
   const textoPlazo = document.querySelector(SELECTORES.textoPlazoSemanas);
   if (textoPlazo) {
-    textoPlazo.innerHTML = `<span class="negrita">${semanas} semanas</span> · ≈ ${String(meses).replace('.', ',')} meses`;
+    const spanSemanas = document.createElement('span');
+    spanSemanas.className = 'negrita';
+    spanSemanas.textContent = `${semanas} semanas`;
+    textoPlazo.replaceChildren(spanSemanas, document.createTextNode(` · ≈ ${String(meses).replace('.', ',')} meses`));
   }
 
   const difPeso = Math.round((pesoObj - pesoAct) * 10) / 10;
@@ -238,19 +241,28 @@ function recalcularPanelPersonalizar(tdeeTermo, pesoActualBase) {
   const cambioEl = document.querySelector(SELECTORES.miniDatoCambio);
   if (cambioEl) {
     const signo = difPeso > 0 ? '+' : '';
-    cambioEl.innerHTML = `${signo}${String(difPeso).replace('.', ',')} <span class="unidad">kg</span>`;
+    const spanUnidad = document.createElement('span');
+    spanUnidad.className = 'unidad';
+    spanUnidad.textContent = 'kg';
+    cambioEl.replaceChildren(document.createTextNode(`${signo}${String(difPeso).replace('.', ',')} `), spanUnidad);
   }
 
   const semEl = document.querySelector(SELECTORES.miniDatoPorSemana);
   if (semEl) {
     const signo = porSemana > 0 ? '+' : '';
-    semEl.innerHTML = `${signo}${String(porSemana).replace('.', ',')} <span class="unidad">kg</span>`;
+    const spanUnidad = document.createElement('span');
+    spanUnidad.className = 'unidad';
+    spanUnidad.textContent = 'kg';
+    semEl.replaceChildren(document.createTextNode(`${signo}${String(porSemana).replace('.', ',')} `), spanUnidad);
   }
 
   const ajEl = document.querySelector(SELECTORES.miniDatoAjusteDiario);
   if (ajEl) {
     const signo = ajusteDiario > 0 ? '+' : '';
-    ajEl.innerHTML = `${signo}${ajusteDiario} <span class="unidad">kcal</span>`;
+    const spanUnidad = document.createElement('span');
+    spanUnidad.className = 'unidad';
+    spanUnidad.textContent = 'kcal';
+    ajEl.replaceChildren(document.createTextNode(`${signo}${ajusteDiario} `), spanUnidad);
   }
 
   const resConsumir = document.querySelector(SELECTORES.resultadoCaloriasConsumir);

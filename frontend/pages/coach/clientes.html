@@ -48,6 +48,18 @@
         <p class="mensaje" id="mensaje-clientes" role="status" hidden></p>
         <p class="sub" id="cargando-clientes">Cargando clientes…</p>
         <!-- js/ui/clientes-ui.js arma una fila por alumno vinculado -->
+        <template id="tpl-cliente-fila">
+          <li>
+            <a class="fila-link" data-ref="enlace">
+              <span class="avatar" data-ref="avatar"></span>
+              <span class="fila-link__textos">
+                <span class="fila-link__nombre" data-ref="nombre"></span>
+                <span class="sub" data-ref="codigo"></span>
+              </span>
+              <span class="chevron"><svg class="icono" width="20" height="20" aria-hidden="true"><use href="#flecha-derecha"/></svg></span>
+            </a>
+          </li>
+        </template>
         <ul class="lista" id="lista-clientes"></ul>
         <p class="sub" id="sin-resultados" hidden>Ningún cliente coincide con la búsqueda.</p>
         <section class="vacio" id="sin-clientes" hidden>
