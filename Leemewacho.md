@@ -31,7 +31,7 @@ frontend/
 │   ├── utils/                     # Utilidades transversales (2 módulos)
 │   │   ├── navegacion.js          # Historial inteligente, avisos toast y atajos WCAG
 │   │   └── texto.js               # Formato de nombres e iniciales de cuentas
-│   └── ui/                        # Controladores desacoplados con mapas SELECTORES (23 módulos)
+│   └── ui/                        # Controladores desacoplados con mapas SELECTORES (26 módulos)
 │       ├── login-ui.js            # index.html
 │       ├── cuenta-ui.js           # registro.html
 │       ├── onboarding-ui.js       # alumno/onboarding.html (stepper de 5 pasos)
@@ -42,17 +42,17 @@ frontend/
 │       ├── reemplazar-ui.js       # alumno/reemplazar.html
 │       ├── alimento-form-ui.js    # alumno/crear-alimento.html y editar-alimento.html
 │       ├── progreso-ui.js         # alumno/progreso.html (evolución y peso)
-│       ├── perfil-ui.js           # alumno/perfil.html (datos y coach)
+│       ├── perfil-ui.js           # alumno/perfil.html (datos y edición interactiva)
 │       ├── objetivo-ui.js         # alumno/perfil.html (regla analógica de peso)
 │       ├── clientes-ui.js         # coach/clientes.html (lista y vinculación)
 │       ├── cliente-ui.js          # coach/cliente.html (ficha del alumno)
-│       ├── perfil-coach-ui.js     # coach/perfil.html (cuenta y cierre de sesión)
+│       ├── perfil-coach-ui.js     # coach/perfil.html (cuenta y edición interactiva)
 │       ├── plan-nuevo-ui.js       # coach/plan-nuevo.html (selector de modalidad)
 │       ├── plan-editor-ui.js      # coach/plan-editor.html y plan-editor-vacio.html
 │       ├── plan-activo-ui.js      # coach/plan-activo.html (ver y archivar plan)
 │       ├── plan-archivado-ui.js   # coach/plan-archivado.html (vista de solo lectura)
 │       ├── historial-ui.js        # coach/historial.html y historial-vacio.html
-│       ├── buscar-alimento-ui.js  # coach/buscar-alimento.html
+│       ├── buscar-alimento-ui.js  # coach/buscar-alimento.html (búsqueda RPC y pestañas)
 │       ├── alimentos-revision-ui.js # coach/alimentos-revision.html (moderación)
 │       ├── plantillas-ui.js       # coach/plantillas.html (catálogo de plantillas)
 │       ├── seguimiento-coach-ui.js # coach/seguimiento.html (progreso de cliente)
@@ -68,20 +68,23 @@ frontend/
     │   ├── reemplazar.html        # Reemplazo de alimentos por equivalencias
     │   ├── crear-alimento.html    # Formulario para proponer nuevo alimento
     │   ├── editar-alimento.html   # Formulario para proponer corrección
-    │   └── perfil.html            # Cuenta, coach vinculado y regla de peso
+    │   ├── progreso.html          # Seguimiento de peso, meta y adherencia
+    │   └── perfil.html            # Cuenta, edición, coach y regla de peso
     ├── coach/
     │   ├── clientes.html          # Bandeja de clientes y vinculación por código
     │   ├── cliente.html           # Ficha de seguimiento del alumno
-    │   ├── perfil.html            # Datos del coach y cierre de sesión
+    │   ├── perfil.html            # Datos del coach, edición y cierre de sesión
     │   ├── plan-nuevo.html        # Creación de plan desde cero o plantilla
-    │   ├── plan-editor.html       # Editor con recálculo reactivo de macros
+    │   ├── plan-editor.html       # Editor con recálculo reactivo y duplicación
     │   ├── plan-editor-vacio.html # Editor en estado inicial sin comidas
     │   ├── plan-activo.html       # Visualización y archivado del plan vigente
     │   ├── plan-archivado.html    # Consulta de planes históricos finalizados
     │   ├── historial.html         # Línea de tiempo de planes del alumno
     │   ├── historial-vacio.html   # Historial vacío de planes
-    │   ├── buscar-alimento.html   # Buscador interactivo de catálogo
-    │   └── alimentos-revision.html # Panel de moderación y aprobación de alimentos
+    │   ├── buscar-alimento.html   # Buscador interactivo RPC de catálogo
+    │   ├── alimentos-revision.html # Panel de moderación y aprobación de alimentos
+    │   ├── plantillas.html        # Catálogo de plantillas maestras Atwater
+    │   └── seguimiento.html       # Seguimiento longitudinal del alumno
     └── shared/
         └── contexto.html          # Motor interactivo de cálculo energético
 ```

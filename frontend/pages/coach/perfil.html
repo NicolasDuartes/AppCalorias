@@ -21,6 +21,8 @@
     <symbol id="plantillas" viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/></symbol>
     <symbol id="alimentos" viewBox="0 0 24 24"><path d="M12 7c-1.5-1-5-1.3-6.3 1.7-1.4 3.2.3 8 2.3 10.5 1.2 1.5 2.4 1.3 4 .6 1.6.7 2.8.9 4-.6 2-2.5 3.7-7.3 2.3-10.5C17 5.7 13.5 6 12 7z"/><path d="M12 7c0-2 1-3.5 3-4"/></symbol>
     <symbol id="perfil" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></symbol>
+    <symbol id="lapiz" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></symbol>
+    <symbol id="cerrar" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></symbol>
   </svg>
   <div class="pantalla">
     <main class="contenido contenido--holgado gap-l">
@@ -32,7 +34,33 @@
           <p class="sub" id="perfil-email"></p>
           <span><span class="tag tag--verde"><span class="tag__punto"></span>Coach</span></span>
         </div>
+        <button class="btn-icono" type="button" id="btn-editar-perfil-coach" aria-label="Editar perfil"><svg class="icono icono--grueso" width="18" height="18" aria-hidden="true"><use href="#lapiz"/></svg></button>
       </header>
+
+      <!-- Modal accesible para edición del perfil del coach -->
+      <div class="modal" id="modal-editar-perfil-coach" role="dialog" aria-modal="true" aria-labelledby="t-modal-coach" hidden>
+        <div class="modal__caja">
+          <div class="modal__cabecera">
+            <h3 class="titulo texto-16" id="t-modal-coach">Editar perfil de coach</h3>
+            <button class="btn-icono" type="button" id="btn-cerrar-modal-coach" aria-label="Cerrar"><svg class="icono" width="18" height="18" aria-hidden="true"><use href="#cerrar"/></svg></button>
+          </div>
+          <form class="columna gap-m" id="form-editar-coach">
+            <label class="campo">
+              <span class="campo__etiqueta">Nombre o @usuario</span>
+              <input class="input" type="text" name="nombreCoach" id="input-coach-nombre" required maxlength="30">
+            </label>
+            <label class="campo">
+              <span class="campo__etiqueta">Email de contacto</span>
+              <input class="input" type="email" name="emailCoach" id="input-coach-email" readonly disabled>
+            </label>
+            <p class="mensaje" id="mensaje-modal-coach" role="alert" hidden></p>
+            <div class="grilla-2">
+              <button class="btn btn--secundario" type="button" id="btn-cancelar-coach">Cancelar</button>
+              <button class="btn btn--primario" type="submit" id="btn-guardar-coach">Guardar cambios</button>
+            </div>
+          </form>
+        </div>
+      </div>
 
       <p class="mensaje" id="mensaje-perfil" role="alert" hidden></p>
 

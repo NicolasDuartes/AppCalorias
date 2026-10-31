@@ -150,6 +150,12 @@ rutas de las páginas son relativas a esa carpeta.
     - Modal accesible para añadir preferencias en `perfil.html`, eliminación reactiva y visualización unificada en la ficha del alumno del coach (`cliente.html`).
 14. **Duplicación de Comidas en el Editor de Planes [Completado - 30/10/2026]:**
     - Botón de duplicar comida en `plan-editor.html` con clonación fiel de alimentos, porciones y notas con recálculo automático Atwater.
+15. **Edición Interactiva del Perfil del Alumno [Completado - 31/10/2026]:**
+    - Modal accesible `#modal-editar-perfil` en `perfil.html` con validación de nombre, edad y altura, guardado reactivo en Supabase `profiles` y `sessionStorage`, reactividad DOM en vivo y blindaje anti-XSS.
+16. **Edición Interactiva del Perfil del Coach [Completado - 31/10/2026]:**
+    - Modal accesible `#modal-editar-perfil-coach` en `coach/perfil.html`, sprite vectorial `#lapiz`/`#cerrar`, actualización reactiva de `#perfil-usuario` e iniciales `#perfil-iniciales`, y notificación toast.
+17. **Búsqueda Remota RPC y Pestañas de Origen en Buscador del Coach [Completado - 31/10/2026]:**
+    - Integración de `buscarAlimentos()` RPC con debounce de 300 ms en `coach/buscar-alimento.html`, selector de pestañas accesibles ("Frecuentes", "Mis alimentos", "Base de datos general") y contenedor `#lista-alimentos` con alternancia semántica `hidden` (Regla de Oro 2).
 
 ### Prioridad 4: Base de Datos y Robustez Transaccional
 

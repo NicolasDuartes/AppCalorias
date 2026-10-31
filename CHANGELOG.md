@@ -2,6 +2,20 @@
 
 Este documento registra los hitos de versiones **Mayores (Major)** y **Medianas (Minor)** de la aplicación con resúmenes ejecutivos concisos ($\le 10$ renglones). Los cambios atómicos y parches específicos se registran directamente en los commits de Git bajo la convención *Conventional Commits*.
 
+## [v0.5.9] — 31/10/2026
+- **Tipo:** Versión Menor (Edición Interactiva de Perfiles de Alumno y Coach, y Buscador Híbrido RPC con Pestañas)
+- **Fecha:** 31 de Octubre de 2026
+- **Resumen:**
+  1. Edición de Perfil del Alumno (`perfil.html` y `perfil-ui.js`): Modal accesible `#modal-editar-perfil` con validación fisiológica, guardado reactivo en Supabase `profiles` y `sessionStorage`, actualización DOM en vivo e inmunidad anti-XSS.
+  2. Edición de Perfil del Coach (`coach/perfil.html` y `perfil-coach-ui.js`): Modal interactivo `#modal-editar-perfil-coach`, actualización reactiva de `#perfil-usuario` e iniciales vectoriales `#perfil-iniciales`, y notificación toast flotante.
+  3. Búsqueda Híbrida RPC en Buscador del Coach (`coach/buscar-alimento.html` y `buscar-alimento-ui.js`): Integración de `buscarAlimentos()` RPC con debounce de 300 ms, normalización Atwater y fallback transparente offline.
+  4. Pestañas de origen de alimentos: Conmutación accesible mediante `aria-selected` entre "Frecuentes", "Mis alimentos" y "Base de datos general".
+  5. Alternancia accesible de estados (Regla de Oro 2): Integración del contenedor `#lista-alimentos` con alternancia semántica vía atributo `hidden` respecto al bloque `.vacio`.
+  6. Blindaje total de la interfaz: Cero usos de `innerHTML` en la totalidad de la capa UI (Regla de Oro 1 al 100%).
+  7. Batería de validación: 25 HTMLs, 39 módulos JS analizados con 0 ciclos, 105 pruebas unitarias y E2E superadas en Microsoft Edge headless (37 alumno, 25 coach, 43 buscador).
+
+---
+
 ## [v0.5.8] — 30/10/2026
 - **Tipo:** Versión Menor (Seguimiento del Coach, Gestión Interactiva de Preferencias y Duplicación de Comidas)
 - **Fecha:** 30 de Octubre de 2026
