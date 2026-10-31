@@ -167,6 +167,10 @@ if (form) {
     }
 
     if (data.session) {
+      if (rol === 'alumno') {
+        window.location.href = new URL('../../pages/alumno/onboarding.html', import.meta.url).href;
+        return;
+      }
       window.location.href = PANTALLAS[rol];
       return;
     }

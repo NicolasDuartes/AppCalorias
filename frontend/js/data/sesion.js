@@ -27,7 +27,16 @@ export async function exigirRol(rol, campos = '') {
   }
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) {
-    window.location.href = PANTALLAS.login;
+    if (typeof window !== 'undefined') {
+      try {
+        const rutaActual = window.location.pathname + window.location.search + window.location.hash;
+        const destino = new URL(PANTALLAS.login);
+        destino.searchParams.set('redirect_to', rutaActual);
+        window.location.href = destino.href;
+      } catch {
+        window.location.href = PANTALLAS.login;
+      }
+    }
     return null;
   }
 

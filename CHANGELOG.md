@@ -2,6 +2,20 @@
 
 Este documento registra los hitos de versiones **Mayores (Major)** y **Medianas (Minor)** de la aplicación con resúmenes ejecutivos concisos ($\le 10$ renglones). Los cambios atómicos y parches específicos se registran directamente en los commits de Git bajo la convención *Conventional Commits*.
 
+## [v0.5.5] — 30/10/2026
+- **Tipo:** Versión Menor (Navegación Unificada del Coach, Guardia de Sesión con Redirección y Acceso a Calibración)
+- **Fecha:** 30 de Octubre de 2026
+- **Resumen:**
+  1. Conexión de la barra inferior del Coach: Actualización de los 10 archivos HTML de Coach y `contexto.html` enlazando el ícono de Alimentos a `alimentos-revision.html`.
+  2. Guardia de sesión con `redirect_to`: `sesion.js` captura la ruta solicitada al redirigir al login para usuarios sin autenticación.
+  3. Redirección inteligente post-login: `login-ui.js` valida y respeta la ruta `redirect_to` compatible con el rol, y deriva automáticamente a alumnos sin contexto a `onboarding.html`.
+  4. Redirección post-registro: `cuenta-ui.js` redirige inmediatamente al onboarding de 5 pasos a nuevos alumnos con sesión iniciada.
+  5. Calibración desde perfil del alumno: Enlace directo en `perfil.html` hacia `onboarding.html` para recalcular TDEE, NEAT y objetivo calórico en cualquier momento.
+  6. Gestión visual de permisos del alumno: Conexión interactiva en `cliente.html` y `cliente-ui.js` con `obtenerPermisosAlumno` y `actualizarPermisoAlumno` con toasts en tiempo real.
+  7. Integridad de navegación y suites E2E: 100% de enlaces y anclas resueltos, 0 regresiones sintácticas y suites de pruebas en navegador real aprobadas.
+
+---
+
 ## [v0.5.4] — 30/10/2026
 - **Tipo:** Versión Menor (Onboarding del Alumno en 5 Pasos y Panel de Moderación de Alimentos para el Coach)
 - **Fecha:** 30 de Octubre de 2026

@@ -126,8 +126,12 @@ rutas de las páginas son relativas a esa carpeta.
    - Asistente de 5 pasos post-registro (sexo, fecha de nacimiento/edad, peso y altura, actividad física NEAT/pasos, entrenamiento METs, objetivo calórico) para poblar el primer contexto energético y persistirlo en `contextos_energeticos`.
 2. **Panel de moderación y revisión de alimentos del Coach (`alimentos-revision.html` y `alimentos-revision-ui.js`) [Completado - 30/10/2026]:**
    - Interfaz en el panel del coach para listar alimentos en estado `'pendiente'` y aprobarlos o rechazarlos con motivo usando el RPC `revisar_alimento` y plantilla nativa `<template>`.
-3. **Gestión visual de `permisos_alumno`:**
-   - Interfaz para que el coach habilite o deshabilite las secciones editables del alumno (`contexto`, `plan`).
+3. **Gestión visual de `permisos_alumno` [Completado - 30/10/2026]:**
+   - Interfaz interactiva en la ficha del alumno (`cliente.html` y `cliente-ui.js`) con interruptores táctiles para que el coach habilite o revoque en tiempo real los permisos de edición del alumno (`contexto` y `plan`).
+4. **Navegación unificada del Coach hacia revisión de alimentos [Completado - 30/10/2026]:**
+   - Conexión de la barra inferior en las 10 páginas HTML del coach y `contexto.html` con enlace activo hacia `alimentos-revision.html`.
+5. **Guardia de sesión con redirección inteligente y calibración [Completado - 30/10/2026]:**
+   - Captura de `redirect_to` al redirigir al login en `sesion.js`, redirección a la ruta segura solicitada en `login-ui.js`, derivación automática a `onboarding.html` para alumnos nuevos en `cuenta-ui.js`/`login-ui.js`, y acceso a calibración desde `perfil.html`.
 
 ### Prioridad 4: Base de Datos y Robustez Transaccional
 

@@ -55,6 +55,36 @@ async function irSegunRol(userId) {
     mostrarMensaje('Entraste, pero no se pudo cargar tu perfil. Volvé a probar en unos minutos.');
     return;
   }
+
+  // Si existe parámetro redirect_to seguro y compatible con el rol
+  const params = new URLSearchParams(window.location.search);
+  const redirectTo = params.get('redirect_to');
+  if (redirectTo && redirectTo.startsWith('/') && !redirectTo.startsWith('//')) {
+    const esRutaCoach = redirectTo.includes('/coach/');
+    const esRutaAlumno = redirectTo.includes('/alumno/');
+    const esCompatible = (perfil.role === 'coach' && !esRutaAlumno) ||
+                         (perfil.role === 'alumno' && !esRutaCoach) ||
+                         redirectTo.includes('/shared/');
+    if (esCompatible) {
+      window.location.href = redirectTo;
+      return;
+    }
+  }
+
+  // Si es un alumno sin contexto energético previo, guiarlo al onboarding
+  if (perfil.role === 'alumno') {
+    try {
+      const { obtenerUltimoContexto } = await import('../data/contexto-api.js');
+      const contexto = await obtenerUltimoContexto(userId);
+      if (!contexto) {
+        window.location.href = new URL('../../pages/alumno/onboarding.html', import.meta.url).href;
+        return;
+      }
+    } catch (e) {
+      console.warn('No se pudo verificar contexto inicial:', e);
+    }
+  }
+
   window.location.href = PANTALLAS[perfil.role] || PANTALLAS.alumno;
 }
 

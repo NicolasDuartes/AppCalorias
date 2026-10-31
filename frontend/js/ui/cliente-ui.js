@@ -8,6 +8,8 @@
    ========================================================== */
 import { supabase } from '../data/supabase.js';
 import { exigirRol } from '../data/sesion.js';
+import { obtenerPermisosAlumno, actualizarPermisoAlumno } from '../data/contexto-api.js';
+import { mostrarAvisoFlotante } from '../utils/navegacion.js';
 import { iniciales, nombreDe } from '../utils/texto.js';
 import '../utils/navegacion.js';
 
@@ -28,7 +30,10 @@ export const SELECTORES = {
   mensajeEliminar: '#mensaje-eliminar',
   nombreCliente: '.nombre-cliente',
   enlaceContexto: 'a[href*="contexto.html"]',
-  enlacePlan: 'a[href*="plan-nuevo.html"], a[href*="plan-activo.html"]'
+  enlacePlan: 'a[href*="plan-nuevo.html"], a[href*="plan-activo.html"]',
+  permisosCliente: '#permisos-cliente',
+  permisoContexto: '#permiso-contexto',
+  permisoPlan: '#permiso-plan'
 };
 
 const el = (sel) => document.querySelector(sel);
@@ -110,6 +115,47 @@ async function iniciar() {
   if (enlacePlan) {
     enlacePlan.href = `plan-activo.html?cliente=${encodeURIComponent(cliente.id)}`;
   }
+  // Hidratar y gestionar permisos del alumno
+  try {
+    const permisos = await obtenerPermisosAlumno(cliente.id);
+    const switchContexto = el(SELECTORES.permisoContexto);
+    const switchPlan = el(SELECTORES.permisoPlan);
+
+    if (switchContexto) {
+      const activo = Array.isArray(permisos) && permisos.includes('contexto');
+      switchContexto.setAttribute('aria-checked', String(activo));
+      switchContexto.addEventListener('click', async () => {
+        const nuevo = switchContexto.getAttribute('aria-checked') !== 'true';
+        switchContexto.setAttribute('aria-checked', String(nuevo));
+        const res = await actualizarPermisoAlumno(cliente.id, 'contexto', nuevo);
+        if (res.success) {
+          mostrarAvisoFlotante(nuevo ? 'Permiso de contexto habilitado.' : 'Permiso de contexto revocado.');
+        } else {
+          switchContexto.setAttribute('aria-checked', String(!nuevo));
+          mostrarAvisoFlotante('No se pudo actualizar el permiso.');
+        }
+      });
+    }
+
+    if (switchPlan) {
+      const activo = Array.isArray(permisos) && permisos.includes('plan');
+      switchPlan.setAttribute('aria-checked', String(activo));
+      switchPlan.addEventListener('click', async () => {
+        const nuevo = switchPlan.getAttribute('aria-checked') !== 'true';
+        switchPlan.setAttribute('aria-checked', String(nuevo));
+        const res = await actualizarPermisoAlumno(cliente.id, 'plan', nuevo);
+        if (res.success) {
+          mostrarAvisoFlotante(nuevo ? 'Permiso de plan alimenticio habilitado.' : 'Permiso de plan revocado.');
+        } else {
+          switchPlan.setAttribute('aria-checked', String(!nuevo));
+          mostrarAvisoFlotante('No se pudo actualizar el permiso.');
+        }
+      });
+    }
+  } catch (err) {
+    console.warn('Error gestionando permisos del alumno:', err);
+  }
+
   const btnEliminar = el(SELECTORES.botonEliminar);
   if (btnEliminar) btnEliminar.hidden = false;
 
