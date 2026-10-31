@@ -164,6 +164,13 @@ rutas de las páginas son relativas a esa carpeta.
 20. **Resiliencia Offline y Mock Client Supabase Transparente (`supabase.js`) [Completado - 31/10/2026]:**
     - Eliminada la dependencia externa síncrona en CDN. Mock Store reactivo en memoria con persistencia en `localStorage`/`sessionStorage` y Query Builder encadenado para navegación y pruebas 100% autónomas sin internet.
 
+21. **Creación y Guardado de Platos Compuestos (`pages/alumno/crear-plato.html` y `crear-plato-ui.js`) [Completado - 31/10/2026]:**
+    - Interfaz para combinar múltiples ingredientes con cálculo dinámico Atwater (kcal, P, C, G) en vivo, plantilla nativa `<template id="tpl-ingrediente-plato">`, persistencia en `sessionStorage` (`appcalorias_mis_platos`) y Supabase (`crearAlimento`), con acceso desde `agregar.html` (`?origen=crear-plato`).
+22. **Sincronización Reactiva de Hidratación en Tiempo Real [Completado - 31/10/2026]:**
+    - Canal de eventos global `appcalorias:agua_actualizada` en `window`. Conexión de tarjeta `#hidrata-hoy` en `progreso.html` con botones rápidos (+1/-1 vaso), cuadrícula de vasos en `dashboard.html` y promedio de consumo en `seguimiento.html` del coach con reactividad instantánea sin recarga.
+23. **Sistema Transversal de Accesibilidad y Trampa de Foco WAI-ARIA (`accesibilidad.js`) [Completado - 31/10/2026]:**
+    - Módulo `frontend/js/utils/accesibilidad.js` (`activarTrampaFoco`, `liberarTrampaFoco`, `configurarModalAccesible`) con ciclado estricto `Tab`/`Shift+Tab`, tecla `Escape` y restauración de foco al disparador en los 6 modales de la aplicación.
+
 ### Prioridad 4: Base de Datos y Robustez Transaccional
 
 1. **Migración de limpieza de tablas zombies:**

@@ -10,6 +10,7 @@ import { cerrarSesion, exigirRol } from '../data/sesion.js';
 import { iniciales, nombreDe } from '../utils/texto.js';
 import { mostrarAvisoFlotante } from '../utils/navegacion.js';
 import { obtenerUltimoContexto } from '../data/contexto-api.js';
+import { configurarModalAccesible, activarTrampaFoco, liberarTrampaFoco } from '../utils/accesibilidad.js';
 
 export const SELECTORES = {
   perfilUsuario: '#perfil-usuario',
@@ -163,16 +164,16 @@ export function abrirModalEditarPerfil() {
     }
   }
 
-  modal.hidden = false;
-  if (inputNombre) {
-    inputNombre.focus();
-  }
+  activarTrampaFoco(modal, {
+    elementoInicial: inputNombre,
+    disparador: el(SELECTORES.btnEditarPerfil)
+  });
 }
 
 export function cerrarModalEditarPerfil() {
   const modal = el(SELECTORES.modalEditarPerfil);
   if (modal) {
-    modal.hidden = true;
+    liberarTrampaFoco(modal);
   }
   const mensajeError = el(SELECTORES.mensajeModalPerfil);
   if (mensajeError) {
@@ -185,7 +186,7 @@ export function cerrarModalEditarPerfil() {
     btnGuardar.textContent = 'Guardar cambios';
   }
   const btnEditar = el(SELECTORES.btnEditarPerfil);
-  if (btnEditar) {
+  if (btnEditar && typeof btnEditar.focus === 'function') {
     btnEditar.focus();
   }
 }
@@ -270,22 +271,24 @@ export async function guardarPerfil({ nombre, edad, altura } = {}) {
 }
 
 export function inicializarEdicionPerfil() {
+  const modalEl = el(SELECTORES.modalEditarPerfil);
   const btnEditar = el(SELECTORES.btnEditarPerfil);
-  if (btnEditar && !btnEditar.dataset.inicializado) {
-    btnEditar.dataset.inicializado = 'true';
-    btnEditar.addEventListener('click', abrirModalEditarPerfil);
-  }
-
   const btnCerrar = el(SELECTORES.btnCerrarModalPerfil);
-  if (btnCerrar && !btnCerrar.dataset.inicializado) {
-    btnCerrar.dataset.inicializado = 'true';
-    btnCerrar.addEventListener('click', cerrarModalEditarPerfil);
-  }
-
   const btnCancelar = el(SELECTORES.btnCancelarPerfil);
-  if (btnCancelar && !btnCancelar.dataset.inicializado) {
-    btnCancelar.dataset.inicializado = 'true';
-    btnCancelar.addEventListener('click', cerrarModalEditarPerfil);
+
+  if (modalEl && !modalEl.dataset.accesibleInicializado) {
+    modalEl.dataset.accesibleInicializado = 'true';
+    configurarModalAccesible(modalEl, {
+      btnAbrir: btnEditar,
+      btnCerrar: [btnCerrar, btnCancelar],
+      primerEnfocable: SELECTORES.inputPerfilNombre,
+      alAbrir: () => {
+        abrirModalEditarPerfil();
+      },
+      alCerrar: () => {
+        cerrarModalEditarPerfil();
+      }
+    });
   }
 
   const formEditar = el(SELECTORES.formEditarPerfil);
@@ -302,16 +305,6 @@ export function inicializarEdicionPerfil() {
       const altura = inputAltura ? inputAltura.value : '';
 
       await guardarPerfil({ nombre, edad, altura });
-    });
-  }
-
-  const modalEl = el(SELECTORES.modalEditarPerfil);
-  if (modalEl && !modalEl.dataset.inicializado) {
-    modalEl.dataset.inicializado = 'true';
-    modalEl.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        cerrarModalEditarPerfil();
-      }
     });
   }
 }
@@ -377,25 +370,28 @@ export function renderizarPreferencias(preferencias = obtenerPreferencias()) {
 export function abrirModalPreferencia() {
   const modal = el(SELECTORES.modalPreferencia);
   if (!modal) return;
-  modal.hidden = false;
   const input = el(SELECTORES.inputPreferencia);
   if (input) {
     input.value = '';
-    input.focus();
   }
+  const disparador = el(SELECTORES.btnAgregarPreferencia) || document.querySelector('#btn-abrir-modal-preferencia');
+  activarTrampaFoco(modal, {
+    elementoInicial: input,
+    disparador
+  });
 }
 
 export function cerrarModalPreferencia() {
   const modal = el(SELECTORES.modalPreferencia);
   if (modal) {
-    modal.hidden = true;
+    liberarTrampaFoco(modal);
   }
   const form = el(SELECTORES.formPreferencia);
   if (form) {
     form.reset();
   }
-  const btn = el(SELECTORES.btnAgregarPreferencia);
-  if (btn) {
+  const btn = el(SELECTORES.btnAgregarPreferencia) || document.querySelector('#btn-abrir-modal-preferencia');
+  if (btn && typeof btn.focus === 'function') {
     btn.focus();
   }
 }
@@ -427,22 +423,24 @@ export function inicializarPreferencias() {
   const preferencias = obtenerPreferencias();
   renderizarPreferencias(preferencias);
 
-  const btnAbrir = el(SELECTORES.btnAgregarPreferencia);
-  if (btnAbrir && !btnAbrir.dataset.inicializado) {
-    btnAbrir.dataset.inicializado = 'true';
-    btnAbrir.addEventListener('click', abrirModalPreferencia);
-  }
+  const modal = el(SELECTORES.modalPreferencia);
+  const btnAbrir = el(SELECTORES.btnAgregarPreferencia) || document.querySelector('#btn-abrir-modal-preferencia');
+  const btnCerrar = el(SELECTORES.btnCerrarModalPref) || document.querySelector('#btn-cerrar-modal-preferencia');
+  const btnCancelar = el(SELECTORES.btnCancelarPref) || document.querySelector('#btn-cancelar-preferencia');
 
-  const btnCerrar = el(SELECTORES.btnCerrarModalPref);
-  if (btnCerrar && !btnCerrar.dataset.inicializado) {
-    btnCerrar.dataset.inicializado = 'true';
-    btnCerrar.addEventListener('click', cerrarModalPreferencia);
-  }
-
-  const btnCancelar = el(SELECTORES.btnCancelarPref);
-  if (btnCancelar && !btnCancelar.dataset.inicializado) {
-    btnCancelar.dataset.inicializado = 'true';
-    btnCancelar.addEventListener('click', cerrarModalPreferencia);
+  if (modal && !modal.dataset.accesibleInicializado) {
+    modal.dataset.accesibleInicializado = 'true';
+    configurarModalAccesible(modal, {
+      btnAbrir,
+      btnCerrar: [btnCerrar, btnCancelar],
+      primerEnfocable: SELECTORES.inputPreferencia,
+      alAbrir: () => {
+        abrirModalPreferencia();
+      },
+      alCerrar: () => {
+        cerrarModalPreferencia();
+      }
+    });
   }
 
   const formPref = el(SELECTORES.formPreferencia);
@@ -453,16 +451,6 @@ export function inicializarPreferencias() {
       const inputPref = el(SELECTORES.inputPreferencia);
       const texto = inputPref ? inputPref.value : '';
       agregarPreferencia(texto);
-    });
-  }
-
-  const modalEl = el(SELECTORES.modalPreferencia);
-  if (modalEl && !modalEl.dataset.inicializado) {
-    modalEl.dataset.inicializado = 'true';
-    modalEl.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        cerrarModalPreferencia();
-      }
     });
   }
 }

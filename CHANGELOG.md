@@ -2,6 +2,20 @@
 
 Este documento registra los hitos de versiones **Mayores (Major)** y **Medianas (Minor)** de la aplicación con resúmenes ejecutivos concisos ($\le 10$ renglones). Los cambios atómicos y parches específicos se registran directamente en los commits de Git bajo la convención *Conventional Commits*.
 
+## [v0.6.1] — 31/10/2026
+- **Tipo:** Versión Menor (Creación de Platos Compuestos, Sincronización Reactiva de Hidratación y Sistema WAI-ARIA Focus Trap)
+- **Fecha:** 31 de Octubre de 2026
+- **Resumen:**
+  1. Creación de Platos Compuestos (`pages/alumno/crear-plato.html` y `crear-plato-ui.js`): Nueva interfaz y controlador UI para armar comidas compuestas combinando ingredientes, cálculo dinámico Atwater (kcal, P, C, G) en vivo, plantilla nativa `<template id="tpl-ingrediente-plato">`, persistencia en `sessionStorage` (`appcalorias_mis_platos`) y sincronización con `crearAlimento`.
+  2. Flujo Integrado de Ingredientes: Botón `#btn-ir-crear-plato` en `agregar.html` y soporte de selección contextual mediante parámetro `?origen=crear-plato`.
+  3. Sincronización Reactiva de Hidratación en Tiempo Real (`dashboard-ui.js`, `progreso-ui.js` y `seguimiento-coach-ui.js`): Canal de eventos `appcalorias:agua_actualizada` en `window`, tarjeta `#hidrata-hoy` en Progreso con botones rápidos (+1/-1 vaso) y reflejo dinámico en la vista de seguimiento del coach sin recargar la página.
+  4. Módulo Transversal de Accesibilidad (`frontend/js/utils/accesibilidad.js`): Trampas de foco WCAG 2.1 AA (`activarTrampaFoco`, `liberarTrampaFoco`, `configurarModalAccesible`) con ciclado estricto `Tab`/`Shift+Tab`, cierre accesible con tecla `Escape` y restauración de foco al disparador.
+  5. Integración Universal de Modales Accesibles: Cobertura completa en los 6 modales (`#modal-editar-perfil`, `#modal-agregar-preferencia`, `#modal-editar-perfil-coach`, `#modal-archivar-plan`, `#modal-revisar`, `#modal-desvincular`).
+  6. Blindaje total de la interfaz: Cero usos de `innerHTML` en la capa UI (Regla de Oro 1).
+  7. Batería de validación: 30 HTMLs (27 en subdirectorios), 42 módulos JS (28 controladores UI) sin ciclos, y 127 pruebas automáticas superadas al 100% en Microsoft Edge headless (40 platos, 37 agua, 50 accesibilidad).
+
+---
+
 ## [v0.6.0] — 31/10/2026
 - **Tipo:** Versión Menor (Historial de Planes del Alumno, Sincronización Transversal de Pesajes y Resiliencia Offline de Supabase)
 - **Fecha:** 31 de Octubre de 2026

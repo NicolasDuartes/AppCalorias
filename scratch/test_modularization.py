@@ -54,7 +54,8 @@ PAGE_MAP_FALLBACK = {
     'progreso-ui.js': ['pages/alumno/progreso.html'],
     'alimentos-revision-ui.js': ['pages/coach/alimentos-revision.html'],
     'plantillas-ui.js': ['pages/coach/plantillas.html'],
-    'seguimiento-coach-ui.js': ['pages/coach/seguimiento.html']
+    'seguimiento-coach-ui.js': ['pages/coach/seguimiento.html'],
+    'crear-plato-ui.js': ['pages/alumno/crear-plato.html']
 }
 
 

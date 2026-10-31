@@ -112,7 +112,7 @@
         </div>
       </section>
 
-      <a class="btn btn--peligro-texto" href="#eliminar" id="boton-eliminar" hidden>Eliminar cliente</a>
+      <a class="btn btn--peligro-texto" id="btn-desvincular-alumno" href="#modal-desvincular" hidden>Eliminar cliente</a>
     </main>
 
     <!-- ===== Navegación del coach (igual en todas las pantallas del coach) ===== -->
@@ -125,7 +125,7 @@
     </nav>
 
     <!-- Confirmación: se abre con href="#eliminar" gracias a :target -->
-    <div class="modal-fondo" id="eliminar" role="alertdialog" aria-modal="true" aria-labelledby="t-eliminar">
+    <div class="modal-fondo" id="modal-desvincular" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="t-eliminar" hidden>
       <a class="modal-fondo__cerrar" href="#" aria-label="Cancelar" tabindex="-1"></a>
       <div class="modal">
         <div class="columna">
@@ -134,7 +134,7 @@
         </div>
         <p class="mensaje" id="mensaje-eliminar" role="alert" hidden></p>
         <div class="grilla-2">
-          <a class="btn btn--secundario" href="#">Cancelar</a>
+          <button class="btn btn--secundario" type="button" id="btn-cerrar-modal-desvincular">Cancelar</button>
           <button class="btn btn--peligro" type="button" id="confirmar-eliminar">Eliminar</button>
         </div>
       </div>

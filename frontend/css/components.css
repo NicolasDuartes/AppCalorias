@@ -816,6 +816,8 @@ summary.opcion::-webkit-details-marker { display: none; }
 
 .barra > span.g { background: var(--macro-g); }
 
+.barra--azul > span { background: var(--azul); }
+
 /* ---------- Encabezado, barra inferior y pie ---------- */
 .encabezado {
   display: flex;
@@ -964,7 +966,8 @@ summary.opcion::-webkit-details-marker { display: none; }
   padding: var(--espacio-xl);
 }
 
-.modal-fondo:target {
+.modal-fondo:target,
+.modal-fondo:not([hidden]) {
   display: flex;
 }
 

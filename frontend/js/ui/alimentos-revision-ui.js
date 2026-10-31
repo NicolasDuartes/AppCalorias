@@ -8,6 +8,7 @@
 import { supabase } from '../data/supabase.js';
 import { exigirRol } from '../data/sesion.js';
 import { mostrarAvisoFlotante } from '../utils/navegacion.js';
+import { configurarModalAccesible, activarTrampaFoco, liberarTrampaFoco } from '../utils/accesibilidad.js';
 
 /**
  * Mapa centralizado de selectores del DOM para alimentos-revision.html.
@@ -19,17 +20,20 @@ export const SELECTORES = {
   cargandoPendientes: '#cargando-pendientes',
   mensajeRevision: '#mensaje-revision',
   tplAlimentoRevision: '#tpl-alimento-revision',
-  modalRechazar: '#rechazar',
+  modalRechazar: '#modal-revisar',
+  modalRevisar: '#modal-revisar',
   formRechazar: '#form-rechazar',
   inputRechazarId: '#rechazar-alimento-id',
   motivoRechazo: '#motivo-rechazo',
   subtituloRechazar: '#subtitulo-rechazar',
   btnConfirmarRechazo: '#btn-confirmar-rechazo',
-  btnCancelarRechazo: '#btn-cancelar-rechazo',
+  btnCancelarRechazo: '#btn-cancelar-revision',
+  btnCancelarRevision: '#btn-cancelar-revision',
+  btnCerrarModal: '#btn-cerrar-modal',
   mensajeRechazar: '#mensaje-rechazar',
   tarjetaAlimento: '.card--alimento-revision',
-  btnAprobar: '[data-ref="btn-aprobar"]',
-  btnRechazar: '[data-ref="btn-rechazar"]'
+  btnAprobar: '[data-ref="btn-aprobar"], .btn-aprobar',
+  btnRechazar: '[data-ref="btn-rechazar"], .btn-rechazar'
 };
 
 /**
@@ -361,7 +365,7 @@ export async function rechazarAlimento(id, motivo = '') {
     btnConfirmar.textContent = 'Rechazar';
   }
 
-  window.location.hash = '';
+  cerrarModalRechazo();
 
   alimentosPendientes = alimentosPendientes.filter((a) => a.id !== id);
 
@@ -402,7 +406,7 @@ export function configurarModalRechazo() {
   if (btnCancelar) {
     btnCancelar.addEventListener('click', (e) => {
       e.preventDefault();
-      window.location.hash = '';
+      cerrarModalRechazo();
     });
   }
 }

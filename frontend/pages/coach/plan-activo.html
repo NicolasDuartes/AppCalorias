@@ -150,7 +150,7 @@
         <a class="btn btn--primario btn--alto" href="plan-editor.html">Actualizar plan</a>
         <p class="nota-centrada">Se guarda como versión nueva; la actual queda en el historial.</p>
       </div>
-      <a class="btn btn--peligro-texto" href="#finalizar">Finalizar plan actual</a>
+      <a class="btn btn--peligro-texto" id="btn-archivar-plan" href="#modal-archivar-plan">Finalizar plan actual</a>
     </main>
 
     <!-- ===== Navegación del coach (igual en todas las pantallas del coach) ===== -->
@@ -162,8 +162,8 @@
       <a class="barra-inferior__item" href="perfil.html"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#perfil"/></svg><span>Perfil</span></a>
     </nav>
 
-    <!-- Confirmación: se abre con href="#finalizar" gracias a :target -->
-    <div class="modal-fondo" id="finalizar" role="alertdialog" aria-modal="true" aria-labelledby="t-finalizar">
+    <!-- Confirmación: modal archivar plan accesible -->
+    <div class="modal-fondo" id="modal-archivar-plan" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="t-finalizar" hidden>
       <a class="modal-fondo__cerrar" href="#" aria-label="Cancelar" tabindex="-1"></a>
       <div class="modal">
         <div class="columna">
@@ -171,7 +171,7 @@
           <p class="sub texto-14">El plan pasa al historial como archivado y benja.blason queda sin plan activo hasta que le asignes uno nuevo.</p>
         </div>
         <div class="grilla-2">
-          <a class="btn btn--secundario" href="#">Cancelar</a>
+          <button class="btn btn--secundario" type="button" id="btn-cancelar-archivo">Cancelar</button>
           <a class="btn btn--peligro" href="historial.html">Finalizar</a>
         </div>
       </div>

@@ -8,6 +8,7 @@ import { supabase } from '../data/supabase.js';
 import { cerrarSesion, exigirRol } from '../data/sesion.js';
 import { iniciales, nombreDe } from '../utils/texto.js';
 import { mostrarAvisoFlotante } from '../utils/navegacion.js';
+import { configurarModalAccesible, activarTrampaFoco, liberarTrampaFoco } from '../utils/accesibilidad.js';
 
 export const SELECTORES = {
   perfilUsuario: '#perfil-usuario',
@@ -95,16 +96,16 @@ export function abrirModalEditarCoach() {
     }
   }
 
-  modal.hidden = false;
-  if (inputNombre) {
-    inputNombre.focus();
-  }
+  activarTrampaFoco(modal, {
+    elementoInicial: inputNombre,
+    disparador: el(SELECTORES.btnEditarPerfilCoach)
+  });
 }
 
 export function cerrarModalEditarCoach() {
   const modal = el(SELECTORES.modalEditarPerfilCoach);
   if (modal) {
-    modal.hidden = true;
+    liberarTrampaFoco(modal);
   }
   const mensajeError = el(SELECTORES.mensajeModalCoach);
   if (mensajeError) {
@@ -117,7 +118,7 @@ export function cerrarModalEditarCoach() {
     btnGuardar.textContent = 'Guardar cambios';
   }
   const btnEditar = el(SELECTORES.btnEditarPerfilCoach);
-  if (btnEditar) {
+  if (btnEditar && typeof btnEditar.focus === 'function') {
     btnEditar.focus();
   }
 }
@@ -195,22 +196,24 @@ export async function guardarPerfilCoach({ nombre } = {}) {
 }
 
 export function inicializarEdicionPerfilCoach() {
+  const modalEl = el(SELECTORES.modalEditarPerfilCoach);
   const btnEditar = el(SELECTORES.btnEditarPerfilCoach);
-  if (btnEditar && !btnEditar.dataset.inicializado) {
-    btnEditar.dataset.inicializado = 'true';
-    btnEditar.addEventListener('click', abrirModalEditarCoach);
-  }
-
   const btnCerrar = el(SELECTORES.btnCerrarModalCoach);
-  if (btnCerrar && !btnCerrar.dataset.inicializado) {
-    btnCerrar.dataset.inicializado = 'true';
-    btnCerrar.addEventListener('click', cerrarModalEditarCoach);
-  }
-
   const btnCancelar = el(SELECTORES.btnCancelarCoach);
-  if (btnCancelar && !btnCancelar.dataset.inicializado) {
-    btnCancelar.dataset.inicializado = 'true';
-    btnCancelar.addEventListener('click', cerrarModalEditarCoach);
+
+  if (modalEl && !modalEl.dataset.accesibleInicializado) {
+    modalEl.dataset.accesibleInicializado = 'true';
+    configurarModalAccesible(modalEl, {
+      btnAbrir: btnEditar,
+      btnCerrar: [btnCerrar, btnCancelar],
+      primerEnfocable: SELECTORES.inputCoachNombre,
+      alAbrir: () => {
+        abrirModalEditarCoach();
+      },
+      alCerrar: () => {
+        cerrarModalEditarCoach();
+      }
+    });
   }
 
   const formEditar = el(SELECTORES.formEditarCoach);
@@ -221,16 +224,6 @@ export function inicializarEdicionPerfilCoach() {
       const inputNombre = el(SELECTORES.inputCoachNombre);
       const nombre = inputNombre ? inputNombre.value : '';
       await guardarPerfilCoach({ nombre });
-    });
-  }
-
-  const modalEl = el(SELECTORES.modalEditarPerfilCoach);
-  if (modalEl && !modalEl.dataset.inicializado) {
-    modalEl.dataset.inicializado = 'true';
-    modalEl.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        cerrarModalEditarCoach();
-      }
     });
   }
 }

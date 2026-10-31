@@ -59,6 +59,8 @@ export const SELECTORES = {
 export const STORAGE_KEY_PESO_ACTUAL = 'appcalorias_peso_actual';
 export const STORAGE_KEY_HISTORIAL_PESAJES = 'appcalorias_historial_pesajes';
 export const EVENTO_PESO_ACTUALIZADO = 'appcalorias:peso_actualizado';
+export const STORAGE_KEY_AGUA_HOY = 'appcalorias_agua_hoy';
+export const EVENTO_AGUA_ACTUALIZADA = 'appcalorias:agua_actualizada';
 
 /**
  * Metas nutricionales e hídricas del plan activo del alumno.
@@ -978,6 +980,14 @@ export function restaurarEstadosComidas() {
 
 export function obtenerVasosAguaGuardados() {
   try {
+    const rawHoy = sessionStorage.getItem(STORAGE_KEY_AGUA_HOY);
+    if (rawHoy) {
+      const parsedHoy = JSON.parse(rawHoy);
+      if (parsedHoy && Array.isArray(parsedHoy.vasos)) return parsedHoy.vasos;
+      if (parsedHoy && typeof parsedHoy.vasos === 'number') {
+        return Array.from({ length: parsedHoy.vasos }, (_, i) => i);
+      }
+    }
     const raw = sessionStorage.getItem(CLAVE_STORAGE_AGUA);
     if (raw) {
       const parsed = JSON.parse(raw);
@@ -991,10 +1001,79 @@ export function obtenerVasosAguaGuardados() {
 
 export function guardarVasosAgua(indices) {
   try {
+    const vasos = document.querySelectorAll(SELECTORES.vasosAgua);
+    const totalVasos = vasos.length || 8;
+    const count = Array.isArray(indices) ? indices.length : Number(indices) || 0;
+    const indicesArr = Array.isArray(indices) ? indices : Array.from({ length: count }, (_, i) => i);
+    const litrosPorVaso = PLAN_OBJETIVO_DEFECTO.aguaLitros / totalVasos;
+    const litrosTotal = Math.round(count * litrosPorVaso * 10) / 10;
+    const fechaISO = aTextoISO(elegido);
+
+    sessionStorage.setItem(CLAVE_STORAGE_AGUA, JSON.stringify(indicesArr));
+    sessionStorage.setItem(STORAGE_KEY_AGUA_HOY, JSON.stringify({
+      vasos: indicesArr,
+      litros: litrosTotal,
+      totalVasos,
+      fechaISO
+    }));
+  } catch {
+    // Ignorar
+  }
+}
+
+/**
+ * Sincroniza el estado de los vasos ante eventos externos de agua_actualizada.
+ * @param {CustomEvent} evento
+ */
+export function sincronizarAguaDesdeEvento(evento) {
+  const detail = evento?.detail;
+  if (!detail) return;
+
+  const vasos = document.querySelectorAll(SELECTORES.vasosAgua);
+  const totalVasos = detail.total || vasos.length || 8;
+  const litrosPorVaso = PLAN_OBJETIVO_DEFECTO.aguaLitros / totalVasos;
+
+  let indices = [];
+  let numVasos = 0;
+
+  if (Array.isArray(detail.vasos)) {
+    indices = detail.vasos;
+    numVasos = indices.length;
+  } else if (typeof detail.vasos === 'number') {
+    numVasos = Math.min(Math.max(0, detail.vasos), totalVasos);
+    indices = Array.from({ length: numVasos }, (_, i) => i);
+  } else if (typeof detail.litros === 'number') {
+    numVasos = Math.min(totalVasos, Math.round(detail.litros / litrosPorVaso));
+    indices = Array.from({ length: numVasos }, (_, i) => i);
+  }
+
+  const setIndices = new Set(indices);
+  vasos.forEach((vaso, i) => {
+    vaso.setAttribute('aria-pressed', String(setIndices.has(i)));
+  });
+
+  const litrosTotal = typeof detail.litros === 'number'
+    ? detail.litros
+    : Math.round(numVasos * litrosPorVaso * 10) / 10;
+  const fechaISO = detail.fechaISO || aTextoISO(elegido);
+
+  try {
+    sessionStorage.setItem(STORAGE_KEY_AGUA_HOY, JSON.stringify({
+      vasos: indices,
+      litros: litrosTotal,
+      totalVasos,
+      fechaISO
+    }));
     sessionStorage.setItem(CLAVE_STORAGE_AGUA, JSON.stringify(indices));
   } catch {
     // Ignorar
   }
+
+  actualizarContadorAgua();
+}
+
+if (typeof window !== 'undefined') {
+  window.addEventListener(EVENTO_AGUA_ACTUALIZADA, sincronizarAguaDesdeEvento);
 }
 
 export function restaurarVasosAgua() {
@@ -1124,19 +1203,31 @@ document.querySelectorAll(SELECTORES.vasosAgua).forEach((vaso, idx) => {
     document.querySelectorAll(SELECTORES.vasosAgua).forEach((v, i) => {
       if (v.getAttribute('aria-pressed') === 'true') presionados.push(i);
     });
+    const totalVasos = document.querySelectorAll(SELECTORES.vasosAgua).length || 8;
+    const litrosPorVaso = PLAN_OBJETIVO_DEFECTO.aguaLitros / totalVasos;
+    const litrosTotal = Math.round(presionados.length * litrosPorVaso * 10) / 10;
+    const fechaISO = aTextoISO(elegido);
+
     guardarVasosAgua(presionados);
     actualizarContadorAgua();
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('appcalorias:agua_actualizada', {
+        detail: {
+          vasos: presionados.length,
+          total: totalVasos,
+          litros: litrosTotal,
+          fechaISO: aTextoISO(elegido)
+        }
+      }));
+    }
 
     // Sincronizar consumo de agua en Supabase si hay sesión activa
     if (usuarioActualId) {
       (async () => {
         try {
-          const fechaISO = aTextoISO(elegido);
           const log = await obtenerOCrearRegistroDiario(usuarioActualId, fechaISO);
           if (log && log.id) {
-            const totalVasos = document.querySelectorAll(SELECTORES.vasosAgua).length || 8;
-            const litrosPorVaso = PLAN_OBJETIVO_DEFECTO.aguaLitros / totalVasos;
-            const litrosTotal = presionados.length * litrosPorVaso;
             await actualizarAgua(log.id, litrosTotal);
           }
         } catch (err) {

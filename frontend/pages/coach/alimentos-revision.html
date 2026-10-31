@@ -76,8 +76,8 @@
           </div>
 
           <div class="grilla-2">
-            <button class="btn btn--chico btn--secundario" type="button" data-ref="btn-rechazar">Rechazar</button>
-            <button class="btn btn--chico btn--primario" type="button" data-ref="btn-aprobar">Aprobar</button>
+            <button class="btn btn--chico btn--secundario btn-rechazar" type="button" data-ref="btn-rechazar">Rechazar</button>
+            <button class="btn btn--chico btn--primario btn-aprobar" type="button" data-ref="btn-aprobar">Aprobar</button>
           </div>
         </article>
       </template>
@@ -92,13 +92,13 @@
       <a class="barra-inferior__item" href="perfil.html"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#perfil"/></svg><span>Perfil</span></a>
     </nav>
 
-    <!-- Modal de rechazo (#rechazar) -->
-    <div class="modal-fondo" id="rechazar" role="dialog" aria-modal="true" aria-labelledby="titulo-rechazar">
+    <!-- Modal de rechazo (#rechazar / #modal-revisar) -->
+    <div class="modal-fondo" id="rechazar" hidden aria-hidden="true">
       <a class="modal-fondo__cerrar" href="#" aria-label="Cerrar ventana" tabindex="-1"></a>
-      <div class="modal">
+      <div class="modal" id="modal-revisar" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="titulo-rechazar">
         <div class="fila fila--entre">
           <h2 class="titulo" id="titulo-rechazar">Rechazar alimento</h2>
-          <a class="btn-icono" href="#" aria-label="Cerrar"><svg class="icono" width="20" height="20" aria-hidden="true"><use href="#cerrar"/></svg></a>
+          <button class="btn-icono" type="button" id="btn-cerrar-modal" aria-label="Cerrar"><svg class="icono" width="20" height="20" aria-hidden="true"><use href="#cerrar"/></svg></button>
         </div>
         <p class="sub texto-14" id="subtitulo-rechazar">Indicá el motivo por el cual se rechaza este alimento (opcional):</p>
         <form class="columna gap-m" id="form-rechazar" novalidate>
@@ -109,7 +109,7 @@
           </label>
           <p class="mensaje" id="mensaje-rechazar" role="alert" hidden></p>
           <div class="grilla-2">
-            <a class="btn btn--secundario" href="#" id="btn-cancelar-rechazo">Cancelar</a>
+            <button class="btn btn--secundario" type="button" id="btn-cancelar-revision">Cancelar</button>
             <button class="btn btn--peligro" type="submit" id="btn-confirmar-rechazo">Rechazar</button>
           </div>
         </form>

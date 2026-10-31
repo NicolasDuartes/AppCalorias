@@ -11,6 +11,7 @@ import { exigirRol } from '../data/sesion.js';
 import { obtenerPermisosAlumno, actualizarPermisoAlumno } from '../data/contexto-api.js';
 import { mostrarAvisoFlotante } from '../utils/navegacion.js';
 import { iniciales, nombreDe } from '../utils/texto.js';
+import { configurarModalAccesible } from '../utils/accesibilidad.js';
 import '../utils/navegacion.js';
 
 const LISTA = 'clientes.html';
@@ -25,7 +26,10 @@ export const SELECTORES = {
   clienteCodigo: '#cliente-codigo',
   seccionesCliente: '#secciones-cliente',
   mensajeCliente: '#mensaje-cliente',
-  botonEliminar: '#boton-eliminar',
+  botonEliminar: '#btn-desvincular-alumno',
+  btnDesvincularAlumno: '#btn-desvincular-alumno',
+  modalDesvincular: '#modal-desvincular',
+  btnCerrarModalDesvincular: '#btn-cerrar-modal-desvincular',
   confirmarEliminar: '#confirmar-eliminar',
   mensajeEliminar: '#mensaje-eliminar',
   nombreCliente: '.nombre-cliente',
@@ -205,8 +209,19 @@ async function iniciar() {
     console.warn('Error gestionando permisos del alumno:', err);
   }
 
-  const btnEliminar = el(SELECTORES.botonEliminar);
+  const btnEliminar = el(SELECTORES.btnDesvincularAlumno);
   if (btnEliminar) btnEliminar.hidden = false;
+
+  const modalDesvincular = el(SELECTORES.modalDesvincular);
+  const btnCerrarModal = el(SELECTORES.btnCerrarModalDesvincular);
+
+  if (modalDesvincular) {
+    configurarModalAccesible(modalDesvincular, {
+      btnAbrir: btnEliminar,
+      btnCerrar: btnCerrarModal,
+      primerEnfocable: SELECTORES.btnCerrarModalDesvincular
+    });
+  }
 
   const btnConfirmar = el(SELECTORES.confirmarEliminar);
   if (btnConfirmar) {

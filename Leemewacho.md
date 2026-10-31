@@ -28,10 +28,11 @@ frontend/
 │   │   ├── nutricion-calc.js      # Fórmula Atwater 4P+4C+9G y consistencia
 │   │   ├── equivalencia-calc.js   # Mediana ponderada L1 de porciones equitativas
 │   │   └── formato-calc.js        # Sanitización decimal y formateo de texto
-│   ├── utils/                     # Utilidades transversales (2 módulos)
+│   ├── utils/                     # Utilidades transversales (3 módulos)
 │   │   ├── navegacion.js          # Historial inteligente, avisos toast y atajos WCAG
-│   │   └── texto.js               # Formato de nombres e iniciales de cuentas
-│   └── ui/                        # Controladores desacoplados con mapas SELECTORES (27 módulos)
+│   │   ├── texto.js               # Formato de nombres e iniciales de cuentas
+│   │   └── accesibilidad.js       # Trampas de foco (Focus Trap), modales WAI-ARIA y atajos WCAG
+│   └── ui/                        # Controladores desacoplados con mapas SELECTORES (28 módulos)
 │       ├── login-ui.js            # index.html
 │       ├── cuenta-ui.js           # registro.html
 │       ├── onboarding-ui.js       # alumno/onboarding.html (stepper de 5 pasos)
@@ -40,6 +41,7 @@ frontend/
 │       ├── historial-alumno-ui.js # alumno/historial.html (historial de planes del alumno)
 │       ├── cantidad-ui.js         # alumno/cantidad.html
 │       ├── agregar-ui.js          # alumno/agregar.html
+│       ├── crear-plato-ui.js      # alumno/crear-plato.html (armado y cálculo de platos)
 │       ├── reemplazar-ui.js       # alumno/reemplazar.html
 │       ├── alimento-form-ui.js    # alumno/crear-alimento.html y editar-alimento.html
 │       ├── progreso-ui.js         # alumno/progreso.html (evolución y peso)

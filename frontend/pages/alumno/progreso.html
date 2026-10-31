@@ -90,6 +90,35 @@
         </div>
       </section>
 
+      <!-- Sección de Hidratación de Hoy -->
+      <section class="card" id="hidrata-hoy" aria-labelledby="t-hidrata-hoy">
+        <div class="card__fila">
+          <div class="columna">
+            <h2 class="seccion-titulo" id="t-hidrata-hoy">Hidratación de hoy</h2>
+            <span class="sub" id="hidrata-subtitulo">Consumo de agua y meta diaria</span>
+          </div>
+          <div class="fila gap-xs" role="group" aria-label="Ajustar consumo de agua">
+            <button type="button" class="btn btn--chico btn--secundario" id="btn-menos-agua" aria-label="Restar un vaso de agua">−1 vaso</button>
+            <button type="button" class="btn btn--chico btn--secundario" id="btn-mas-agua" aria-label="Sumar un vaso de agua">+1 vaso</button>
+          </div>
+        </div>
+
+        <div class="columna gap-2xs">
+          <div class="fila fila--entre">
+            <span class="sub" id="litros-agua-texto">Consumo</span>
+            <span class="negrita texto-14" id="litros-agua">0,0 L / 2,5 L</span>
+          </div>
+          <div class="barra barra--azul" id="barra-agua" role="progressbar" aria-label="Progreso de hidratación diaria" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <span style="width: 0%"></span>
+          </div>
+        </div>
+
+        <div class="fila fila--entre">
+          <span class="sub" id="vasos-agua-texto">0 de 8 vasos</span>
+          <span class="sub" id="porcentaje-agua">0%</span>
+        </div>
+      </section>
+
       <!-- Sección de Adherencia y Hábitos -->
       <section class="card" id="seccion-habitos" aria-labelledby="t-seccion-habitos">
         <div class="columna gap-2xs">

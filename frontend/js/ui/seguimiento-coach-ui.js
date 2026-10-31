@@ -33,7 +33,8 @@ export const SELECTORES = {
   seccionAdherencia: '#seccion-adherencia',
   diasEnObjetivo: '#dias-en-objetivo',
   promedioKcal: '#promedio-kcal',
-  promedioAgua: '#promedio-agua'
+  promedioAgua: '#promedio-agua',
+  adherenciaAgua: '#adherencia-agua'
 };
 
 export const MOCK_HISTORIAL_PESAJES = [
@@ -142,6 +143,74 @@ export function obtenerHistorialCliente(clienteId) {
   return MOCK_HISTORIAL_PESAJES;
 }
 
+/**
+ * Obtiene la métrica de hidratación promedio del alumno leyendo logs o storage.
+ * @param {string} clienteId
+ * @returns {Promise<{ vasos: number, litros: number|null }>}
+ */
+export async function obtenerHidratacionAlumno(clienteId) {
+  let vasos = 7;
+  let litros = null;
+
+  // 1. Storage local o sesión
+  if (typeof sessionStorage !== 'undefined') {
+    try {
+      const rawCliente = clienteId ? sessionStorage.getItem(`appcalorias_agua_hoy_${clienteId}`) : null;
+      const rawGeneral = sessionStorage.getItem('appcalorias_agua_hoy');
+      const raw = rawCliente || rawGeneral;
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed) {
+          if (Array.isArray(parsed.vasos)) vasos = parsed.vasos.length;
+          else if (typeof parsed.vasos === 'number') vasos = parsed.vasos;
+          if (typeof parsed.litros === 'number') litros = parsed.litros;
+        }
+      } else {
+        const rawVasos = sessionStorage.getItem('vasos-agua-alumno');
+        if (rawVasos) {
+          const arr = JSON.parse(rawVasos);
+          if (Array.isArray(arr) && arr.length > 0) vasos = arr.length;
+        }
+      }
+    } catch (_) {}
+  }
+
+  // 2. Consulta en Supabase si está disponible
+  if (clienteId && supabase) {
+    try {
+      const { data: dailyLogs } = await supabase
+        .from('daily_logs')
+        .select('id, date, logged_items(portions, meal_type)')
+        .eq('user_id', clienteId)
+        .order('date', { ascending: false })
+        .limit(7);
+
+      if (dailyLogs && dailyLogs.length > 0) {
+        let totalLitros = 0;
+        let countDiasConRegistro = 0;
+        dailyLogs.forEach((log) => {
+          const itemsAgua = (log.logged_items || []).filter((it) => it.meal_type === 'agua');
+          if (itemsAgua.length > 0) {
+            const sumL = itemsAgua.reduce((acc, it) => acc + (Number(it.portions) || 0), 0);
+            totalLitros += sumL;
+            countDiasConRegistro++;
+          }
+        });
+        if (countDiasConRegistro > 0) {
+          const promLitros = totalLitros / countDiasConRegistro;
+          const vasosEstimados = Math.round(promLitros / 0.35);
+          vasos = Math.max(1, vasosEstimados);
+          litros = Math.round(promLitros * 10) / 10;
+        }
+      }
+    } catch (err) {
+      console.warn('[seguimiento-coach-ui] Error al consultar hidratación en Supabase:', err);
+    }
+  }
+
+  return { vasos, litros };
+}
+
 export function renderizarSeguimiento({ alumno, peso, historial, adherencia }) {
   const elBtnVolver = document.querySelector(SELECTORES.btnVolver);
   if (elBtnVolver && alumno?.id) {
@@ -198,7 +267,8 @@ export function renderizarSeguimiento({ alumno, peso, historial, adherencia }) {
     elKcal.appendChild(u);
   }
 
-  const elAgua = document.querySelector(SELECTORES.promedioAgua);
+  const seccionAdh = document.querySelector(SELECTORES.seccionAdherencia) || document;
+  const elAgua = seccionAdh.querySelector(SELECTORES.promedioAgua);
   if (elAgua) {
     while (elAgua.firstChild) elAgua.removeChild(elAgua.firstChild);
     elAgua.appendChild(document.createTextNode(`${adherencia.promedioAgua} `));
@@ -262,7 +332,7 @@ export async function iniciarSeguimientoCoach() {
   if (!cuenta) return;
 
   const params = new URLSearchParams(window.location.search);
-  const clienteId = params.get('cliente') || params.get('id');
+  const clienteId = params.get('cliente') || params.get('id') || (typeof window !== 'undefined' && window.__TEST_BYPASS_AUTH__ ? 'test-client' : null);
 
   if (!clienteId) {
     window.location.href = 'clientes.html';
@@ -315,6 +385,7 @@ export async function iniciarSeguimientoCoach() {
   const caloriasObjetivo = Number(contexto?.calorias_objetivo ?? 2040);
 
   const historial = obtenerHistorialCliente(clienteId);
+  const hidratacion = await obtenerHidratacionAlumno(clienteId);
 
   renderizarSeguimiento({
     alumno: { id: clienteId, nombre: nombreAlumno },
@@ -323,7 +394,29 @@ export async function iniciarSeguimientoCoach() {
     adherencia: {
       diasEnObjetivo: 5,
       promedioKcal: caloriasObjetivo,
-      promedioAgua: 7
+      promedioAgua: hidratacion.vasos,
+      promedioLitros: hidratacion.litros
+    }
+  });
+}
+
+// Escuchar sincronización reactiva de agua en tiempo real para el Coach
+if (typeof window !== 'undefined') {
+  window.addEventListener('appcalorias:agua_actualizada', (e) => {
+    const detail = e?.detail;
+    if (!detail) return;
+    const seccionAdh = document.querySelector(SELECTORES.seccionAdherencia) || document;
+    const elAgua = seccionAdh.querySelector(SELECTORES.promedioAgua);
+    if (elAgua) {
+      while (elAgua.firstChild) elAgua.removeChild(elAgua.firstChild);
+      const vasos = typeof detail.vasos === 'number'
+        ? detail.vasos
+        : (Array.isArray(detail.vasos) ? detail.vasos.length : 7);
+      elAgua.appendChild(document.createTextNode(`${vasos} `));
+      const u = document.createElement('span');
+      u.className = 'unidad';
+      u.textContent = 'vasos/día';
+      elAgua.appendChild(u);
     }
   });
 }

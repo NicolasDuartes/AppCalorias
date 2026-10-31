@@ -11,6 +11,7 @@
 import { exigirRol } from '../data/sesion.js';
 import { obtenerPlanActivo, archivarPlan } from '../data/planes-api.js';
 import { mostrarAvisoFlotante, guardarAvisoToast } from '../utils/navegacion.js';
+import { configurarModalAccesible } from '../utils/accesibilidad.js';
 import '../utils/navegacion.js';
 
 /**
@@ -33,9 +34,12 @@ export const SELECTORES = {
   acordeones: '.acordeon',
   itemsLectura: '.item-lectura',
   btnActualizar: 'a[href*="plan-editor.html"]',
-  btnFinalizarTrigger: 'a[href="#finalizar"]',
-  modalFinalizar: '#finalizar',
-  btnConfirmarFinalizar: '#finalizar .btn--peligro'
+  btnArchivarPlan: '#btn-archivar-plan',
+  modalArchivarPlan: '#modal-archivar-plan',
+  btnCancelarArchivo: '#btn-cancelar-archivo',
+  btnFinalizarTrigger: '#btn-archivar-plan, a[href="#modal-archivar-plan"]',
+  modalFinalizar: '#modal-archivar-plan',
+  btnConfirmarFinalizar: '#modal-archivar-plan .btn--peligro'
 };
 
 /**
@@ -66,6 +70,19 @@ export async function iniciarPlanActivo() {
     } catch {
       // Fallback a contenido estático renderizado
     }
+  }
+
+  // Configuración de accesibilidad y trampa de foco para modal de archivar plan
+  const modalArchivar = document.querySelector(SELECTORES.modalArchivarPlan);
+  const btnArchivar = document.querySelector(SELECTORES.btnArchivarPlan);
+  const btnCancelar = document.querySelector(SELECTORES.btnCancelarArchivo);
+
+  if (modalArchivar) {
+    configurarModalAccesible(modalArchivar, {
+      btnAbrir: btnArchivar,
+      btnCerrar: btnCancelar,
+      primerEnfocable: SELECTORES.btnCancelarArchivo
+    });
   }
 
   // Interceptar confirmación de finalizar plan

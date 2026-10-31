@@ -28,7 +28,14 @@ export const SELECTORES = {
   btnRegistrarPeso: '#btn-registrar-peso',
   diasEnObjetivo: '#dias-en-objetivo',
   promedioKcal: '#promedio-kcal',
-  promedioAgua: '#promedio-agua'
+  promedioAgua: '#promedio-agua',
+  seccionHidrataHoy: '#hidrata-hoy',
+  litrosAgua: '#litros-agua',
+  barraAgua: '#barra-agua',
+  btnMenosAgua: '#btn-menos-agua',
+  btnMasAgua: '#btn-mas-agua',
+  vasosAguaTexto: '#vasos-agua-texto',
+  porcentajeAgua: '#porcentaje-agua'
 };
 
 export const STORAGE_KEY_PESO_ACTUAL = 'appcalorias_peso_actual';
@@ -36,7 +43,11 @@ export const STORAGE_KEY_HISTORIAL_PESAJES = 'appcalorias_historial_pesajes';
 export const CLAVE_STORAGE_PESAJES = STORAGE_KEY_HISTORIAL_PESAJES;
 export const CLAVE_STORAGE_PESO_ACTUAL = STORAGE_KEY_PESO_ACTUAL;
 export const CLAVE_STORAGE_AGUA = 'vasos-agua-alumno';
+export const STORAGE_KEY_AGUA_HOY = 'appcalorias_agua_hoy';
 export const EVENTO_PESO_ACTUALIZADO = 'appcalorias:peso_actualizado';
+export const EVENTO_AGUA_ACTUALIZADA = 'appcalorias:agua_actualizada';
+export const META_AGUA_DEFECTO = 2.5;
+export const TOTAL_VASOS_DEFECTO = 8;
 
 export const MOCK_HISTORIAL_PESAJES = [
   {
@@ -363,6 +374,238 @@ export function renderizarProgreso(datos, historial) {
     spanUnidad.textContent = ' vasos/día';
     promAguaEl.append(`${vasosCount} `, spanUnidad);
   }
+
+  renderizarHidratacionHoy();
+}
+
+/**
+ * Obtiene el estado consolidado de consumo de agua desde sessionStorage.
+ * @returns {{ vasos: number, totalVasos: number, litros: number, metaLitros: number, fechaISO: string }}
+ */
+export function obtenerEstadoAguaHoy() {
+  let vasos = 0;
+  let totalVasos = TOTAL_VASOS_DEFECTO;
+  let litros = 0;
+  let metaLitros = META_AGUA_DEFECTO;
+  let fechaISO = new Date().toISOString().slice(0, 10);
+
+  if (typeof sessionStorage !== 'undefined') {
+    try {
+      const raw = sessionStorage.getItem(STORAGE_KEY_AGUA_HOY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed) {
+          if (Array.isArray(parsed.vasos)) {
+            vasos = parsed.vasos.length;
+          } else if (typeof parsed.vasos === 'number') {
+            vasos = parsed.vasos;
+          }
+          if (typeof parsed.totalVasos === 'number' && parsed.totalVasos > 0) {
+            totalVasos = parsed.totalVasos;
+          }
+          if (typeof parsed.litros === 'number') {
+            litros = parsed.litros;
+          } else {
+            litros = Math.round((vasos * (metaLitros / totalVasos)) * 10) / 10;
+          }
+          if (parsed.fechaISO) fechaISO = parsed.fechaISO;
+        }
+      } else {
+        const rawAgua = sessionStorage.getItem(CLAVE_STORAGE_AGUA);
+        if (rawAgua) {
+          const arr = JSON.parse(rawAgua);
+          if (Array.isArray(arr)) {
+            vasos = arr.length;
+            litros = Math.round((vasos * (metaLitros / totalVasos)) * 10) / 10;
+          }
+        }
+      }
+    } catch (_) {}
+  }
+
+  return { vasos, totalVasos, litros, metaLitros, fechaISO };
+}
+
+/**
+ * Renderiza la tarjeta de hidratación diaria sin innerHTML.
+ * @param {Object} [estadoAgua]
+ */
+export function renderizarHidratacionHoy(estadoAgua) {
+  const estado = estadoAgua || obtenerEstadoAguaHoy();
+  const litrosConsumidos = Number(estado.litros ?? 0);
+  const metaLitros = Number(estado.metaLitros ?? META_AGUA_DEFECTO);
+  const totalVasos = Number(estado.totalVasos ?? TOTAL_VASOS_DEFECTO);
+  const vasosCount = Number(estado.vasos ?? 0);
+
+  const pct = metaLitros > 0 ? Math.min(100, Math.round((litrosConsumidos / metaLitros) * 100)) : 0;
+
+  const elLitros = document.querySelector(SELECTORES.litrosAgua);
+  if (elLitros) {
+    elLitros.textContent = `${formatearNumero(litrosConsumidos, 1)} L / ${formatearNumero(metaLitros, 1)} L`;
+  }
+
+  const elBarra = document.querySelector(SELECTORES.barraAgua);
+  if (elBarra) {
+    elBarra.setAttribute('aria-valuenow', String(pct));
+    const relleno = elBarra.firstElementChild;
+    if (relleno) relleno.style.width = `${pct}%`;
+  }
+
+  const elVasosTexto = document.querySelector(SELECTORES.vasosAguaTexto);
+  if (elVasosTexto) {
+    elVasosTexto.textContent = `${vasosCount} de ${totalVasos} vasos`;
+  }
+
+  const elPorcentaje = document.querySelector(SELECTORES.porcentajeAgua);
+  if (elPorcentaje) {
+    elPorcentaje.textContent = `${pct}%`;
+  }
+
+  const promAguaEl = document.querySelector(SELECTORES.promedioAgua);
+  if (promAguaEl) {
+    while (promAguaEl.firstChild) promAguaEl.removeChild(promAguaEl.firstChild);
+    const spanUnidad = document.createElement('span');
+    spanUnidad.className = 'unidad';
+    spanUnidad.textContent = ' vasos/día';
+    promAguaEl.append(`${vasosCount} `, spanUnidad);
+  }
+}
+
+/**
+ * Registra rápidamente consumo de agua (+1 o -1 vaso).
+ * Emite appcalorias:agua_actualizada y sincroniza storage y Supabase.
+ * @param {number} delta
+ * @returns {Promise<Object>}
+ */
+export async function registrarAguaRapida(delta = 1) {
+  const actual = obtenerEstadoAguaHoy();
+  const totalVasos = actual.totalVasos || TOTAL_VASOS_DEFECTO;
+  const metaLitros = actual.metaLitros || META_AGUA_DEFECTO;
+  const litrosPorVaso = metaLitros / totalVasos;
+
+  const nuevoVasos = Math.max(0, Math.min(totalVasos, actual.vasos + delta));
+  const nuevoLitros = Math.round(nuevoVasos * litrosPorVaso * 10) / 10;
+  const indices = Array.from({ length: nuevoVasos }, (_, i) => i);
+  const fechaISO = actual.fechaISO || new Date().toISOString().slice(0, 10);
+
+  const consolidado = {
+    vasos: indices,
+    litros: nuevoLitros,
+    totalVasos,
+    fechaISO
+  };
+
+  if (typeof sessionStorage !== 'undefined') {
+    try {
+      sessionStorage.setItem(STORAGE_KEY_AGUA_HOY, JSON.stringify(consolidado));
+      sessionStorage.setItem(CLAVE_STORAGE_AGUA, JSON.stringify(indices));
+    } catch (_) {}
+  }
+
+  renderizarHidratacionHoy({
+    vasos: nuevoVasos,
+    totalVasos,
+    litros: nuevoLitros,
+    metaLitros,
+    fechaISO
+  });
+
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent(EVENTO_AGUA_ACTUALIZADA, {
+      detail: {
+        vasos: nuevoVasos,
+        total: totalVasos,
+        litros: nuevoLitros,
+        fechaISO
+      }
+    }));
+  }
+
+  if (alumnoIdActual) {
+    try {
+      const { obtenerOCrearRegistroDiario, actualizarAgua } = await import('../data/registro-api.js');
+      const log = await obtenerOCrearRegistroDiario(alumnoIdActual, fechaISO);
+      if (log && log.id) {
+        await actualizarAgua(log.id, nuevoLitros);
+      }
+    } catch (err) {
+      console.warn('[progreso-ui] Error al sincronizar agua con Supabase:', err);
+    }
+  }
+
+  return consolidado;
+}
+
+/**
+ * Vincula los botones de ajuste rápido de agua.
+ */
+export function inicializarEventosAgua() {
+  const btnMas = document.querySelector(SELECTORES.btnMasAgua);
+  if (btnMas && !btnMas.__agua_bound) {
+    btnMas.__agua_bound = true;
+    btnMas.addEventListener('click', () => {
+      registrarAguaRapida(1).catch((e) => console.warn('[progreso-ui] Error en +1 vaso:', e));
+    });
+  }
+
+  const btnMenos = document.querySelector(SELECTORES.btnMenosAgua);
+  if (btnMenos && !btnMenos.__agua_bound) {
+    btnMenos.__agua_bound = true;
+    btnMenos.addEventListener('click', () => {
+      registrarAguaRapida(-1).catch((e) => console.warn('[progreso-ui] Error en -1 vaso:', e));
+    });
+  }
+}
+
+/**
+ * Sincroniza la vista de progreso ante eventos reactivos de agua.
+ * @param {CustomEvent} evento
+ */
+export function sincronizarAguaReactiva(evento) {
+  const detail = evento?.detail;
+  if (!detail) return;
+
+  const actual = obtenerEstadoAguaHoy();
+  const totalVasos = detail.total || actual.totalVasos || TOTAL_VASOS_DEFECTO;
+  const metaLitros = actual.metaLitros || META_AGUA_DEFECTO;
+  const litrosPorVaso = metaLitros / totalVasos;
+
+  let count = 0;
+  let indices = [];
+  if (Array.isArray(detail.vasos)) {
+    indices = detail.vasos;
+    count = indices.length;
+  } else if (typeof detail.vasos === 'number') {
+    count = Math.max(0, Math.min(totalVasos, detail.vasos));
+    indices = Array.from({ length: count }, (_, i) => i);
+  } else if (typeof detail.litros === 'number') {
+    count = Math.min(totalVasos, Math.round(detail.litros / litrosPorVaso));
+    indices = Array.from({ length: count }, (_, i) => i);
+  }
+
+  const litros = typeof detail.litros === 'number'
+    ? detail.litros
+    : Math.round(count * litrosPorVaso * 10) / 10;
+
+  const fechaISO = detail.fechaISO || actual.fechaISO;
+
+  try {
+    sessionStorage.setItem(STORAGE_KEY_AGUA_HOY, JSON.stringify({
+      vasos: indices,
+      litros,
+      totalVasos,
+      fechaISO
+    }));
+    sessionStorage.setItem(CLAVE_STORAGE_AGUA, JSON.stringify(indices));
+  } catch (_) {}
+
+  renderizarHidratacionHoy({
+    vasos: count,
+    totalVasos,
+    litros,
+    metaLitros,
+    fechaISO
+  });
 }
 
 /**
@@ -491,12 +734,20 @@ export async function sincronizarPesajeReactivo(evento) {
   renderizarProgreso(datos, historial);
 }
 
-// Escuchar evento reactivo global en window
+// Escuchar eventos reactivos globales en window
 if (typeof window !== 'undefined') {
   window.addEventListener(EVENTO_PESO_ACTUALIZADO, (e) => {
     sincronizarPesajeReactivo(e).catch((err) => {
       console.warn('[progreso-ui] Error al procesar appcalorias:peso_actualizado:', err);
     });
+  });
+
+  window.addEventListener(EVENTO_AGUA_ACTUALIZADA, (e) => {
+    try {
+      sincronizarAguaReactiva(e);
+    } catch (err) {
+      console.warn('[progreso-ui] Error al procesar appcalorias:agua_actualizada:', err);
+    }
   });
 }
 
@@ -509,6 +760,8 @@ export async function iniciarProgresoUI() {
   const historial = obtenerHistorialPesajes();
 
   renderizarProgreso(datos, historial);
+  renderizarHidratacionHoy();
+  inicializarEventosAgua();
   return { sesion, datos, historial };
 }
 

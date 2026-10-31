@@ -24,6 +24,7 @@ export const SELECTORES = {
   antetituloVerde: '.encabezado__textos .antetitulo--verde',
   titulo: '.encabezado__textos .titulo',
   buscador: 'input[name="buscar"]',
+  btnIrCrearPlato: '#btn-ir-crear-plato',
   seccionPlan: '[aria-labelledby="t-plan"]',
   seccionRecientes: '[aria-labelledby="t-recientes"]',
   seccionBusqueda: '#seccion-busqueda',
@@ -88,6 +89,27 @@ export function adaptarAgregarContextual() {
   if (!esPaginaAgregar) return;
 
   const params = new URLSearchParams(window.location.search);
+  const origen = params.get('origen');
+  if (origen === 'crear-plato') {
+    const antetitulo = document.querySelector(SELECTORES.antetituloVerde);
+    if (antetitulo) {
+      antetitulo.textContent = 'Ingrediente';
+    }
+    const titulo = document.querySelector(SELECTORES.titulo);
+    if (titulo) {
+      titulo.textContent = 'Seleccionar ingrediente';
+    }
+    const btnVolver = document.querySelector('header a[aria-label="Volver"]');
+    if (btnVolver) {
+      btnVolver.setAttribute('href', 'crear-plato.html');
+    }
+    const btnListo = document.querySelector(SELECTORES.pieBotonListo);
+    if (btnListo) {
+      btnListo.setAttribute('href', 'crear-plato.html');
+      btnListo.textContent = 'Volver al plato';
+    }
+  }
+
   const comida = params.get('comida');
   if (comida) {
     const antetitulo = document.querySelector(SELECTORES.antetituloVerde);
@@ -441,6 +463,97 @@ export async function filtrarYBuscarAlimentos(termino) {
 }
 
 /**
+ * Guarda el alimento seleccionado en el borrador de ingredientes y redirige a crear-plato.html.
+ * @param {HTMLElement} fila
+ */
+export function seleccionarIngredienteParaPlato(fila) {
+  if (!fila) return;
+
+  const id = fila.dataset.id || `ing-${Date.now()}`;
+  const nombre = fila.querySelector(SELECTORES.filaTitulo)?.textContent?.trim()
+    || fila.querySelector('[data-ref="nombre"]')?.textContent?.trim()
+    || 'Alimento';
+
+  const linea = fila.querySelector(SELECTORES.filaLinea)?.textContent?.trim()
+    || fila.querySelector('[data-ref="macros"]')?.textContent?.trim()
+    || '';
+
+  const cantidad = fila.querySelector(SELECTORES.filaCantidad)?.textContent?.trim()
+    || fila.querySelector('[data-ref="porciones"]')?.textContent?.trim()
+    || '';
+
+  let baseGramos = Number(fila.dataset.gramos) || 0;
+  if (!baseGramos) {
+    const matchG = cantidad.match(/(\d+(?:[.,]\d+)?)\s*g\b/i);
+    if (matchG) {
+      baseGramos = parseFloat(matchG[1].replace(',', '.')) || 100;
+    } else {
+      baseGramos = 100;
+    }
+  }
+
+  let p = Number(fila.dataset.p) || 0;
+  let c = Number(fila.dataset.c) || 0;
+  let g = Number(fila.dataset.g) || 0;
+  let kcal = Number(fila.dataset.kcal) || 0;
+
+  if (p === 0 && linea) {
+    const mP = linea.match(/P\s*(\d+(?:[.,]\d+)?)/i);
+    if (mP) p = parseFloat(mP[1].replace(',', '.'));
+  }
+  if (c === 0 && linea) {
+    const mC = linea.match(/C\s*(\d+(?:[.,]\d+)?)/i);
+    if (mC) c = parseFloat(mC[1].replace(',', '.'));
+  }
+  if (g === 0 && linea) {
+    const mG = linea.match(/G\s*(\d+(?:[.,]\d+)?)/i);
+    if (mG) g = parseFloat(mG[1].replace(',', '.'));
+  }
+  if (kcal === 0 && linea) {
+    const mK = linea.match(/(\d+[\d.]*)\s*kcal/i);
+    if (mK) kcal = parseInt(mK[1].replace(/\./g, ''), 10);
+  }
+
+  const factor100 = baseGramos > 0 ? (100 / baseGramos) : 1;
+  const proteina100 = Math.round(p * factor100 * 10) / 10;
+  const carbohidratos100 = Math.round(c * factor100 * 10) / 10;
+  const grasas100 = Math.round(g * factor100 * 10) / 10;
+  const gramos = baseGramos > 0 ? baseGramos : 100;
+
+  const nuevoIngrediente = {
+    id,
+    nombre,
+    proteina100,
+    carbohidratos100,
+    grasas100,
+    gramos
+  };
+
+  let borrador = [];
+  try {
+    const raw = sessionStorage.getItem('appcalorias_ingredientes_plato_borrador');
+    if (raw) borrador = JSON.parse(raw);
+    if (!Array.isArray(borrador)) borrador = [];
+  } catch {
+    borrador = [];
+  }
+
+  borrador.push(nuevoIngrediente);
+
+  try {
+    sessionStorage.setItem('appcalorias_ingredientes_plato_borrador', JSON.stringify(borrador));
+  } catch (err) {
+    console.warn('Error al guardar ingrediente en borrador:', err);
+  }
+
+  if (typeof window !== 'undefined' && window.__TEST_NO_REDIRECT__) {
+    window.__LAST_REDIRECT__ = 'crear-plato.html';
+  } else {
+    window.location.href = 'crear-plato.html';
+  }
+}
+
+/**
  * Inicializa el controlador de la pantalla Agregar Alimento.
  */
 export function iniciarAgregar() {
@@ -451,6 +564,23 @@ export function iniciarAgregar() {
 
   // Escuchar clics en botones de agregar delegados
   document.addEventListener('click', (evento) => {
+    const params = new URLSearchParams(window.location.search);
+    const esOrigenCrearPlato = params.get('origen') === 'crear-plato';
+
+    if (esOrigenCrearPlato) {
+      const btn = evento.target.closest(SELECTORES.btnAgregar);
+      const enlace = evento.target.closest(SELECTORES.filaEnlace);
+      if (btn || enlace) {
+        evento.preventDefault();
+        evento.stopPropagation();
+        const fila = (btn || enlace).closest(SELECTORES.filas);
+        if (fila) {
+          seleccionarIngredienteParaPlato(fila);
+        }
+        return;
+      }
+    }
+
     const btn = evento.target.closest(SELECTORES.btnAgregar);
     if (btn) {
       manejarToggleAgregar(btn);
