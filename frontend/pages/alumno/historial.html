@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Historial de planes · Alumno</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../../css/base.css">
+  <link rel="stylesheet" href="../../css/components.css">
+  <link rel="stylesheet" href="../../css/pages/alumno.css">
+</head>
+<body>
+  <!-- Iconos de esta página: se dibujan con <svg class="icono"><use href="#nombre"/></svg> -->
+  <svg class="sprite" aria-hidden="true">
+    <symbol id="volver" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></symbol>
+    <symbol id="perfil" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></symbol>
+    <symbol id="dashboard" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="9" rx="1.5"/><rect x="13" y="4" width="7" height="5" rx="1.5"/><rect x="13" y="11" width="7" height="9" rx="1.5"/><rect x="4" y="15" width="7" height="5" rx="1.5"/></symbol>
+    <symbol id="plan" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 9.5h16M4 14.8h16M10 4v16"/></symbol>
+    <symbol id="progreso" viewBox="0 0 24 24"><path d="M5 20V11M12 20V5M19 20v-6M3 20h18"/></symbol>
+    <symbol id="ajustes" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></symbol>
+    <symbol id="archivo" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="5" rx="1"/><path d="M5 9v11h14V9M10 13h4"/></symbol>
+    <symbol id="flecha-derecha" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+  </svg>
+  <div class="pantalla">
+    <main class="contenido">
+      <!-- ===== Encabezado ===== -->
+      <header class="encabezado">
+        <a class="btn-icono" href="plan.html" aria-label="Volver"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#volver"/></svg></a>
+        <div class="encabezado__textos">
+          <h1 class="titulo">Historial de planes</h1>
+          <p class="sub">Versiones anteriores asignadas por tu coach</p>
+        </div>
+      </header>
+
+      <!-- ===== Contenedor de lista de planes históricos ===== -->
+      <section class="columna gap-m" id="lista-planes-historial" role="feed" aria-label="Versiones anteriores del plan">
+        <!-- Renderizado dinámico desde tpl-plan-historial -->
+      </section>
+
+      <!-- ===== Estado vacío (Regla de Oro 2) ===== -->
+      <section class="card vacio" id="estado-vacio-historial" hidden>
+        <span class="vacio__icono"><svg class="icono" width="32" height="32" aria-hidden="true"><use href="#archivo"/></svg></span>
+        <h2 class="seccion-titulo">No hay versiones anteriores</h2>
+        <p class="sub texto-14">Cuando tu coach actualice tu plan nutricional, las versiones previas quedarán registradas acá.</p>
+        <a class="btn btn--secundario" href="plan.html">Volver a mi plan</a>
+      </section>
+
+      <!-- ===== Plantilla de plan histórico (Regla de Oro 1) ===== -->
+      <template id="tpl-plan-historial">
+        <article class="card tarjeta-historial">
+          <div class="card__fila">
+            <span class="tag tag--gris" data-ref="estado">Archivado</span>
+            <span class="sub negrita" data-ref="version"></span>
+          </div>
+          <h2 class="seccion-titulo" data-ref="titulo"></h2>
+          <div class="card__fila">
+            <p><span class="num num--m" data-ref="kcal"></span> <span class="unidad">kcal/día</span></p>
+            <span class="sub" data-ref="vigencia"></span>
+          </div>
+          <div class="reparto" aria-label="Distribución de macronutrientes">
+            <span class="p" data-ref="reparto-p"></span>
+            <span class="c" data-ref="reparto-c"></span>
+            <span class="g" data-ref="reparto-g"></span>
+          </div>
+          <div class="macros">
+            <div class="macro"><span class="macro__nombre"><span class="punto punto--p"></span>Proteínas</span><span class="num num--s" data-ref="macro-p"></span></div>
+            <div class="macro"><span class="macro__nombre"><span class="punto punto--c"></span>Carbohidratos</span><span class="num num--s" data-ref="macro-c"></span></div>
+            <div class="macro"><span class="macro__nombre"><span class="punto punto--g"></span>Grasas</span><span class="num num--s" data-ref="macro-g"></span></div>
+          </div>
+          <a class="btn btn--chico btn--secundario" data-ref="link-detalle" href="../coach/plan-archivado.html">Ver detalle</a>
+        </article>
+      </template>
+    </main>
+
+    <!-- ===== Barra inferior de navegación del alumno ===== -->
+    <nav class="barra-inferior" aria-label="Navegación principal">
+      <a class="barra-inferior__item" href="perfil.html"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#perfil"/></svg><span>Perfil</span></a>
+      <a class="barra-inferior__item" href="dashboard.html"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#dashboard"/></svg><span>Dashboard</span></a>
+      <a class="barra-inferior__item" href="progreso.html"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#progreso"/></svg><span>Progreso</span></a>
+      <button class="barra-inferior__item" type="button"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#ajustes"/></svg><span>Ajustes</span></button>
+    </nav>
+  </div>
+  <script type="module" src="../../js/ui/historial-alumno-ui.js"></script>
+</body>
+</html>

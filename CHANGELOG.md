@@ -2,6 +2,20 @@
 
 Este documento registra los hitos de versiones **Mayores (Major)** y **Medianas (Minor)** de la aplicación con resúmenes ejecutivos concisos ($\le 10$ renglones). Los cambios atómicos y parches específicos se registran directamente en los commits de Git bajo la convención *Conventional Commits*.
 
+## [v0.6.0] — 31/10/2026
+- **Tipo:** Versión Menor (Historial de Planes del Alumno, Sincronización Transversal de Pesajes y Resiliencia Offline de Supabase)
+- **Fecha:** 31 de Octubre de 2026
+- **Resumen:**
+  1. Historial de Planes del Alumno (`pages/alumno/historial.html` y `historial-alumno-ui.js`): Nueva vista semántica y accesible con lista de planes previos, desglose calórico/macronutrientes, fechas de vigencia, enlace seguro a `plan-archivado.html?rol=alumno` y plantilla nativa `<template id="tpl-plan-historial">`.
+  2. Enlace en Plan Activo: Incorporación del botón `#btn-ver-historial-planes` en `pages/alumno/plan.html` con navegación fluida y contextual.
+  3. Soporte de Rol Alumno en Visor de Plan Archivado (`plan-archivado-ui.js`): Adaptación de navegación y títulos dinámicos ("Volver a Mis Planes") preservando permisos de solo lectura.
+  4. Sincronización Transversal de Pesajes y Metas (`objetivo-ui.js`, `progreso-ui.js` y `dashboard-ui.js`): Canal de eventos unificado `appcalorias:peso_actualizado` en `window` y claves de almacenamiento estandarizadas. Actualización reactiva instantánea sin recarga de página de la aguja del velocímetro, porcentaje a la meta, historial de pesajes y recálculo BMR/TDEE/TEF en vivo.
+  5. Resiliencia Offline y Mock Client Supabase (`supabase.js`): Cero dependencia rígida de CDN externo. Mock store local reactivo y query builder encadenado transparente ante desconexión o fallo de red.
+  6. Blindaje total de la interfaz: Cero usos de `innerHTML` en la totalidad de la capa UI (Regla de Oro 1). Registro en mapa de modularización (`test_modularization.py`).
+  7. Batería de validación: 29 HTMLs (26 en subdirectorios), 40 módulos JS (27 controladores UI) sin ciclos, y 119 pruebas automáticas superadas al 100% en Microsoft Edge headless y entorno de prueba.
+
+---
+
 ## [v0.5.9] — 31/10/2026
 - **Tipo:** Versión Menor (Edición Interactiva de Perfiles de Alumno y Coach, y Buscador Híbrido RPC con Pestañas)
 - **Fecha:** 31 de Octubre de 2026

@@ -31,12 +31,13 @@ frontend/
 │   ├── utils/                     # Utilidades transversales (2 módulos)
 │   │   ├── navegacion.js          # Historial inteligente, avisos toast y atajos WCAG
 │   │   └── texto.js               # Formato de nombres e iniciales de cuentas
-│   └── ui/                        # Controladores desacoplados con mapas SELECTORES (26 módulos)
+│   └── ui/                        # Controladores desacoplados con mapas SELECTORES (27 módulos)
 │       ├── login-ui.js            # index.html
 │       ├── cuenta-ui.js           # registro.html
 │       ├── onboarding-ui.js       # alumno/onboarding.html (stepper de 5 pasos)
 │       ├── dashboard-ui.js        # alumno/dashboard.html
 │       ├── plan-ui.js             # alumno/plan.html
+│       ├── historial-alumno-ui.js # alumno/historial.html (historial de planes del alumno)
 │       ├── cantidad-ui.js         # alumno/cantidad.html
 │       ├── agregar-ui.js          # alumno/agregar.html
 │       ├── reemplazar-ui.js       # alumno/reemplazar.html
@@ -63,6 +64,7 @@ frontend/
     │   ├── onboarding.html        # Asistente de 5 pasos para biometría y meta
     │   ├── dashboard.html         # Día, calorías, comidas vacías y agua
     │   ├── plan.html              # Plan alimenticio activo asignado
+│   │   ├── historial.html         # Historial y consulta de planes anteriores
     │   ├── cantidad.html          # Ajuste de gramos con recálculo en vivo
     │   ├── agregar.html           # Selección de alimentos para una comida
     │   ├── reemplazar.html        # Reemplazo de alimentos por equivalencias

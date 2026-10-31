@@ -2,6 +2,7 @@
    progreso-ui.js — Controlador de evolución de peso y hábitos del alumno
    - Muestra peso inicial, actual y meta, con porcentaje de avance.
    - Historial reactivo de pesajes alimentado desde sessionStorage / contextos_energeticos.
+   - Sincronización reactiva transversal y canal de eventos de pesaje.
    - Resumen de adherencia calórica e hidratación diaria.
    - Cero innerHTML con datos variables (Regla de Oro 1).
    ========================================================== */
@@ -13,6 +14,7 @@ import '../utils/navegacion.js';
 export const SELECTORES = {
   seccionPeso: '#seccion-peso',
   seccionHabitos: '#seccion-habitos',
+  historialPesajes: '#historial-pesajes',
   objetivoSubtitulo: '#objetivo-subtitulo',
   pesoInicial: '#peso-inicial',
   pesoActual: '#peso-actual',
@@ -29,9 +31,12 @@ export const SELECTORES = {
   promedioAgua: '#promedio-agua'
 };
 
-export const CLAVE_STORAGE_PESAJES = 'appcalorias_historial_pesajes';
-export const CLAVE_STORAGE_PESO_ACTUAL = 'appcalorias_peso_actual';
+export const STORAGE_KEY_PESO_ACTUAL = 'appcalorias_peso_actual';
+export const STORAGE_KEY_HISTORIAL_PESAJES = 'appcalorias_historial_pesajes';
+export const CLAVE_STORAGE_PESAJES = STORAGE_KEY_HISTORIAL_PESAJES;
+export const CLAVE_STORAGE_PESO_ACTUAL = STORAGE_KEY_PESO_ACTUAL;
 export const CLAVE_STORAGE_AGUA = 'vasos-agua-alumno';
+export const EVENTO_PESO_ACTUALIZADO = 'appcalorias:peso_actualizado';
 
 export const MOCK_HISTORIAL_PESAJES = [
   {
@@ -180,7 +185,7 @@ export async function cargarDatosProgreso(alumnoId) {
 
   if (typeof sessionStorage !== 'undefined') {
     try {
-      const pAct = sessionStorage.getItem(CLAVE_STORAGE_PESO_ACTUAL);
+      const pAct = sessionStorage.getItem(STORAGE_KEY_PESO_ACTUAL);
       if (pAct !== null && pAct !== '') {
         const num = Number(pAct);
         if (!Number.isNaN(num) && num > 0) {
@@ -214,7 +219,7 @@ export async function cargarDatosProgreso(alumnoId) {
 export function obtenerHistorialPesajes() {
   if (typeof sessionStorage !== 'undefined') {
     try {
-      const raw = sessionStorage.getItem(CLAVE_STORAGE_PESAJES);
+      const raw = sessionStorage.getItem(STORAGE_KEY_HISTORIAL_PESAJES);
       if (raw) {
         const parseado = JSON.parse(raw);
         if (Array.isArray(parseado) && parseado.length > 0) {
@@ -231,7 +236,7 @@ export function obtenerHistorialPesajes() {
 export function guardarHistorialPesajes(historial) {
   if (typeof sessionStorage !== 'undefined') {
     try {
-      sessionStorage.setItem(CLAVE_STORAGE_PESAJES, JSON.stringify(historial));
+      sessionStorage.setItem(STORAGE_KEY_HISTORIAL_PESAJES, JSON.stringify(historial));
     } catch (e) {
       console.warn('[progreso-ui] Error al guardar appcalorias_historial_pesajes:', e);
     }
@@ -269,7 +274,9 @@ export function renderizarProgreso(datos, historial) {
   }
 
   // Renderizar historial de pesajes (Cero innerHTML con datos variables)
-  const listaEl = document.querySelector(SELECTORES.listaPesajes);
+  const listaEl = document.querySelector(SELECTORES.listaPesajes) ||
+                  document.querySelector('#historial-pesajes ul') ||
+                  document.querySelector('#historial-pesajes');
   const tpl = document.querySelector(SELECTORES.tplPesajeFila);
   const sinPesajesEl = document.querySelector(SELECTORES.sinPesajes);
 
@@ -358,12 +365,22 @@ export function renderizarProgreso(datos, historial) {
   }
 }
 
+/**
+ * Registra un nuevo pesaje desde la UI de progreso o API.
+ * Persiste en sessionStorage, emite el evento reactivo oficial y actualiza el DOM.
+ * @param {number} peso
+ * @param {string} [fecha=new Date().toISOString()]
+ * @param {string} [nota='']
+ * @returns {Promise<boolean>}
+ */
 export async function agregarPesaje(peso, fecha = new Date().toISOString(), nota = '') {
   const numPeso = Number(peso);
   if (Number.isNaN(numPeso) || numPeso <= 0) return false;
 
   if (typeof sessionStorage !== 'undefined') {
-    sessionStorage.setItem(CLAVE_STORAGE_PESO_ACTUAL, String(numPeso));
+    try {
+      sessionStorage.setItem(STORAGE_KEY_PESO_ACTUAL, String(numPeso));
+    } catch (_) {}
   }
 
   const historial = obtenerHistorialPesajes();
@@ -374,10 +391,113 @@ export async function agregarPesaje(peso, fecha = new Date().toISOString(), nota
   });
   guardarHistorialPesajes(historial);
 
+  // Sincronizar contexto si está presente en sessionStorage
+  if (typeof sessionStorage !== 'undefined') {
+    try {
+      const idActual = alumnoIdActual;
+      if (idActual) {
+        const raw = sessionStorage.getItem(`appcalorias_contexto_ultimo_${idActual}`);
+        if (raw) {
+          const ctx = JSON.parse(raw);
+          ctx.peso_actual = numPeso;
+          sessionStorage.setItem(`appcalorias_contexto_ultimo_${idActual}`, JSON.stringify(ctx));
+        }
+      }
+      const rawGen = sessionStorage.getItem('appcalorias_contexto_ultimo');
+      if (rawGen) {
+        const ctxGen = JSON.parse(rawGen);
+        ctxGen.peso_actual = numPeso;
+        sessionStorage.setItem('appcalorias_contexto_ultimo', JSON.stringify(ctxGen));
+      }
+    } catch (_) {}
+  }
+
   const datos = await cargarDatosProgreso(alumnoIdActual);
   datos.pesoActual = numPeso;
   renderizarProgreso(datos, historial);
+
+  // Emitir evento reactivo oficial en window
+  if (typeof window !== 'undefined') {
+    const timestamp = (fecha ? new Date(fecha).getTime() : Date.now()) || Date.now();
+    window.dispatchEvent(new CustomEvent(EVENTO_PESO_ACTUALIZADO, {
+      detail: { peso: numPeso, fecha, timestamp, ...(nota ? { nota } : {}) }
+    }));
+  }
+
   return true;
+}
+
+/**
+ * Manejador reactivo ante emisión de appcalorias:peso_actualizado.
+ * Actualiza el DOM, el porcentaje a la meta y el historial sin recargar.
+ * @param {CustomEvent} evento
+ */
+export async function sincronizarPesajeReactivo(evento) {
+  const detail = evento?.detail;
+  if (!detail || detail.peso === undefined) return;
+  const numPeso = Number(detail.peso);
+  if (Number.isNaN(numPeso) || numPeso <= 0) return;
+
+  const fecha = detail.fecha || new Date().toISOString();
+  const nota = detail.nota || '';
+
+  if (typeof sessionStorage !== 'undefined') {
+    try {
+      sessionStorage.setItem(STORAGE_KEY_PESO_ACTUAL, String(numPeso));
+    } catch (_) {}
+  }
+
+  const historial = obtenerHistorialPesajes();
+  const yaExiste = historial.some((item) => {
+    if (Number(item.peso) !== numPeso) return false;
+    if (item.fecha === fecha) return true;
+    const tItem = new Date(item.fecha).getTime();
+    const tEvent = new Date(fecha).getTime();
+    return !Number.isNaN(tItem) && !Number.isNaN(tEvent) && Math.abs(tItem - tEvent) < 2000;
+  });
+
+  if (!yaExiste) {
+    historial.unshift({
+      peso: numPeso,
+      fecha,
+      nota
+    });
+    guardarHistorialPesajes(historial);
+  }
+
+  // Sincronizar contexto local
+  if (typeof sessionStorage !== 'undefined') {
+    try {
+      const idActual = alumnoIdActual;
+      if (idActual) {
+        const raw = sessionStorage.getItem(`appcalorias_contexto_ultimo_${idActual}`);
+        if (raw) {
+          const ctx = JSON.parse(raw);
+          ctx.peso_actual = numPeso;
+          sessionStorage.setItem(`appcalorias_contexto_ultimo_${idActual}`, JSON.stringify(ctx));
+        }
+      }
+      const rawGen = sessionStorage.getItem('appcalorias_contexto_ultimo');
+      if (rawGen) {
+        const ctxGen = JSON.parse(rawGen);
+        ctxGen.peso_actual = numPeso;
+        sessionStorage.setItem('appcalorias_contexto_ultimo', JSON.stringify(ctxGen));
+      }
+    } catch (_) {}
+  }
+
+  const datos = await cargarDatosProgreso(alumnoIdActual);
+  datos.pesoActual = numPeso;
+  renderizarProgreso(datos, historial);
+}
+
+// Escuchar evento reactivo global en window
+if (typeof window !== 'undefined') {
+  window.addEventListener(EVENTO_PESO_ACTUALIZADO, (e) => {
+    sincronizarPesajeReactivo(e).catch((err) => {
+      console.warn('[progreso-ui] Error al procesar appcalorias:peso_actualizado:', err);
+    });
+  });
 }
 
 export async function iniciarProgresoUI() {

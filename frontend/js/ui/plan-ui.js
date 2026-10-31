@@ -38,6 +38,7 @@ export const SELECTORES = {
   versionTexto: '.card__fila .sub.negrita',
   vigenciaTexto: '.grilla-2 .columna:nth-child(1) .negrita',
   modalidadTexto: '.grilla-2 .columna:nth-child(2) .negrita',
+  btnVerHistorialPlanes: '#btn-ver-historial-planes',
   pautaTexto: '.tile--azul + div .negrita',
   suplementoTexto: '.tile--azul + div .sub',
   notaCoach: '.acordeon__cuerpo .nota'

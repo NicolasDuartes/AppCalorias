@@ -56,6 +56,10 @@ export const SELECTORES = {
   vasosAgua: '.vasos .vaso'
 };
 
+export const STORAGE_KEY_PESO_ACTUAL = 'appcalorias_peso_actual';
+export const STORAGE_KEY_HISTORIAL_PESAJES = 'appcalorias_historial_pesajes';
+export const EVENTO_PESO_ACTUALIZADO = 'appcalorias:peso_actualizado';
+
 /**
  * Metas nutricionales e hídricas del plan activo del alumno.
  */
@@ -120,6 +124,7 @@ function nombreDelDia(fecha) {
 }
 
 function dibujarRueda() {
+  if (!rueda) return;
   rueda.replaceChildren();
   for (let i = -LADO; i <= LADO; i += 1) {
     const fecha = sumarDias(elegido, i);
@@ -143,12 +148,12 @@ function dibujarRueda() {
 }
 
 function anchoDeDia() {
-  return rueda.clientWidth / (LADO * 2 + 1);
+  return rueda ? (rueda.clientWidth / (LADO * 2 + 1)) : 40;
 }
 
 // Al girar, los días entran desde el lado del que vino el elegido
 function animarGiro(pasos) {
-  if (!pasos || sinAnimacion.matches) return;
+  if (!rueda || !pasos || sinAnimacion.matches) return;
   rueda.animate(
     [{ transform: `translateX(${pasos * anchoDeDia()}px)` }, { transform: 'translateX(0)' }],
     { duration: 220, easing: 'ease-out' },
@@ -160,12 +165,18 @@ function elegir(fecha) {
   const pasos = diasEntre(elegido, nuevo);
   elegido = nuevo;
   const nombre = nombreDelDia(elegido);
-  titulo.textContent = nombre;
-  titulo.classList.toggle('selector-fecha__texto--fecha', nombre !== 'Hoy' && nombre !== 'Ayer');
-  selector.setAttribute('aria-label', `Elegir fecha. Mostrando ${nombre.toLowerCase()}`);
-  dibujarRueda();
-  // Saltos grandes (desde el calendario) cambian sin animación
-  if (Math.abs(pasos) <= LADO) animarGiro(pasos);
+  if (titulo) {
+    titulo.textContent = nombre;
+    titulo.classList.toggle('selector-fecha__texto--fecha', nombre !== 'Hoy' && nombre !== 'Ayer');
+  }
+  if (selector) {
+    selector.setAttribute('aria-label', `Elegir fecha. Mostrando ${nombre.toLowerCase()}`);
+  }
+  if (rueda) {
+    dibujarRueda();
+    // Saltos grandes (desde el calendario) cambian sin animación
+    if (Math.abs(pasos) <= LADO) animarGiro(pasos);
+  }
 
   // Recargar datos para el día elegido
   recargarDatosDia(elegido);
@@ -300,50 +311,56 @@ export async function hidratarDashboard(fecha = elegido) {
 let inicioX = null;
 let deslizo = false;
 
-rueda.addEventListener('pointerdown', (evento) => {
-  inicioX = evento.clientX;
-  deslizo = false;
-});
-
-rueda.addEventListener('pointerup', (evento) => {
-  if (inicioX === null) return;
-  const recorrido = evento.clientX - inicioX;
-  inicioX = null;
-  const dias = Math.round(recorrido / anchoDeDia());
-  if (Math.abs(recorrido) < 24 || dias === 0) return;
-  deslizo = true; // Evita que el click que sigue al deslizar elija otro día
-  elegir(sumarDias(elegido, -dias));
-});
-
-rueda.addEventListener('pointercancel', () => {
-  inicioX = null;
-});
-
-rueda.addEventListener('click', (evento) => {
-  if (deslizo) {
+if (rueda) {
+  rueda.addEventListener('pointerdown', (evento) => {
+    inicioX = evento.clientX;
     deslizo = false;
-    return;
-  }
-  const boton = evento.target.closest('.dia');
-  if (boton) elegir(desdeTextoISO(boton.dataset.fecha));
-});
+  });
 
-selector.addEventListener('click', () => {
-  calendario.value = aTextoISO(elegido);
-  try {
-    calendario.showPicker();
-  } catch {
-    // Navegadores sin showPicker: el input recibe el foco y el usuario lo abre
-    calendario.focus();
-    calendario.click();
-  }
-});
+  rueda.addEventListener('pointerup', (evento) => {
+    if (inicioX === null) return;
+    const recorrido = evento.clientX - inicioX;
+    inicioX = null;
+    const dias = Math.round(recorrido / anchoDeDia());
+    if (Math.abs(recorrido) < 24 || dias === 0) return;
+    deslizo = true; // Evita que el click que sigue al deslizar elija otro día
+    elegir(sumarDias(elegido, -dias));
+  });
 
-calendario.addEventListener('change', () => {
-  if (calendario.value) elegir(desdeTextoISO(calendario.value));
-});
+  rueda.addEventListener('pointercancel', () => {
+    inicioX = null;
+  });
 
-elegir(hoy);
+  rueda.addEventListener('click', (evento) => {
+    if (deslizo) {
+      deslizo = false;
+      return;
+    }
+    const boton = evento.target.closest('.dia');
+    if (boton) elegir(desdeTextoISO(boton.dataset.fecha));
+  });
+}
+
+if (selector && calendario) {
+  selector.addEventListener('click', () => {
+    calendario.value = aTextoISO(elegido);
+    try {
+      calendario.showPicker();
+    } catch {
+      // Navegadores sin showPicker: el input recibe el foco y el usuario lo abre
+      calendario.focus();
+      calendario.click();
+    }
+  });
+
+  calendario.addEventListener('change', () => {
+    if (calendario.value) elegir(desdeTextoISO(calendario.value));
+  });
+}
+
+if (selector || rueda || titulo) {
+  elegir(hoy);
+}
 
 // ---------- Modelo y Resumen Nutricional Reactivo ----------
 export const CLAVE_STORAGE_COMIDAS = 'comidas-diarias-alumno';
@@ -782,6 +799,121 @@ export function actualizarResumenNutricional() {
   const elGBar = document.querySelector(SELECTORES.macroGrasasBarra);
   if (elGVal) elGVal.textContent = `${Math.round(consumidoG)} / ${PLAN_OBJETIVO_DEFECTO.g} g`;
   if (elGBar) elGBar.style.width = `${Math.min(100, Math.round((consumidoG / PLAN_OBJETIVO_DEFECTO.g) * 100))}%`;
+}
+
+let pesoReferenciaActual = null;
+
+/**
+ * Recalcula de forma transparente el gasto metabólico de referencia y balance calórico diario
+ * en base al nuevo peso corporal sincronizado reactivamente.
+ * @param {number} nuevoPeso
+ * @returns {{ bmr: number, tdee: number, caloriasObjetivo: number }}
+ */
+export function recalcularGastoReferencia(nuevoPeso) {
+  const peso = Number(nuevoPeso);
+  if (Number.isNaN(peso) || peso <= 0) {
+    return { bmr: 0, tdee: 0, caloriasObjetivo: PLAN_OBJETIVO_DEFECTO.kcal };
+  }
+
+  pesoReferenciaActual = peso;
+
+  // 1. Intentar recuperar el contexto energético activo desde sessionStorage
+  let contexto = null;
+  if (typeof sessionStorage !== 'undefined') {
+    try {
+      if (usuarioActualId) {
+        const raw = sessionStorage.getItem(`appcalorias_contexto_ultimo_${usuarioActualId}`);
+        if (raw) contexto = JSON.parse(raw);
+      }
+      if (!contexto) {
+        const raw = sessionStorage.getItem('appcalorias_contexto_ultimo');
+        if (raw) contexto = JSON.parse(raw);
+      }
+    } catch (_) {}
+  }
+
+  const sexo = (contexto?.sexo || 'M').toUpperCase();
+  const altura = Number(contexto?.altura_cm || 175);
+  const edad = Number(contexto?.edad_anios || 28);
+  const pasos = Number(contexto?.pasos_diarios || 8000);
+  const met = Number(contexto?.met || 6.0);
+  const duracion = Number(contexto?.duracion_horas || 1.0);
+  const sesiones = Number(contexto?.sesiones_semana || 4);
+  const tipoDieta = contexto?.tipo_dieta || 'deficit_moderado';
+
+  // BMR: Mifflin-St Jeor (10*P + 6.25*A - 5*E + s)
+  const ajusteSexo = sexo === 'F' ? -161 : 5;
+  const bmr = Math.round(10 * peso + 6.25 * altura - 5 * edad + ajusteSexo);
+
+  // NEAT: ~0.04 * peso * pasos
+  const neat = Math.round(0.04 * peso * (pasos / 1000) * 10);
+
+  // Gasto entrenamiento y promedio diario
+  const gastoSesion = Math.round(met * peso * duracion);
+  const entrenoDiario = Math.round((gastoSesion * sesiones) / 7);
+
+  // TDEE base + Termogénesis (10%)
+  const tdeeBase = bmr + neat + entrenoDiario;
+  const tdeeTermo = Math.round(tdeeBase * 1.1);
+
+  // Ajuste según tipo de dieta
+  let ajusteCalorico = -300;
+  if (tipoDieta === 'deficit_leve') ajusteCalorico = -150;
+  else if (tipoDieta === 'deficit_moderado') ajusteCalorico = -300;
+  else if (tipoDieta === 'mantenimiento') ajusteCalorico = 0;
+  else if (tipoDieta === 'superavit_leve') ajusteCalorico = 150;
+  else if (tipoDieta === 'superavit_moderado') ajusteCalorico = 300;
+  else if (tipoDieta === 'personalizado' && contexto?.ajuste_kcal != null) {
+    ajusteCalorico = Number(contexto.ajuste_kcal);
+  }
+
+  const caloriasObjetivo = Math.max(1200, tdeeTermo + ajusteCalorico);
+
+  PLAN_OBJETIVO_DEFECTO.kcal = caloriasObjetivo;
+
+  // Ajustar macronutrientes balanceadamente
+  const proteinaG = Math.round(Math.min(peso * 2.0, caloriasObjetivo * 0.35 / 4));
+  const grasaG = Math.round(Math.min(peso * 0.9, caloriasObjetivo * 0.28 / 9));
+  const carboG = Math.max(50, Math.round((caloriasObjetivo - (proteinaG * 4 + grasaG * 9)) / 4));
+
+  PLAN_OBJETIVO_DEFECTO.p = proteinaG;
+  PLAN_OBJETIVO_DEFECTO.g = grasaG;
+  PLAN_OBJETIVO_DEFECTO.c = carboG;
+
+  // Actualizar contexto en cache local
+  if (contexto && typeof sessionStorage !== 'undefined') {
+    try {
+      contexto.peso_actual = peso;
+      contexto.bmr_kcal = bmr;
+      contexto.tdee_kcal = tdeeBase;
+      contexto.tdee_termogenesis_kcal = tdeeTermo;
+      contexto.calorias_objetivo = caloriasObjetivo;
+      if (usuarioActualId) {
+        sessionStorage.setItem(`appcalorias_contexto_ultimo_${usuarioActualId}`, JSON.stringify(contexto));
+      }
+      sessionStorage.setItem('appcalorias_contexto_ultimo', JSON.stringify(contexto));
+    } catch (_) {}
+  }
+
+  // Refrescar el DOM del resumen nutricional reactivamente
+  actualizarResumenNutricional();
+
+  return { bmr, tdee: tdeeTermo, caloriasObjetivo };
+}
+
+// Escuchar evento reactivo global de peso para recalibrar metabolismo
+if (typeof window !== 'undefined') {
+  window.addEventListener(EVENTO_PESO_ACTUALIZADO, (evento) => {
+    const detail = evento?.detail;
+    if (detail && detail.peso !== undefined) {
+      const num = Number(detail.peso);
+      if (!Number.isNaN(num) && num > 0) {
+        if (pesoReferenciaActual === null || Math.abs(num - pesoReferenciaActual) >= 0.1) {
+          recalcularGastoReferencia(num);
+        }
+      }
+    }
+  });
 }
 
 /**

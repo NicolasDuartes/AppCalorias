@@ -40,16 +40,31 @@ export const SELECTORES = {
  * Inicializa el controlador del plan archivado.
  */
 export async function iniciarPlanArchivado() {
-  const cuenta = await exigirRol('coach');
+  const params = new URLSearchParams(window.location.search);
+  const esAlumno = params.get('rol') === 'alumno';
+  const cuenta = await exigirRol(esAlumno ? 'alumno' : 'coach');
   if (!cuenta) return;
 
-  const params = new URLSearchParams(window.location.search);
   const cliente = params.get('cliente');
   const planId = params.get('plan');
 
   if (cliente) {
     const sub = document.querySelector(SELECTORES.subtituloCliente);
     if (sub) sub.textContent = cliente;
+  } else if (esAlumno) {
+    const sub = document.querySelector(SELECTORES.subtituloCliente);
+    if (sub) sub.textContent = 'Versión anterior';
+  }
+
+  if (esAlumno) {
+    const btnVolver = document.querySelector('a.btn-icono[aria-label="Volver"]');
+    if (btnVolver) {
+      btnVolver.setAttribute('href', '../alumno/historial.html');
+    }
+    const btnReutilizar = document.querySelector(SELECTORES.btnReutilizar);
+    if (btnReutilizar) {
+      btnReutilizar.hidden = true;
+    }
   }
 
   // Hidratar datos del plan si viene el parámetro plan en la URL

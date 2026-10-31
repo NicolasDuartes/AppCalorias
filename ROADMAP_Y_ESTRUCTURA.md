@@ -157,6 +157,13 @@ rutas de las páginas son relativas a esa carpeta.
 17. **Búsqueda Remota RPC y Pestañas de Origen en Buscador del Coach [Completado - 31/10/2026]:**
     - Integración de `buscarAlimentos()` RPC con debounce de 300 ms en `coach/buscar-alimento.html`, selector de pestañas accesibles ("Frecuentes", "Mis alimentos", "Base de datos general") y contenedor `#lista-alimentos` con alternancia semántica `hidden` (Regla de Oro 2).
 
+18. **Historial de Planes del Alumno (`pages/alumno/historial.html` y `historial-alumno-ui.js`) [Completado - 31/10/2026]:**
+    - Vista dedicada del alumno con lista de planes previos, desglose calórico y macronutrientes, fechas de vigencia, enlace seguro al visor de solo lectura `plan-archivado.html?rol=alumno` y plantilla nativa `<template id="tpl-plan-historial">`.
+19. **Sincronización Transversal de Pesajes y Metas en Tiempo Real [Completado - 31/10/2026]:**
+    - Canal global de eventos `appcalorias:peso_actualizado` en `window` y claves de almacenamiento unificadas (`appcalorias_peso_actual`, `appcalorias_historial_pesajes`). Sincronización bidireccional instantánea entre la regla de `objetivo-ui.js`, el historial y barra de meta de `progreso-ui.js`, y el cálculo metabólico BMR/TDEE/TEF y anillo calórico de `dashboard-ui.js`.
+20. **Resiliencia Offline y Mock Client Supabase Transparente (`supabase.js`) [Completado - 31/10/2026]:**
+    - Eliminada la dependencia externa síncrona en CDN. Mock Store reactivo en memoria con persistencia en `localStorage`/`sessionStorage` y Query Builder encadenado para navegación y pruebas 100% autónomas sin internet.
+
 ### Prioridad 4: Base de Datos y Robustez Transaccional
 
 1. **Migración de limpieza de tablas zombies:**

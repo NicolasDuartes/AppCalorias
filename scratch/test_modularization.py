@@ -33,6 +33,7 @@ PAGE_MAP_FALLBACK = {
     'agregar-ui.js': ['pages/alumno/agregar.html'],
     'cantidad-ui.js': ['pages/alumno/cantidad.html'],
     'plan-ui.js': ['pages/alumno/plan.html'],
+    'historial-alumno-ui.js': ['pages/alumno/historial.html'],
     'plan-activo-ui.js': ['pages/coach/plan-activo.html'],
     'plan-archivado-ui.js': ['pages/coach/plan-archivado.html'],
     'plan-editor-ui.js': ['pages/coach/plan-editor.html', 'pages/coach/plan-editor-vacio.html'],
