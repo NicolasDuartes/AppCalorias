@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Seguimiento · Coach</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../../css/base.css">
+  <link rel="stylesheet" href="../../css/components.css">
+  <link rel="stylesheet" href="../../css/pages/coach.css">
+</head>
+<body>
+  <!-- Sprite SVG con los símbolos requeridos -->
+  <svg class="sprite" aria-hidden="true">
+    <symbol id="volver" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></symbol>
+    <symbol id="seguimiento" viewBox="0 0 24 24"><path d="M4 20V4M4 20h16"/><path d="M7 15l3.5-3.5 3 3L18 10"/><circle cx="18" cy="16" r="2.5"/><path d="M20 18l1.5 1.5"/></symbol>
+    <symbol id="clientes" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17" cy="9" r="2.5"/><path d="M16.5 14c2.9.2 5 2.3 5 5.5"/></symbol>
+    <symbol id="plantillas" viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/></symbol>
+    <symbol id="alimentos" viewBox="0 0 24 24"><path d="M12 7c-1.5-1-5-1.3-6.3 1.7-1.4 3.2.3 8 2.3 10.5 1.2 1.5 2.4 1.3 4 .6 1.6.7 2.8.9 4-.6 2-2.5 3.7-7.3 2.3-10.5C17 5.7 13.5 6 12 7z"/><path d="M12 7c0-2 1-3.5 3-4"/></symbol>
+    <symbol id="perfil" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></symbol>
+    <symbol id="mas" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="check" viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></symbol>
+    <symbol id="fuego" viewBox="0 0 24 24"><path d="M12 3c1 3.5 5 5.5 5 10a5 5 0 0 1-10 0c0-2.5 1.5-4 2.5-5 .3 1.7 1 2.7 2 3 0-3 .5-5.5.5-8z"/></symbol>
+    <symbol id="agua" viewBox="0 0 24 24"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></symbol>
+  </svg>
+
+  <div class="pantalla">
+    <main class="contenido contenido--holgado gap-l">
+      <!-- ===== Encabezado ===== -->
+      <header class="encabezado gap-l">
+        <a class="btn-icono" id="btn-volver" href="cliente.html" aria-label="Volver"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#volver"/></svg></a>
+        <div class="encabezado__textos gap-2xs">
+          <h1 class="titulo">Seguimiento del alumno</h1>
+          <p class="sub" id="subtitulo-alumno">Cargando…</p>
+        </div>
+      </header>
+
+      <!-- ===== Métricas de peso corporal ===== -->
+      <section class="card" id="seccion-peso" aria-labelledby="t-seccion-peso">
+        <div class="columna gap-2xs">
+          <h2 class="seccion-titulo" id="t-seccion-peso">Evolución de peso corporal</h2>
+          <span class="sub" id="peso-resumen">Progreso hacia la meta</span>
+        </div>
+
+        <!-- Muestra peso inicial, peso actual y peso meta -->
+        <div class="fila fila--entre objetivo__pesos">
+          <div class="columna">
+            <span class="sub">Inicial</span>
+            <span class="negrita texto-15" id="peso-inicial">—</span>
+          </div>
+          <div class="columna columna--centro">
+            <span class="sub">Actual</span>
+            <span class="num num--m" id="peso-actual">—</span>
+          </div>
+          <div class="columna derecha">
+            <span class="sub">Meta</span>
+            <span class="negrita texto-15" id="peso-meta">—</span>
+          </div>
+        </div>
+
+        <!-- Indicador de progreso: diferencia y barra de avance porcentual -->
+        <div class="columna gap-2xs">
+          <div class="fila fila--entre">
+            <span class="sub" id="peso-diferencia">—</span>
+            <span class="negrita texto-14" id="peso-porcentaje">0%</span>
+          </div>
+          <div class="barra" id="barra-progreso-peso" role="progressbar" aria-label="Progreso hacia la meta" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <span style="width: 0%"></span>
+          </div>
+        </div>
+
+        <!-- Historial de pesajes recientes -->
+        <div class="columna gap-s" id="bloque-historial">
+          <div class="fila fila--entre">
+            <h3 class="negrita texto-14" id="t-historial">Historial de pesajes</h3>
+            <span class="sub" id="total-pesajes">Últimos registros</span>
+          </div>
+          <ul class="lista" id="lista-pesajes" aria-labelledby="t-historial">
+            <!-- Filas inyectadas dinámicamente con tpl-pesaje-fila -->
+          </ul>
+          <p class="sub" id="sin-pesajes" hidden>No hay registros de pesajes aún.</p>
+        </div>
+      </section>
+
+      <!-- ===== Adherencia semanal y hábitos ===== -->
+      <section class="card" id="seccion-adherencia" aria-labelledby="t-seccion-adherencia">
+        <div class="columna gap-2xs">
+          <h2 class="seccion-titulo" id="t-seccion-adherencia">Adherencia semanal</h2>
+          <span class="sub" id="adherencia-subtitulo">Cumplimiento del plan y hábitos</span>
+        </div>
+
+        <div class="grilla-2" id="resumen-adherencia">
+          <div class="columna gap-2xs">
+            <div class="fila gap-xs">
+              <svg class="icono" width="18" height="18" aria-hidden="true" style="color: var(--verde);"><use href="#check"/></svg>
+              <span class="sub">Días en objetivo</span>
+            </div>
+            <span class="num num--s" id="dias-en-objetivo">5 <span class="unidad">/ 7</span></span>
+          </div>
+          <div class="columna gap-2xs">
+            <div class="fila gap-xs">
+              <svg class="icono" width="18" height="18" aria-hidden="true" style="color: var(--naranja);"><use href="#fuego"/></svg>
+              <span class="sub">Promedio calórico</span>
+            </div>
+            <span class="num num--s" id="promedio-kcal">2.040 <span class="unidad">kcal</span></span>
+          </div>
+        </div>
+
+        <div class="card__fila" id="resumen-hidratacion">
+          <div class="fila gap-s">
+            <span class="tile tile--azul"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#agua"/></svg></span>
+            <div class="columna gap-3xs">
+              <span class="negrita texto-15">Hidratación diaria</span>
+              <span class="sub" id="promedio-agua-sub">Promedio estimado de consumo</span>
+            </div>
+          </div>
+          <span class="num num--s" id="promedio-agua">7 <span class="unidad">vasos/día</span></span>
+        </div>
+      </section>
+    </main>
+
+    <!-- ===== Barra inferior del coach ===== -->
+    <nav class="barra-inferior" aria-label="Navegación del coach">
+      <a class="barra-inferior__item" href="clientes.html"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#clientes"/></svg><span>Clientes</span></a>
+      <a class="barra-inferior__item" href="plantillas.html"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#plantillas"/></svg><span>Plantillas</span></a>
+      <a class="barra-inferior__mas" href="clientes.html#anadir-cliente" aria-label="Añadir cliente"><svg class="icono icono--grueso" width="26" height="26" aria-hidden="true"><use href="#mas"/></svg></a>
+      <a class="barra-inferior__item" href="alimentos-revision.html"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#alimentos"/></svg><span>Alimentos</span></a>
+      <a class="barra-inferior__item" href="perfil.html"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#perfil"/></svg><span>Perfil</span></a>
+    </nav>
+
+    <!-- Plantilla de fila de pesaje para el historial -->
+    <template id="tpl-pesaje-fila">
+      <li class="item-lectura">
+        <span class="item-lectura__textos">
+          <span class="negrita texto-15" data-bind="fecha"></span>
+          <span class="sub" data-bind="variacion"></span>
+        </span>
+        <span class="num num--s"><span data-bind="peso"></span> <span class="unidad">kg</span></span>
+      </li>
+    </template>
+  </div>
+
+  <script type="module" src="../../js/ui/seguimiento-coach-ui.js"></script>
+</body>
+</html>

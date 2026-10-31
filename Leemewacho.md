@@ -55,6 +55,7 @@ frontend/
 │       ├── buscar-alimento-ui.js  # coach/buscar-alimento.html
 │       ├── alimentos-revision-ui.js # coach/alimentos-revision.html (moderación)
 │       ├── plantillas-ui.js       # coach/plantillas.html (catálogo de plantillas)
+│       ├── seguimiento-coach-ui.js # coach/seguimiento.html (progreso de cliente)
 │       ├── contexto-ui.js         # shared/contexto.html (cálculo BMR/TDEE)
 │       └── rol-ui.js              # shared/contexto.html (conmutador por rol)
 └── pages/

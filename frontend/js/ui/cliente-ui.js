@@ -31,6 +31,9 @@ export const SELECTORES = {
   nombreCliente: '.nombre-cliente',
   enlaceContexto: 'a[href*="contexto.html"]',
   enlacePlan: 'a[href*="plan-nuevo.html"], a[href*="plan-activo.html"]',
+  enlaceSeguimiento: '#enlace-seguimiento',
+  preferenciasCliente: '#preferencias-cliente',
+  listaPreferenciasCliente: '#lista-preferencias-cliente',
   permisosCliente: '#permisos-cliente',
   permisoContexto: '#permiso-contexto',
   permisoPlan: '#permiso-plan'
@@ -107,6 +110,7 @@ async function iniciar() {
   const cod = el(SELECTORES.clienteCodigo);
   if (cod) cod.textContent = `ID ${cliente.client_code}`;
   document.querySelectorAll(SELECTORES.nombreCliente).forEach((n) => { n.textContent = `@${usuario}`; });
+
   const enlaceContexto = el(SELECTORES.enlaceContexto);
   if (enlaceContexto) {
     enlaceContexto.href = `../shared/contexto.html?cliente=${encodeURIComponent(cliente.id)}`;
@@ -115,6 +119,51 @@ async function iniciar() {
   if (enlacePlan) {
     enlacePlan.href = `plan-activo.html?cliente=${encodeURIComponent(cliente.id)}`;
   }
+  const enlaceSeguimiento = el(SELECTORES.enlaceSeguimiento);
+  if (enlaceSeguimiento) {
+    enlaceSeguimiento.href = `seguimiento.html?cliente=${encodeURIComponent(cliente.id)}`;
+  }
+
+  // Hidratar preferencias del alumno
+  const contPreferencias = el(SELECTORES.listaPreferenciasCliente);
+  if (contPreferencias) {
+    while (contPreferencias.firstChild) {
+      contPreferencias.removeChild(contPreferencias.firstChild);
+    }
+    let prefs = [];
+    try {
+      const stored = sessionStorage.getItem('appcalorias_preferencias_alumno');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          prefs = parsed;
+        } else if (typeof parsed === 'object' && parsed !== null) {
+          prefs = Object.values(parsed);
+        }
+      }
+    } catch {
+      const stored = sessionStorage.getItem('appcalorias_preferencias_alumno');
+      if (stored && typeof stored === 'string') {
+        prefs = stored.split(',').map((s) => s.trim()).filter(Boolean);
+      }
+    }
+
+    if (!prefs.length && cliente?.preferencias && Array.isArray(cliente.preferencias)) {
+      prefs = cliente.preferencias;
+    }
+
+    if (!prefs.length) {
+      prefs = ['Sin lactosa', 'No come pescado', 'Desayuna liviano'];
+    }
+
+    prefs.forEach((prefTexto) => {
+      const chip = document.createElement('span');
+      chip.className = 'preferencia';
+      chip.textContent = String(prefTexto);
+      contPreferencias.appendChild(chip);
+    });
+  }
+
   // Hidratar y gestionar permisos del alumno
   try {
     const permisos = await obtenerPermisosAlumno(cliente.id);

@@ -2,6 +2,20 @@
 
 Este documento registra los hitos de versiones **Mayores (Major)** y **Medianas (Minor)** de la aplicación con resúmenes ejecutivos concisos ($\le 10$ renglones). Los cambios atómicos y parches específicos se registran directamente en los commits de Git bajo la convención *Conventional Commits*.
 
+## [v0.5.8] — 30/10/2026
+- **Tipo:** Versión Menor (Seguimiento del Coach, Gestión Interactiva de Preferencias y Duplicación de Comidas)
+- **Fecha:** 30 de Octubre de 2026
+- **Resumen:**
+  1. Seguimiento del Coach (`seguimiento.html` y `seguimiento-coach-ui.js`): Vista completa de evolución de peso corporal, barra de avance hacia la meta, tarjeta de adherencia semanal e historial de pesajes.
+  2. Conexión de ficha del alumno: Activación del enlace a `seguimiento.html?cliente=UUID` en `cliente.html` (reemplazando el estado inactivo previo).
+  3. Tarjeta de Preferencias en la ficha del coach: Visualización de las condiciones declaradas por el alumno en `cliente.html` con chips seguros.
+  4. Preferencias y Restricciones interactivas en el alumno (`perfil.html` y `perfil-ui.js`): Modal accesible de adición, botón dinámico de eliminación y persistencia en `sessionStorage` (`appcalorias_preferencias_alumno`).
+  5. Duplicar Comidas en el Editor (`plan-editor-ui.js`): Botón `.btn-duplicar-comida` con icono `#copiar` para clonar comidas completas con sus alimentos, porciones y notas con recálculo Atwater automático.
+  6. Algoritmo correlativo de copias: Nombrado inteligente (`Desayuno (copia)`, `Desayuno (copia 2)`) y serialización completa para guardado atómico.
+  7. Verificación total: 25 HTMLs y 39 módulos JS analizados con 0 fallos de modularización, 100% de enlaces resueltos y 59 pruebas en navegador real aprobadas.
+
+---
+
 ## [v0.5.7] — 30/10/2026
 - **Tipo:** Versión Menor (Panel de Progreso del Alumno, Catálogo de Plantillas del Coach y Colaciones Dinámicas)
 - **Fecha:** 30 de Octubre de 2026

@@ -144,6 +144,12 @@ rutas de las páginas son relativas a esa carpeta.
     - Catálogo interactivo de 4 plantillas maestras Atwater, conexión con la barra inferior del coach y precarga automática en el editor de planes.
 11. **Adición Dinámica de Colaciones en el Editor de Planes [Completado - 30/10/2026]:**
     - Soporte interactivo para agregar y eliminar colaciones correlativas ("Colación 1", "Colación 2") mediante plantilla `<template id="tpl-comida-colacion">` y recálculo reactivo.
+12. **Panel de Seguimiento del Coach (`seguimiento.html` y `seguimiento-coach-ui.js`) [Completado - 30/10/2026]:**
+    - Monitoreo longitudinal de peso, adherencia calórica e historial de pesajes en el panel del coach con enlace activo desde `cliente.html`.
+13. **Gestión Interactiva de Preferencias y Restricciones [Completado - 30/10/2026]:**
+    - Modal accesible para añadir preferencias en `perfil.html`, eliminación reactiva y visualización unificada en la ficha del alumno del coach (`cliente.html`).
+14. **Duplicación de Comidas en el Editor de Planes [Completado - 30/10/2026]:**
+    - Botón de duplicar comida en `plan-editor.html` con clonación fiel de alimentos, porciones y notas con recálculo automático Atwater.
 
 ### Prioridad 4: Base de Datos y Robustez Transaccional
 

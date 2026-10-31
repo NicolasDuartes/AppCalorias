@@ -52,7 +52,8 @@ PAGE_MAP_FALLBACK = {
     'onboarding-ui.js': ['pages/alumno/onboarding.html'],
     'progreso-ui.js': ['pages/alumno/progreso.html'],
     'alimentos-revision-ui.js': ['pages/coach/alimentos-revision.html'],
-    'plantillas-ui.js': ['pages/coach/plantillas.html']
+    'plantillas-ui.js': ['pages/coach/plantillas.html'],
+    'seguimiento-coach-ui.js': ['pages/coach/seguimiento.html']
 }
 
 

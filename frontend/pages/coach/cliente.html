@@ -67,16 +67,25 @@
             </a>
           </li>
           <li>
-            <div class="fila-link" aria-disabled="true">
+            <a class="fila-link" id="enlace-seguimiento" href="seguimiento.html">
               <span class="tile tile--azul"><svg class="icono" width="22" height="22" aria-hidden="true"><use href="#seguimiento"/></svg></span>
               <span class="fila-link__textos">
                 <span class="fila-link__nombre">Seguimiento</span>
                 <span class="sub">Evolución de peso y adherencia</span>
               </span>
-              <span class="tag tag--gris">Pronto</span>
-            </div>
+              <span class="chevron"><svg class="icono" width="20" height="20" aria-hidden="true"><use href="#flecha-derecha"/></svg></span>
+            </a>
           </li>
         </ul>
+      </section>
+
+      <!-- ===== Preferencias del alumno ===== -->
+      <section class="card columna gap-m" id="preferencias-cliente" aria-label="Preferencias del alumno">
+        <div class="columna gap-2xs">
+          <h2 class="titulo texto-16">Preferencias y restricciones</h2>
+          <p class="sub texto-13">Condiciones declaradas por el alumno para el armado del plan.</p>
+        </div>
+        <div class="preferencias" id="lista-preferencias-cliente"></div>
       </section>
 
       <!-- ===== Permisos del alumno ===== -->

@@ -38,6 +38,7 @@ export const SELECTORES = {
   btnAnadirColacion: '#boton-anadir-colacion',
   tplComidaColacion: '#tpl-comida-colacion',
   btnQuitarComida: '.btn-quitar-comida',
+  btnDuplicarComida: '.btn-duplicar-comida',
   btnColacion: '#boton-anadir-colacion',
   textareaNota: '.acordeon__cuerpo textarea',
   cardFija: '.card--fija',
@@ -197,6 +198,15 @@ export function anadirColacion(nombrePersonalizado = null) {
     });
   }
 
+  const btnDuplicar = nuevoAcordeon.querySelector(SELECTORES.btnDuplicarComida);
+  if (btnDuplicar) {
+    btnDuplicar.addEventListener('click', (evento) => {
+      evento.preventDefault();
+      evento.stopPropagation();
+      duplicarComida(nuevoAcordeon);
+    });
+  }
+
   if (btnColacion.parentNode) {
     btnColacion.parentNode.insertBefore(nuevoAcordeon, btnColacion);
   }
@@ -204,6 +214,205 @@ export function anadirColacion(nombrePersonalizado = null) {
   recalcularResumenPlan();
   mostrarAvisoFlotante('Nueva colación agregada al plan.');
 
+  return nuevoAcordeon;
+}
+
+/**
+ * Determina el nuevo nombre al duplicar una comida:
+ * Si termina en '(copia)', pasa a '(copia 2)'.
+ * Si termina en '(copia N)', pasa a '(copia N+1)'.
+ * En caso contrario, concatena ' (copia)'.
+ * @param {string} nombreOriginal
+ * @returns {string}
+ */
+export function generarNombreCopiaComida(nombreOriginal) {
+  const nombreLimpio = String(nombreOriginal || 'Comida').trim();
+  const matchCopiaNum = nombreLimpio.match(/^(.*?)\s*\(copia\s+(\d+)\)$/i);
+  if (matchCopiaNum) {
+    const base = matchCopiaNum[1].trim();
+    const num = parseInt(matchCopiaNum[2], 10) + 1;
+    return `${base} (copia ${num})`;
+  }
+  const matchCopia = nombreLimpio.match(/^(.*?)\s*\(copia\)$/i);
+  if (matchCopia) {
+    const base = matchCopia[1].trim();
+    return `${base} (copia 2)`;
+  }
+  return `${nombreLimpio} (copia)`;
+}
+
+/**
+ * Duplica una comida completa en el editor de planes:
+ * - Extrae título, notas y filas de alimentos.
+ * - Genera el nuevo nombre secuencial para la copia.
+ * - Clona la estructura mediante tplComidaColacion (o clon limpio).
+ * - Clona cada alimento con sus gramos, dataset nutricional y eventos reactivos.
+ * - Vincula botones de acción (.btn-duplicar-comida, .btn-quitar-comida).
+ * - Inserta el nuevo acordeón inmediatamente después del acordeón original.
+ * - Abre el nuevo acordeón (open = true).
+ * - Recalcula inmediatamente las calorías y macronutrientes del plan.
+ * - Muestra aviso flotante de confirmación.
+ * @param {HTMLElement} acordeonOriginal
+ * @returns {HTMLElement|null} El acordeón duplicado e insertado en el DOM
+ */
+export function duplicarComida(acordeonOriginal) {
+  if (!acordeonOriginal || !(acordeonOriginal instanceof HTMLElement)) return null;
+
+  const tituloEl = acordeonOriginal.querySelector(SELECTORES.acordeonTitulo) || acordeonOriginal.querySelector('[data-ref="titulo"]');
+  const nombreOriginal = tituloEl?.textContent?.trim() || 'Comida';
+  const nuevoNombre = generarNombreCopiaComida(nombreOriginal);
+
+  const textareaOriginal = acordeonOriginal.querySelector(SELECTORES.textareaNota);
+  const notasOriginales = textareaOriginal?.value || '';
+
+  const alimentosOriginales = acordeonOriginal.querySelectorAll(SELECTORES.alimento);
+
+  const tpl = document.querySelector(SELECTORES.tplComidaColacion);
+  let nuevoAcordeon = null;
+
+  if (tpl && tpl.content) {
+    const clon = tpl.content.cloneNode(true);
+    nuevoAcordeon = clon.querySelector(SELECTORES.acordeon) || clon.firstElementChild;
+  }
+
+  if (!nuevoAcordeon) {
+    nuevoAcordeon = acordeonOriginal.cloneNode(true);
+    nuevoAcordeon.querySelectorAll(SELECTORES.alimento).forEach((f) => f.remove());
+  }
+
+  // Establecer nuevo título de la comida
+  const nuevoTituloEl = nuevoAcordeon.querySelector(SELECTORES.acordeonTitulo) || nuevoAcordeon.querySelector('[data-ref="titulo"]');
+  if (nuevoTituloEl) {
+    nuevoTituloEl.textContent = nuevoNombre;
+  }
+
+  // Establecer notas
+  const nuevoTextarea = nuevoAcordeon.querySelector(SELECTORES.textareaNota);
+  if (nuevoTextarea) {
+    nuevoTextarea.value = notasOriginales;
+  }
+
+  // Configurar enlace para añadir alimentos a esta comida
+  const clienteId = extraerClienteId();
+  const btnAnadir = nuevoAcordeon.querySelector('[data-ref="btn-anadir-alimento"]') || nuevoAcordeon.querySelector(SELECTORES.btnAnadir);
+  if (btnAnadir) {
+    const queryCliente = (clienteId && clienteId !== '00000000-0000-0000-0000-000000000001')
+      ? `&cliente=${encodeURIComponent(clienteId)}`
+      : '';
+    btnAnadir.setAttribute('href', `buscar-alimento.html?comida=${encodeURIComponent(nuevoNombre)}${queryCliente}`);
+  }
+
+  // Clonar y vincular cada alimento del original
+  const contenedorAlimentos = nuevoAcordeon.querySelector('[data-ref="contenedor-alimentos"]');
+  alimentosOriginales.forEach((alimentoOriginal) => {
+    const filaClonada = alimentoOriginal.cloneNode(true);
+    delete filaClonada.dataset.eventosVinculados;
+
+    // Preservar valor de gramos ingresado
+    const inputOrig = alimentoOriginal.querySelector(SELECTORES.alimentoInputCantidad);
+    const inputClon = filaClonada.querySelector(SELECTORES.alimentoInputCantidad);
+    if (inputOrig && inputClon) {
+      inputClon.value = inputOrig.value;
+    }
+
+    // Preservar metadatos nutricionales por 100g
+    if (alimentoOriginal.dataset.kcal100) filaClonada.dataset.kcal100 = alimentoOriginal.dataset.kcal100;
+    if (alimentoOriginal.dataset.p100) filaClonada.dataset.p100 = alimentoOriginal.dataset.p100;
+    if (alimentoOriginal.dataset.c100) filaClonada.dataset.c100 = alimentoOriginal.dataset.c100;
+    if (alimentoOriginal.dataset.g100) filaClonada.dataset.g100 = alimentoOriginal.dataset.g100;
+    if (alimentoOriginal.dataset.categoria) filaClonada.dataset.categoria = alimentoOriginal.dataset.categoria;
+
+    // Actualizar enlace Cambiar alimento para apuntar a la nueva comida
+    const btnCambiar = filaClonada.querySelector(SELECTORES.btnCambiar);
+    if (btnCambiar) {
+      const queryCliente = (clienteId && clienteId !== '00000000-0000-0000-0000-000000000001')
+        ? `&cliente=${encodeURIComponent(clienteId)}`
+        : '';
+      btnCambiar.setAttribute('href', `buscar-alimento.html?comida=${encodeURIComponent(nuevoNombre)}${queryCliente}&cambiar=1`);
+    }
+
+    vincularEventosAlimento(filaClonada);
+
+    if (contenedorAlimentos) {
+      contenedorAlimentos.appendChild(filaClonada);
+    } else if (btnAnadir && btnAnadir.parentNode) {
+      btnAnadir.parentNode.insertBefore(filaClonada, btnAnadir);
+    } else {
+      const cuerpo = nuevoAcordeon.querySelector('.acordeon__cuerpo') || nuevoAcordeon;
+      cuerpo.appendChild(filaClonada);
+    }
+  });
+
+  // Asegurar botón quitar comida si no existe
+  let btnQuitar = nuevoAcordeon.querySelector(SELECTORES.btnQuitarComida);
+  if (!btnQuitar) {
+    btnQuitar = document.createElement('button');
+    btnQuitar.className = 'btn-icono btn-quitar-comida';
+    btnQuitar.type = 'button';
+    btnQuitar.setAttribute('aria-label', 'Quitar esta comida');
+    btnQuitar.setAttribute('title', 'Quitar comida');
+
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('class', 'icono');
+    svg.setAttribute('width', '18');
+    svg.setAttribute('height', '18');
+    svg.setAttribute('aria-hidden', 'true');
+    const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+    use.setAttribute('href', '#cerrar');
+    svg.appendChild(use);
+    btnQuitar.appendChild(svg);
+
+    const filaAcciones = nuevoAcordeon.querySelector('.fila.gap-s') || nuevoAcordeon.querySelector('.acordeon__cabecera, summary');
+    const flecha = nuevoAcordeon.querySelector('.acordeon__flecha');
+    if (filaAcciones && flecha) {
+      filaAcciones.insertBefore(btnQuitar, flecha);
+    } else if (filaAcciones) {
+      filaAcciones.appendChild(btnQuitar);
+    }
+  }
+
+  if (btnQuitar) {
+    btnQuitar.addEventListener('click', (evento) => {
+      evento.preventDefault();
+      evento.stopPropagation();
+      if (!nuevoAcordeon.isConnected) return;
+      nuevoAcordeon.remove();
+      mostrarAvisoFlotante('Comida eliminada del plan.');
+      recalcularResumenPlan();
+    });
+  }
+
+  // Vincular botón duplicar de la nueva comida
+  const btnDuplicar = nuevoAcordeon.querySelector(SELECTORES.btnDuplicarComida);
+  if (btnDuplicar) {
+    btnDuplicar.addEventListener('click', (evento) => {
+      evento.preventDefault();
+      evento.stopPropagation();
+      duplicarComida(nuevoAcordeon);
+    });
+  }
+
+  // Marcar como colación/comida serializable y limpiar identificador previo
+  if (!nuevoAcordeon.dataset.comida) {
+    nuevoAcordeon.dataset.comida = 'colacion';
+  }
+  delete nuevoAcordeon.dataset.mealId;
+
+  // Insertar inmediatamente después del acordeón original
+  if (acordeonOriginal.nextElementSibling) {
+    acordeonOriginal.parentNode.insertBefore(nuevoAcordeon, acordeonOriginal.nextElementSibling);
+  } else {
+    acordeonOriginal.parentNode.appendChild(nuevoAcordeon);
+  }
+
+  // Abrir el acordeón duplicado
+  nuevoAcordeon.open = true;
+
+  // Recalcular comida y resumen del plan
+  recalcularComida(nuevoAcordeon);
+  recalcularResumenPlan();
+
+  mostrarAvisoFlotante(`Comida "${nombreOriginal}" duplicada.`);
   return nuevoAcordeon;
 }
 
@@ -242,6 +451,16 @@ export function hidratarAlimentosIniciales() {
         ? `&cliente=${encodeURIComponent(clienteActual)}`
         : '';
       btnAnadir.setAttribute('href', `buscar-alimento.html?comida=${encodeURIComponent(titulo)}${paramCliente}`);
+    }
+
+    const btnDuplicar = acordeon.querySelector(SELECTORES.btnDuplicarComida);
+    if (btnDuplicar && btnDuplicar.dataset.vinculado !== 'true') {
+      btnDuplicar.dataset.vinculado = 'true';
+      btnDuplicar.addEventListener('click', (evento) => {
+        evento.preventDefault();
+        evento.stopPropagation();
+        duplicarComida(acordeon);
+      });
     }
 
     const infoComida = (plantillaActiva && plantillaActiva.comidas && plantillaActiva.comidas[titulo])
@@ -822,6 +1041,19 @@ export async function iniciarPlanEditor() {
       acordeon.remove();
       mostrarAvisoFlotante('Comida eliminada del plan.');
       recalcularResumenPlan();
+    }
+  });
+
+  // Delegación de eventos para duplicación de comidas
+  document.addEventListener('click', (evento) => {
+    const btnDuplicar = evento.target.closest(SELECTORES.btnDuplicarComida);
+    if (!btnDuplicar) return;
+
+    evento.preventDefault();
+    evento.stopPropagation();
+    const acordeon = btnDuplicar.closest(SELECTORES.acordeon);
+    if (acordeon) {
+      duplicarComida(acordeon);
     }
   });
 

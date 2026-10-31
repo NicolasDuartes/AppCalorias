@@ -104,3 +104,13 @@
   opacity: 0;
   transform: translateY(-8px);
 }
+
+
+/* ---------- Seguimiento del alumno ---------- */
+.objetivo__pesos {
+  align-items: flex-end;
+}
+
+.objetivo__pesos .columna {
+  gap: 2px;
+}
