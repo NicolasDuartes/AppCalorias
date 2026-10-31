@@ -31,9 +31,10 @@ frontend/
 │   ├── utils/                     # Utilidades transversales (2 módulos)
 │   │   ├── navegacion.js          # Historial inteligente, avisos toast y atajos WCAG
 │   │   └── texto.js               # Formato de nombres e iniciales de cuentas
-│   └── ui/                        # Controladores desacoplados con mapas SELECTORES (21 módulos)
+│   └── ui/                        # Controladores desacoplados con mapas SELECTORES (23 módulos)
 │       ├── login-ui.js            # index.html
 │       ├── cuenta-ui.js           # registro.html
+│       ├── onboarding-ui.js       # alumno/onboarding.html (stepper de 5 pasos)
 │       ├── dashboard-ui.js        # alumno/dashboard.html
 │       ├── plan-ui.js             # alumno/plan.html
 │       ├── cantidad-ui.js         # alumno/cantidad.html
@@ -51,10 +52,12 @@ frontend/
 │       ├── plan-archivado-ui.js   # coach/plan-archivado.html (vista de solo lectura)
 │       ├── historial-ui.js        # coach/historial.html y historial-vacio.html
 │       ├── buscar-alimento-ui.js  # coach/buscar-alimento.html
+│       ├── alimentos-revision-ui.js # coach/alimentos-revision.html (moderación)
 │       ├── contexto-ui.js         # shared/contexto.html (cálculo BMR/TDEE)
 │       └── rol-ui.js              # shared/contexto.html (conmutador por rol)
 └── pages/
     ├── alumno/
+    │   ├── onboarding.html        # Asistente de 5 pasos para biometría y meta
     │   ├── dashboard.html         # Día, calorías, comidas vacías y agua
     │   ├── plan.html              # Plan alimenticio activo asignado
     │   ├── cantidad.html          # Ajuste de gramos con recálculo en vivo
@@ -74,7 +77,8 @@ frontend/
     │   ├── plan-archivado.html    # Consulta de planes históricos finalizados
     │   ├── historial.html         # Línea de tiempo de planes del alumno
     │   ├── historial-vacio.html   # Historial vacío de planes
-    │   └── buscar-alimento.html   # Buscador interactivo de catálogo
+    │   ├── buscar-alimento.html   # Buscador interactivo de catálogo
+    │   └── alimentos-revision.html # Panel de moderación y aprobación de alimentos
     └── shared/
         └── contexto.html          # Motor interactivo de cálculo energético
 ```

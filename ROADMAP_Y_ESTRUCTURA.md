@@ -122,10 +122,10 @@ rutas de las páginas son relativas a esa carpeta.
 
 ### Prioridad 3: Flujos de Usuario Faltantes
 
-1. **Onboarding del alumno (`onboarding.html`):**
-   - Asistente de 5 pasos post-registro (sexo, fecha de nacimiento, peso y altura, actividad física NEAT/METs, objetivo calórico) para poblar el primer contexto energético.
-2. **Panel de moderación y revisión de alimentos del Coach:**
-   - Interfaz en el panel del coach para listar alimentos en estado `'pendiente'` y aprobarlos o rechazarlos usando los RPCs `revisar_alimento` y `revisar_correccion`.
+1. **Onboarding del alumno (`onboarding.html` y `onboarding-ui.js`) [Completado - 30/10/2026]:**
+   - Asistente de 5 pasos post-registro (sexo, fecha de nacimiento/edad, peso y altura, actividad física NEAT/pasos, entrenamiento METs, objetivo calórico) para poblar el primer contexto energético y persistirlo en `contextos_energeticos`.
+2. **Panel de moderación y revisión de alimentos del Coach (`alimentos-revision.html` y `alimentos-revision-ui.js`) [Completado - 30/10/2026]:**
+   - Interfaz en el panel del coach para listar alimentos en estado `'pendiente'` y aprobarlos o rechazarlos con motivo usando el RPC `revisar_alimento` y plantilla nativa `<template>`.
 3. **Gestión visual de `permisos_alumno`:**
    - Interfaz para que el coach habilite o deshabilite las secciones editables del alumno (`contexto`, `plan`).
 

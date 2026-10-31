@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Configuración inicial · Alumno</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../../css/base.css">
+  <link rel="stylesheet" href="../../css/components.css">
+  <link rel="stylesheet" href="../../css/pages/alumno.css">
+</head>
+<body>
+  <!-- Sprite SVG accesible con iconos del flujo de onboarding -->
+  <svg class="sprite" aria-hidden="true">
+    <symbol id="volver" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></symbol>
+    <symbol id="flecha-derecha" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+    <symbol id="hecho" viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></symbol>
+    <symbol id="alerta" viewBox="0 0 24 24"><path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17v.5"/></symbol>
+    <symbol id="info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></symbol>
+    <symbol id="perfil" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></symbol>
+    <symbol id="fuego" viewBox="0 0 24 24"><path d="M12 3c1 3.5 5 5.5 5 10a5 5 0 0 1-10 0c0-2.5 1.5-4 2.5-5 .3 1.7 1 2.7 2 3 0-3 .5-5.5.5-8z"/></symbol>
+  </svg>
+
+  <div class="pantalla">
+    <main class="contenido contenido--holgado gap-l">
+      <!-- Encabezado con Stepper / Asistente visual en 5 pasos -->
+      <header class="encabezado encabezado--columna gap-s">
+        <div class="fila fila--entre">
+          <span class="antetitulo antetitulo--verde">Configuración de perfil</span>
+          <span class="texto-13 texto-gris" id="stepper-indicador">Paso 1 de 5</span>
+        </div>
+        <h1 class="titulo" id="stepper-titulo">Sexo y edad</h1>
+        <div class="barra" role="progressbar" aria-label="Progreso del asistente" aria-valuemin="1" aria-valuemax="5" aria-valuenow="1" id="stepper-barra">
+          <span id="stepper-progreso" style="width: 20%"></span>
+        </div>
+      </header>
+
+      <form class="columna gap-l" id="form-onboarding" novalidate onsubmit="return false;">
+
+        <!-- ===== PASO 1: Sexo biológico y edad ===== -->
+        <section class="card columna gap-m paso-asistente" id="paso-1" data-paso="1" aria-labelledby="t-paso-1">
+          <div class="columna gap-2xs">
+            <h2 class="seccion-titulo" id="t-paso-1">Datos personales</h2>
+            <p class="sub texto-14">Necesitamos tu sexo biológico y tu edad para calcular tu tasa metabólica basal mediante la fórmula Mifflin-St Jeor.</p>
+          </div>
+
+          <fieldset class="campo">
+            <legend class="campo__etiqueta campo__etiqueta--fuerte">Sexo biológico</legend>
+            <div class="segmentado" role="radiogroup" aria-label="Sexo biológico" id="segmentado-sexo">
+              <button class="btn-segmentado" type="button" role="radio" aria-checked="true" data-sexo="M" id="btn-sexo-m">Masculino</button>
+              <button class="btn-segmentado" type="button" role="radio" aria-checked="false" data-sexo="F" id="btn-sexo-f">Femenino</button>
+            </div>
+          </fieldset>
+
+          <div class="columna gap-s">
+            <label class="campo">
+              <span class="campo__etiqueta campo__etiqueta--fuerte">Fecha de nacimiento</span>
+              <span class="input"><input type="date" name="fechaNacimiento" id="input-fecha-nacimiento" autocomplete="bday"></span>
+            </label>
+
+            <div class="fila fila--centro gap-s">
+              <span class="texto-12 texto-gris">— o ingresá tu edad en años —</span>
+            </div>
+
+            <label class="campo">
+              <span class="campo__etiqueta campo__etiqueta--fuerte">Edad en años</span>
+              <span class="input input--derecha"><input type="number" name="edad" id="input-edad" placeholder="Ej.: 28" min="10" max="100" value="28" required><span class="unidad">años</span></span>
+            </label>
+          </div>
+
+          <p class="aviso texto-12" id="error-paso-1" role="alert" hidden><svg class="icono" width="16" height="16" aria-hidden="true"><use href="#alerta"/></svg><span id="error-paso-1-texto">Por favor ingresá una edad válida entre 10 y 100 años.</span></p>
+        </section>
+
+        <!-- ===== PASO 2: Altura y peso inicial ===== -->
+        <section class="card columna gap-m paso-asistente" id="paso-2" data-paso="2" aria-labelledby="t-paso-2" hidden>
+          <div class="columna gap-2xs">
+            <h2 class="seccion-titulo" id="t-paso-2">Altura y peso inicial</h2>
+            <p class="sub texto-14">Tus medidas corporales determinan la masa activa sobre la cual se calculan tus requerimientos basales y de actividad.</p>
+          </div>
+
+          <div class="columna gap-m">
+            <label class="campo">
+              <span class="campo__etiqueta campo__etiqueta--fuerte">Altura (cm)</span>
+              <span class="input input--derecha"><input type="number" name="altura" id="input-altura" placeholder="Ej.: 175" min="80" max="250" value="175" required><span class="unidad">cm</span></span>
+            </label>
+
+            <label class="campo">
+              <span class="campo__etiqueta campo__etiqueta--fuerte">Peso inicial (kg)</span>
+              <span class="input input--derecha"><input type="text" inputmode="decimal" name="peso" id="input-peso" placeholder="Ej.: 75.0" value="75" required><span class="unidad">kg</span></span>
+            </label>
+          </div>
+
+          <p class="aviso texto-12" id="error-paso-2" role="alert" hidden><svg class="icono" width="16" height="16" aria-hidden="true"><use href="#alerta"/></svg><span id="error-paso-2-texto">Por favor ingresá una altura (80-250 cm) y un peso válido (20-350 kg).</span></p>
+        </section>
+
+        <!-- ===== PASO 3: Movimiento diario no deportivo (NEAT) ===== -->
+        <section class="card columna gap-m paso-asistente" id="paso-3" data-paso="3" aria-labelledby="t-paso-3" hidden>
+          <div class="columna gap-2xs">
+            <h2 class="seccion-titulo" id="t-paso-3">Actividad diaria no deportiva (NEAT)</h2>
+            <p class="sub texto-14">El NEAT comprende todo movimiento fuera del deporte (caminar, estar de pie, tareas del hogar) y quema la mayor parte de tu energía diaria activa.</p>
+          </div>
+
+          <fieldset class="campo">
+            <legend class="campo__etiqueta campo__etiqueta--fuerte">Nivel de pasos habitual</legend>
+            <div class="opciones" role="radiogroup" aria-label="Nivel de movimiento diario" id="opciones-neat">
+              <button class="opcion" type="button" role="radio" aria-checked="false" data-pasos="4000" id="opcion-neat-sedentario">
+                <span class="radio"></span>
+                <span class="opcion__textos">
+                  <span class="negrita texto-15">Sedentario</span>
+                  <span class="sub texto-12">Mayormente sentado, trabajo de escritorio (~4.000 pasos)</span>
+                </span>
+                <span class="num num--s">4.000</span>
+              </button>
+
+              <button class="opcion" type="button" role="radio" aria-checked="true" data-pasos="8000" id="opcion-neat-moderado">
+                <span class="radio"></span>
+                <span class="opcion__textos">
+                  <span class="negrita texto-15">Moderado</span>
+                  <span class="sub texto-12">Caminatas regulares, trabajo dinámico mixto (~8.000 pasos)</span>
+                </span>
+                <span class="num num--s">8.000</span>
+              </button>
+
+              <button class="opcion" type="button" role="radio" aria-checked="false" data-pasos="12000" id="opcion-neat-activo">
+                <span class="radio"></span>
+                <span class="opcion__textos">
+                  <span class="negrita texto-15">Activo</span>
+                  <span class="sub texto-12">Mucho tiempo de pie y desplazamientos continuos (~12.000 pasos)</span>
+                </span>
+                <span class="num num--s">12.000</span>
+              </button>
+
+              <button class="opcion" type="button" role="radio" aria-checked="false" data-pasos="custom" id="opcion-neat-personalizado">
+                <span class="radio"></span>
+                <span class="opcion__textos">
+                  <span class="negrita texto-15">Personalizado</span>
+                  <span class="sub texto-12">Ingresar cantidad específica de pasos diarios</span>
+                </span>
+              </button>
+            </div>
+          </fieldset>
+
+          <label class="campo" id="campo-pasos-personalizado">
+            <span class="campo__etiqueta campo__etiqueta--fuerte">Pasos diarios estimados</span>
+            <span class="input input--derecha"><input type="number" name="pasos" id="input-pasos" placeholder="Ej.: 8000" min="0" max="50000" value="8000"><span class="unidad">pasos</span></span>
+          </label>
+
+          <p class="aviso texto-12" id="error-paso-3" role="alert" hidden><svg class="icono" width="16" height="16" aria-hidden="true"><use href="#alerta"/></svg><span id="error-paso-3-texto">Por favor ingresá un número de pasos entre 0 y 50.000.</span></p>
+        </section>
+
+        <!-- ===== PASO 4: Entrenamiento semanal ===== -->
+        <section class="card columna gap-m paso-asistente" id="paso-4" data-paso="4" aria-labelledby="t-paso-4" hidden>
+          <div class="columna gap-2xs">
+            <h2 class="seccion-titulo" id="t-paso-4">Entrenamiento semanal</h2>
+            <p class="sub texto-14">Calculamos las calorías promedio que quemás entrenando para sumarlas a tu gasto metabólico total.</p>
+          </div>
+
+          <label class="campo">
+            <span class="campo__etiqueta campo__etiqueta--fuerte">Sesiones de entrenamiento por semana</span>
+            <span class="input input--derecha"><input type="number" name="sesiones" id="input-sesiones" min="0" max="7" value="4"><span class="unidad">días/sem</span></span>
+          </label>
+
+          <label class="campo">
+            <span class="campo__etiqueta campo__etiqueta--fuerte">Duración por sesión</span>
+            <span class="input input--derecha"><input type="number" name="duracionMinutos" id="input-duracion-minutos" min="0" max="360" step="5" value="60"><span class="unidad">minutos</span></span>
+          </label>
+
+          <fieldset class="campo">
+            <legend class="campo__etiqueta campo__etiqueta--fuerte">Intensidad (METs)</legend>
+            <div class="segmentado" role="radiogroup" aria-label="Intensidad de entrenamiento" id="segmentado-intensidad">
+              <button class="btn-segmentado" type="button" role="radio" aria-checked="false" data-met="3" id="btn-intensidad-suave">Suave (3)</button>
+              <button class="btn-segmentado" type="button" role="radio" aria-checked="true" data-met="6" id="btn-intensidad-media">Media (6)</button>
+              <button class="btn-segmentado" type="button" role="radio" aria-checked="false" data-met="9" id="btn-intensidad-intensa">Intensa (9)</button>
+            </div>
+            <p class="sub texto-12" id="ayuda-intensidad">Media: pesas en gimnasio, trote moderado o natación recreativa (~6 METs).</p>
+          </fieldset>
+
+          <input type="hidden" name="met" id="input-met" value="6">
+
+          <p class="aviso texto-12" id="error-paso-4" role="alert" hidden><svg class="icono" width="16" height="16" aria-hidden="true"><use href="#alerta"/></svg><span id="error-paso-4-texto">Verificá las sesiones (0 a 7) y la duración del entrenamiento.</span></p>
+        </section>
+
+        <!-- ===== PASO 5: Objetivo calórico ===== -->
+        <section class="card columna gap-m paso-asistente" id="paso-5" data-paso="5" aria-labelledby="t-paso-5" hidden>
+          <div class="columna gap-2xs">
+            <h2 class="seccion-titulo" id="t-paso-5">Objetivo calórico</h2>
+            <p class="sub texto-14">Calculamos tu gasto diario total (TDEE + digestión) y ajustamos las calorías según tu objetivo principal.</p>
+          </div>
+
+          <!-- Preview de calorías y gasto metabólico -->
+          <div class="card card--oscura columna gap-xs" id="card-resumen-objetivo">
+            <span class="sub">Calorías diarias recomendadas</span>
+            <div class="fila fila--base gap-xs">
+              <span class="num num--xl" id="resumen-calorias-objetivo">2.060</span>
+              <span class="unidad">kcal / día</span>
+            </div>
+            <p class="sub texto-12" id="resumen-metabolismo-detalle">Gasto diario estimado (TDEE + digestión): 2.560 kcal</p>
+          </div>
+
+          <fieldset class="campo">
+            <legend class="campo__etiqueta campo__etiqueta--fuerte">Elegí tu objetivo</legend>
+            <div class="opciones" role="radiogroup" aria-label="Objetivo calórico" id="opciones-objetivo">
+              <button class="opcion" type="button" role="radio" aria-checked="false" data-tipo="deficit_leve" data-ajuste="-300" id="opcion-deficit-leve">
+                <span class="radio"></span>
+                <span class="opcion__textos">
+                  <span class="negrita texto-15">Déficit leve</span>
+                  <span class="sub texto-12">−300 kcal · Descenso paulatino y cómodo</span>
+                </span>
+                <span class="num num--s" id="num-obj-deficit-leve">2.260</span>
+              </button>
+
+              <button class="opcion" type="button" role="radio" aria-checked="true" data-tipo="deficit_moderado" data-ajuste="-500" id="opcion-deficit-mod">
+                <span class="radio"></span>
+                <span class="opcion__textos">
+                  <span class="negrita texto-15">Déficit moderado</span>
+                  <span class="sub texto-12">−500 kcal · Pérdida de grasa óptima (Recomendado)</span>
+                </span>
+                <span class="num num--s" id="num-obj-deficit-mod">2.060</span>
+              </button>
+
+              <button class="opcion" type="button" role="radio" aria-checked="false" data-tipo="mantenimiento" data-ajuste="0" id="opcion-mantenimiento">
+                <span class="radio"></span>
+                <span class="opcion__textos">
+                  <span class="negrita texto-15">Mantenimiento</span>
+                  <span class="sub texto-12">0 kcal · Mantener peso y rendimiento</span>
+                </span>
+                <span class="num num--s" id="num-obj-mantenimiento">2.560</span>
+              </button>
+
+              <button class="opcion" type="button" role="radio" aria-checked="false" data-tipo="superavit_leve" data-ajuste="300" id="opcion-superavit-leve">
+                <span class="radio"></span>
+                <span class="opcion__textos">
+                  <span class="negrita texto-15">Superávit leve</span>
+                  <span class="sub texto-12">+300 kcal · Ganancia muscular magra</span>
+                </span>
+                <span class="num num--s" id="num-obj-superavit-leve">2.860</span>
+              </button>
+
+              <button class="opcion" type="button" role="radio" aria-checked="false" data-tipo="superavit_moderado" data-ajuste="500" id="opcion-superavit-mod">
+                <span class="radio"></span>
+                <span class="opcion__textos">
+                  <span class="negrita texto-15">Superávit moderado</span>
+                  <span class="sub texto-12">+500 kcal · Aumento de fuerza e hipertrofia</span>
+                </span>
+                <span class="num num--s" id="num-obj-superavit-mod">3.060</span>
+              </button>
+            </div>
+          </fieldset>
+
+          <p class="aviso texto-12" id="error-paso-5" role="alert" hidden><svg class="icono" width="16" height="16" aria-hidden="true"><use href="#alerta"/></svg><span id="error-paso-5-texto">Por favor seleccioná un objetivo para tu plan.</span></p>
+        </section>
+
+      </form>
+    </main>
+
+    <!-- Botones de navegación del asistente en el pie -->
+    <footer class="pie">
+      <button class="btn btn--secundario" type="button" id="btn-anterior" hidden>
+        <svg class="icono" width="18" height="18" aria-hidden="true"><use href="#volver"/></svg>
+        <span>Anterior</span>
+      </button>
+      <button class="btn btn--primario" type="button" id="btn-siguiente">
+        <span>Siguiente</span>
+        <svg class="icono" width="18" height="18" aria-hidden="true"><use href="#flecha-derecha"/></svg>
+      </button>
+      <button class="btn btn--primario" type="button" id="btn-finalizar" hidden>
+        <svg class="icono" width="18" height="18" aria-hidden="true"><use href="#hecho"/></svg>
+        <span>Comenzar mi plan</span>
+      </button>
+    </footer>
+  </div>
+
+  <script type="module" src="../../js/ui/onboarding-ui.js"></script>
+</body>
+</html>

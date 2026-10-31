@@ -48,7 +48,9 @@ PAGE_MAP_FALLBACK = {
     'cuenta-ui.js': ['registro.html'],
     'objetivo-ui.js': ['pages/alumno/perfil.html'],
     'rol-ui.js': ['pages/shared/contexto.html'],
-    'contexto-ui.js': ['pages/shared/contexto.html']
+    'contexto-ui.js': ['pages/shared/contexto.html'],
+    'onboarding-ui.js': ['pages/alumno/onboarding.html'],
+    'alimentos-revision-ui.js': ['pages/coach/alimentos-revision.html']
 }
 
 

@@ -87,3 +87,20 @@
   min-width: 0;
   margin-bottom: var(--espacio-m);
 }
+
+
+/* ---------- Panel de moderación y revisión de alimentos ---------- */
+.lista-alimentos-pendientes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-m);
+}
+
+.card--alimento-revision {
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.card--alimento-revision.removiendo {
+  opacity: 0;
+  transform: translateY(-8px);
+}

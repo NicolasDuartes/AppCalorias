@@ -2,6 +2,20 @@
 
 Este documento registra los hitos de versiones **Mayores (Major)** y **Medianas (Minor)** de la aplicación con resúmenes ejecutivos concisos ($\le 10$ renglones). Los cambios atómicos y parches específicos se registran directamente en los commits de Git bajo la convención *Conventional Commits*.
 
+## [v0.5.4] — 30/10/2026
+- **Tipo:** Versión Menor (Onboarding del Alumno en 5 Pasos y Panel de Moderación de Alimentos para el Coach)
+- **Fecha:** 30 de Octubre de 2026
+- **Resumen:**
+  1. Onboarding del Alumno en 5 pasos guiados (`onboarding.html` y `onboarding-ui.js`): Sexo, edad, altura, peso, NEAT, entrenamiento METs y objetivo calórico.
+  2. Guardado metabólico unificado: Cálculo de Mifflin-St Jeor, TDEE y TEF con persistencia en `public.contextos_energeticos` y bienvenida al dashboard.
+  3. Panel de Moderación de Alimentos del Coach (`alimentos-revision.html` y `alimentos-revision-ui.js`): Gestión de alimentos en estado pendiente con plantilla `<template>`.
+  4. Aprobación y rechazo interactivo: Invocación de `revisar_alimento`, modal accesible para motivo de rechazo y feedback toast.
+  5. Cumplimiento de las 3 Reglas de Oro: Cero `innerHTML` con datos de usuario, conmutación declarativa de estado vacío con `hidden` y mapas `SELECTORES`.
+  6. Sincronización documental: Árbol de archivos actualizado en `Leemewacho.md` alcanzando 22 páginas HTML y 36 módulos JS.
+  7. Verificación total: 10 suites automatizadas aprobadas al 100% (sintaxis, modularización, enlaces, cálculos metabólicos y pruebas E2E).
+
+---
+
 ## [v0.5.3] — 30/10/2026
 - **Tipo:** Versión Menor (Conexión Integral de Capa de Datos, Persistencia Metabólica y Formularios de Alimentos)
 - **Fecha:** 30 de Octubre de 2026
