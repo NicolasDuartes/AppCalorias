@@ -15,7 +15,7 @@ AppCalorias es una plataforma **Vanilla Web pura (buildless)** optimizada para d
 ### Puesta en Marcha Local
 
 #### En Windows:
-Hacé doble clic en [`iniciar.bat`](file:///C:/Users/gian9/OneDrive/Desktop/AppCalorias/iniciar.bat) o ejecutalo desde la consola:
+Hacé doble clic en [`iniciar.bat`](iniciar.bat) o ejecutalo desde la consola:
 ```cmd
 iniciar.bat
 ```
@@ -40,10 +40,10 @@ AppCalorias/
 ├── frontend/                     # Aplicación web cliente (Vanilla Web MPA)
 │   ├── index.html                # Inicio de sesión (punto de entrada)
 │   ├── registro.html             # Registro de nuevas cuentas (alumno / coach)
-│   ├── pages/                    # 29 vistas funcionales divididas por rol
-│   │   ├── alumno/               # Dashboard, plan, comidas, reemplazo, crear plato, progreso, perfil
-│   │   ├── coach/                # Clientes, planes, historial, editor, buscador, moderación, plantillas
-│   │   └── shared/               # Pantallas compartidas (contexto energético)
+│   ├── pages/                    # 27 vistas en subdirectorios divididas por rol (29 HTMLs en total)
+│   │   ├── alumno/               # 12 vistas: dashboard, plan, historial, comidas, reemplazo, plato, progreso, perfil, onboarding
+│   │   ├── coach/                # 14 vistas: clientes, planes, historial, editor, buscador, moderación, plantillas, seguimiento
+│   │   └── shared/               # 1 vista compartida: contexto energético (contexto.html)
 │   ├── css/                      # Sistema de diseño desacoplado (en cascada)
 │   │   ├── base.css              # 1º: Tokens (:root), reseteo, tipografía y viewport
 │   │   ├── components.css        # 2º: Componentes compartidos y utilidades ARIA
@@ -79,44 +79,42 @@ La lógica de la aplicación se divide estrictamente en 4 capas desacopladas sin
 | **Controladores UI** | `frontend/js/ui/` | **28** | Captura de eventos, sincronización DOM con mapas `SELECTORES`, renderizado sin `innerHTML` (`<template>`). |
 | **Capa de Datos** | `frontend/js/data/` | **8** | Abstracción de base de datos, consultas Supabase, control de sesión y persistencia resiliente offline con `MockStore`. |
 | **Cálculo Puro** | `frontend/js/calc/` | **3** | Algoritmos deterministas sin DOM ni red: Atwater ($4P+4C+9G$), minimización $L_1$ de equivalencias y formato. |
-| **Utilidades** | `frontend/js/utils/` | **3** | Cascarón de navegación (`navegacion.js`), WCAG WAI-ARIA Focus Trap (`accesibilidad.js`) y sanitización de texto (`texto.js`). |
+| **Utilidades** | `frontend/js/utils/` | **3** | Cascarón de navegación (`navegacion.js`), WCAG WAI-ARIA Focus Trap (`accesibilidad.js`) y formateo de cuenta (`texto.js`). |
 
 <details>
-<summary><strong>📋 Ver el desglose detallado de los 28 Controladores UI y sus 29 Pantallas</strong></summary>
+<summary><strong>📋 Ver el desglose detallado de los 28 Controladores UI y las 29 Pantallas HTML</strong></summary>
 
-### Vistas y Controladores del Alumno (`frontend/pages/alumno/`)
-- `dashboard.html` ↔ `dashboard-ui.js`: Selector de fecha, totales del día, tarjetas de 4 comidas y 1-Tap Check.
-- `plan.html` ↔ `plan-ui.js`: Visualización del menú vigente asignado por el coach.
-- `comida.html` ↔ `comida-ui.js`: Detalle de ingesta por comida y marcado rápido.
-- `cantidad.html` ↔ `cantidad-ui.js`: Ajuste granular de porción o unidades de un alimento.
-- `agregar.html` ↔ `agregar-ui.js`: Búsqueda y agregado manual de alimentos a una comida.
-- `reemplazar.html` ↔ `reemplazar-ui.js`: Motor interactivo de sustitución nutricional con semáforo.
-- `crear-plato.html` ↔ `crear-plato-ui.js`: Guardado de platos compuestos como comidas frecuentes.
-- `crear-alimento.html` ↔ `crear-alimento-ui.js`: Propuesta de nuevo alimento pendiente de moderación.
-- `editar-alimento.html` ↔ `editar-alimento-ui.js`: Propuesta de corrección sobre catálogo existente.
-- `progreso.html` ↔ `progreso-ui.js`: Seguimiento de peso corporal, adherencia e hidratación diaria.
-- `perfil.html` ↔ `perfil-ui.js`: Gestión de cuenta de alumno, datos antropométricos y código de cliente.
+### Vistas y Controladores del Alumno (`frontend/pages/alumno/` — 12 pantallas)
+- `dashboard.html` ↔ `dashboard-ui.js`: Selector de fecha, totales del día, tarjetas de comidas principales y colaciones dinámicas con 1-Tap Check, y vasos de agua.
+- `onboarding.html` ↔ `onboarding-ui.js`: Asistente guiado en 5 pasos para calibrar biometría, NEAT, entrenamiento METs y objetivo calórico inicial.
+- `plan.html` ↔ `plan-ui.js`: Visualización del menú vigente asignado por el coach y acceso al historial.
+- `historial.html` ↔ `historial-alumno-ui.js`: Historial cronológico de versiones de planes del alumno con reparto de macronutrientes.
+- `cantidad.html` ↔ `cantidad-ui.js`: Ajuste granular de porción en gramos o unidades con recálculo nutricional en vivo.
+- `agregar.html` ↔ `agregar-ui.js`: Búsqueda local/remota con debounce y agregado manual de alimentos a una comida.
+- `reemplazar.html` ↔ `reemplazar-ui.js`: Motor interactivo de sustitución nutricional con semáforo de equivalencia.
+- `crear-plato.html` ↔ `crear-plato-ui.js`: Armado de platos compuestos combinando múltiples ingredientes con recálculo Atwater reactivo.
+- `crear-alimento.html` y `editar-alimento.html` ↔ `alimento-form-ui.js`: Alta de nuevos alimentos y propuestas de corrección sobre el catálogo con validación termodinámica.
+- `progreso.html` ↔ `progreso-ui.js`: Evolución de peso corporal, adherencia calórica y control rápido de hidratación diaria.
+- `perfil.html` ↔ `perfil-ui.js` + `objetivo-ui.js`: Gestión de cuenta de alumno, preferencias alimentarias, regla deslizable de pesaje y velocímetro de objetivo.
 
-### Vistas y Controladores del Coach (`frontend/pages/coach/`)
-- `clientes.html` ↔ `clientes-ui.js`: Bandeja de clientes, métricas rápidas y vinculación con `vincular_alumno`.
-- `cliente.html` ↔ `cliente-ui.js`: Ficha técnica del alumno, plan actual y accesos directos.
-- `plan-nuevo.html` ↔ `plan-nuevo-ui.js`: Asistente de nuevo plan (desde cero o plantilla).
-- `plan-editor.html` ↔ `plan-editor-ui.js`: Editor reactivo de comidas y cálculo Atwater en vivo.
-- `plan-editor-vacio.html`: Variante visual inicial del editor sin comidas cargadas.
-- `plan-activo.html` ↔ `plan-activo-ui.js`: Inspección del plan en curso y archivado.
-- `plan-archivado.html` ↔ `plan-archivado-ui.js`: Consulta histórica en modo solo lectura.
-- `historial.html` ↔ `historial-ui.js`: Línea de tiempo de planes del alumno seleccionado.
-- `historial-vacio.html`: Variante del historial para alumnos sin planes previos.
-- `buscar-alimento.html` ↔ `buscar-alimento-ui.js`: Búsqueda trigram en catálogo con macros por porción.
-- `alimentos-revision.html` ↔ `alimentos-revision-ui.js`: Moderación de alimentos propuestos por alumnos.
-- `plantillas.html` ↔ `plantillas-ui.js`: Catálogo maestro de planes base reutilizables.
-- `seguimiento.html` ↔ `seguimiento-coach-ui.js`: Métricas longitudinales y adherencia semanal.
-- `perfil.html` ↔ `perfil-coach-ui.js`: Datos del profesional y configuración de cuenta.
+### Vistas y Controladores del Coach (`frontend/pages/coach/` — 14 pantallas)
+- `clientes.html` ↔ `clientes-ui.js`: Bandeja de clientes, métricas rápidas y vinculación por código con `vincular_alumno`.
+- `cliente.html` ↔ `cliente-ui.js`: Ficha técnica del alumno, permisos por sección, preferencias y accesos directos.
+- `plan-nuevo.html` ↔ `plan-nuevo-ui.js`: Asistente de creación de nuevo plan (desde cero o precargado desde plantilla).
+- `plan-editor.html` (y vista de compatibilidad `plan-editor-vacio.html`) ↔ `plan-editor-ui.js`: Editor reactivo de comidas, colaciones dinámicas, duplicación de ingestas y cálculo Atwater en vivo.
+- `plan-activo.html` ↔ `plan-activo-ui.js`: Inspección del plan vigente y modal accesible de archivado.
+- `plan-archivado.html` ↔ `plan-archivado-ui.js`: Consulta histórica en modo solo lectura (compatible con rol coach y alumno).
+- `historial.html` (y vista de compatibilidad `historial-vacio.html`) ↔ `historial-ui.js`: Línea de tiempo de planes del alumno seleccionado.
+- `buscar-alimento.html` ↔ `buscar-alimento-ui.js`: Búsqueda híbrida trigram en catálogo con pestañas y macros por porción.
+- `alimentos-revision.html` ↔ `alimentos-revision-ui.js`: Panel de moderación para aprobar o rechazar alimentos propuestos por alumnos.
+- `plantillas.html` ↔ `plantillas-ui.js`: Catálogo maestro de 4 plantillas nutricionales base reutilizables.
+- `seguimiento.html` ↔ `seguimiento-coach-ui.js`: Evolución longitudinal de peso, adherencia semanal e hidratación del cliente.
+- `perfil.html` ↔ `perfil-coach-ui.js`: Datos profesionales del entrenador y edición accesible de perfil.
 
-### Vistas Compartidas y Autenticación
-- `frontend/index.html` ↔ `login-ui.js`: Inicio de sesión y redirección inteligente por rol.
-- `frontend/registro.html` ↔ `registro-ui.js`: Alta de cuentas con generación automática de `client_code`.
-- `frontend/pages/shared/contexto.html` ↔ `contexto-ui.js` / `rol-ui.js`: Motor metabólico de gasto energético.
+### Vistas Compartidas y Autenticación (3 pantallas)
+- `frontend/index.html` ↔ `login-ui.js`: Inicio de sesión, soporte `redirect_to` y redirección inteligente por rol.
+- `frontend/registro.html` ↔ `cuenta-ui.js`: Alta de cuentas con verificación de `@usuario` y generación automática de `client_code`.
+- `frontend/pages/shared/contexto.html` ↔ `contexto-ui.js` + `rol-ui.js`: Calculadora metabólica (Mifflin-St Jeor, NEAT, METs, TEF, TDEE) con invariante de visibilidad por rol.
 
 </details>
 
@@ -161,32 +159,32 @@ $$E(x) = w_1 \frac{|C_A - x C_B|}{C_A} + w_2 \frac{4|P_A - x P_B|}{C_A} + w_3 \f
 ## 👥 Roles y Flujos de Usuario
 
 ### 🏋️ Alumno ("Acciones Inmediatas, Cero Fricción")
-- **Dashboard Diario:** Selector de fecha con rueda interactiva, contador dinámico de calorías y macronutrientes (P, C, G) del día, tarjetas de 4 comidas con marcado *1-Tap Check* ("Lo comí") y contador de vasos de agua.
-- **Plan Alimenticio:** Visualización clara de la pauta asignada por el coach, sin necesidad de calcular gramajes.
-- **Motor de Reemplazo:** Sustitución de alimentos en tiempo real respetando los macronutrientes del plan.
-- **Progreso Físico:** Historial reactivo de pesajes corporales y porcentaje de avance hacia el objetivo.
+- **Dashboard Diario:** Selector de fecha con rueda interactiva, contador dinámico de calorías y macronutrientes (P, C, G) del día, tarjetas de comidas principales y colaciones con marcado *1-Tap Check* ("Lo comí") y contador de vasos de agua.
+- **Plan e Historial Alimenticio:** Visualización de la pauta vigente asignada por el coach y consulta de versiones archivadas previas.
+- **Motor de Reemplazo y Platos Compuestos:** Sustitución de alimentos en tiempo real respetando los macronutrientes del plan y armado de recetas propias multi-ingrediente.
+- **Progreso Físico e Hidratación:** Historial reactivo de pesajes corporales, porcentaje de avance hacia el objetivo y ajuste rápido de agua consumida.
 
 ### 📋 Coach ("El Método le Pertenece")
 - **Gestión de Clientes:** Listado de alumnos asignados y vinculación inmediata por código único (`NF-XXXX-YY`).
-- **Editor Reactivo de Planes:** Diseño de comidas desde cero o a partir de plantillas, con recálculo Atwater instantáneo.
-- **Historial y Seguimiento:** Consulta de planes archivados, semáforo clínico de adherencia semanal y feedback nutricional.
-- **Buscador y Moderación:** Catálogo con búsqueda trigram y panel de aprobación de alimentos propuestos por alumnos.
+- **Editor Reactivo de Planes y Plantillas:** Diseño de comidas y colaciones desde cero o a partir de 4 plantillas base, duplicación de ingestas y recálculo Atwater instantáneo.
+- **Historial y Seguimiento:** Consulta de planes archivados, evolución de pesajes, adherencia semanal e hidratación en tiempo real.
+- **Buscador y Moderación:** Catálogo con búsqueda trigram por pestañas y panel de aprobación/rechazo de alimentos propuestos por alumnos.
 
 ### 🌐 Contexto Energético Compartido
-- Cálculo de la **Tasa Metabólica Basal (TMB - Mifflin-St Jeor)**, **NEAT**, **METs**, **TEF (10%)** y **TDEE**, con alertas de seguridad ante déficits calóricos severos.
+- Cálculo de la **Tasa Metabólica Basal (TMB - Mifflin-St Jeor)**, **NEAT**, **METs**, **TEF (10%)** y **TDEE**, ocultando el desglose técnico al alumno y exponiéndolo íntegramente al coach.
 
 ---
 
 ## 🎨 Sistema de Diseño (Design Tokens)
 
-La interfaz se rige por las directrices de [`DESIGN.md`](file:///C:/Users/gian9/OneDrive/Desktop/AppCalorias/DESIGN.md):
-- **Tipografía:** *Bricolage Grotesque* (títulos numéricos con números tabulares `tabular-nums`) e *Instrument Sans* (cuerpo y controles).
-- **Paleta Canónica:**
-  - Marca Verde: `--verde: #1E6847` / `--verde-hover: #164E35` / `--verde-superficie: #E8F5E9`
-  - Fondos y Superficies: `--fondo: #F7F6F2` / `--superficie: #FFFFFF` / `--borde: #E5E7EB`
-  - Tipografía: `--texto: #1A1A1A` / `--texto-secundario: #6B7280`
-  - Semáforo y Alertas: `--aviso: #D97706` / `--peligro: #DC2626`
-- **Accesibilidad y Ergonomía:** Zona táctil mínima de **44 × 44 px** (`--alto-tactil`), Focus Trap obligatorio con [`accesibilidad.js`](file:///C:/Users/gian9/OneDrive/Desktop/AppCalorias/frontend/js/utils/accesibilidad.js) en modales, y sanitización automática de comas a puntos en teclados móviles `inputmode="decimal"`.
+La interfaz se rige por las directrices de [`DESIGN.md`](DESIGN.md) y [`frontend/css/base.css`](frontend/css/base.css):
+- **Tipografía:** *Bricolage Grotesque* (`--fuente-titulos`, títulos y cifras con `tabular-nums`) e *Instrument Sans* (`--fuente-texto`, cuerpo y controles).
+- **Paleta Canónica (`:root` en `base.css`):**
+  - Marca Verde: `--verde: #1E6847` / `--verde-oscuro: #134631` / `--verde-claro: #E4EFE8`
+  - Fondos y Superficies: `--fondo: #F3F5F1` / `--fondo-app: #DDE3DC` / `--blanco: #FFFFFF` / `--borde: #E3E7E1`
+  - Tipografía: `--tinta: #17211C` / `--gris-oscuro: #4A554E` / `--gris: #5B665F` / `--gris-medio: #8A948D`
+  - Semánticos y Macros: `--azul: #2B59C3` (`--macro-p`) / `--naranja: #E39A2D` (`--macro-c`) / `--violeta: #A8467F` (`--macro-g`) / `--rojo: #8A3B2E` / `--agua: #7FB3E8`
+- **Accesibilidad y Ergonomía:** Zona táctil mínima de **44 × 44 px** (`--alto-tactil`), Focus Trap obligatorio con [`accesibilidad.js`](frontend/js/utils/accesibilidad.js) en modales, y sanitización automática de comas a puntos en teclados móviles `inputmode="decimal"`.
 
 ---
 
@@ -210,19 +208,23 @@ python scratch/test_supabase_modules.py
 python scratch/test_equivalencia_calc.py
 python scratch/test_nutricion_calc.py
 
-# 6. Pruebas de interfaz en navegador Chromium/Edge headless
+# 6. Pruebas de interfaz y reactividad en navegador Chromium/Edge headless
 python scratch/test_dashboard_ui.py
 python scratch/test_reemplazar_ui.py
+python scratch/test_progreso_ui.py
+python scratch/test_crear_plato.py
+python scratch/test_accesibilidad_modales.py
+python scratch/test_sincronizacion_agua.py
 ```
 
 ---
 
 ## 📚 Documentación Técnica Canónica (5 Pilares)
 
-- 🏛️ [**README.md**](file:///C:/Users/gian9/OneDrive/Desktop/AppCalorias/README.md): Portal principal, arquitectura de 4 capas, capa de datos y motores de cálculo.
-- 📐 [**DESIGN.md**](file:///C:/Users/gian9/OneDrive/Desktop/AppCalorias/DESIGN.md): Especificación exhaustiva de tokens CSS, componentes transversales y WAI-ARIA.
-- 🗺️ [**ROADMAP.md**](file:///C:/Users/gian9/OneDrive/Desktop/AppCalorias/ROADMAP.md): Sprints completados, decisiones arquitectónicas y backlog técnico priorizado.
-- 🤝 [**CONTRIBUTING.md**](file:///C:/Users/gian9/OneDrive/Desktop/AppCalorias/CONTRIBUTING.md): Guía de desarrollo, patrón SELECTORES, reglas de plantillas y tests.
-- 📜 [**CHANGELOG.md**](file:///C:/Users/gian9/OneDrive/Desktop/AppCalorias/CHANGELOG.md): Registro cronológico de versiones ejecutivas (v0.1.0 -> v0.6.1).
-- 🗄️ [**supabase/ESQUEMA.md**](file:///C:/Users/gian9/OneDrive/Desktop/AppCalorias/supabase/ESQUEMA.md): Esquema relacional, flujo Coach-Alumno, semáforo, RLS y RPCs.
-- 🚀 [**supabase/README.md**](file:///C:/Users/gian9/OneDrive/Desktop/AppCalorias/supabase/README.md): Guía operativa de migraciones, reversiones y tests pgTAP.
+- 🏛️ [**README.md**](README.md): Portal principal, arquitectura de 4 capas, capa de datos y motores de cálculo.
+- 📐 [**DESIGN.md**](DESIGN.md): Especificación exhaustiva de tokens CSS, componentes transversales y WAI-ARIA.
+- 🗺️ [**ROADMAP.md**](ROADMAP.md): Sprints completados, decisiones arquitectónicas y backlog técnico priorizado.
+- 🤝 [**CONTRIBUTING.md**](CONTRIBUTING.md): Guía de desarrollo, patrón SELECTORES, reglas de plantillas y tests.
+- 📜 [**CHANGELOG.md**](CHANGELOG.md): Registro cronológico de versiones ejecutivas (v0.1.0 -> v0.6.1).
+- 🗄️ [**supabase/ESQUEMA.md**](supabase/ESQUEMA.md): Esquema relacional, flujo Coach-Alumno, semáforo, RLS y RPCs.
+- 🚀 [**supabase/README.md**](supabase/README.md): Guía operativa de migraciones, reversiones y tests pgTAP.

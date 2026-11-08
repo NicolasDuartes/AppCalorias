@@ -14,12 +14,28 @@ export const PANTALLAS = {
 };
 
 /**
- * Para pantallas de un solo rol ("alumno" o "coach").
- * - Sin sesión: manda al login y devuelve null.
- * - Con otro rol: manda a la pantalla de ese rol y devuelve null.
- * - Si no se pudo leer el perfil: devuelve { usuarioId, perfil: null }.
- * - Si todo está bien: devuelve { usuarioId, perfil } con `role` y los
- *   `campos` pedidos (ej. 'username, email').
+ * Verifica que exista una sesión activa en Supabase Auth y que el usuario posea el rol requerido.
+ * Si no hay sesión, redirige al login preservando la ruta actual en `?redirect_to=`.
+ * Si el usuario tiene un rol distinto al exigido, redirige a la portada de su rol.
+ *
+ * @param {'alumno'|'coach'} rol - Rol obligatorio para acceder a la pantalla actual.
+ * @param {string} [campos=''] - Lista separada por comas de columnas adicionales a consultar en `public.profiles` (ej. `'username, client_code'`).
+ * @returns {Promise<{ usuarioId: string, perfil: Object|null }|null>} Datos de sesión y perfil, o `null` si se redirigió fuera de la vista.
+ *
+ * @example
+ * // Caso normal: exigir rol de alumno solicitando campos adicionales del perfil
+ * const sesion = await exigirRol('alumno', 'username, client_code, coach_id');
+ * // -> { usuarioId: "uuid-123", perfil: { role: "alumno", username: "lucas", ... } }
+ *
+ * @example
+ * // Caso especial: ejecución en entorno de pruebas automatizadas con bypass activo
+ * window.__TEST_BYPASS_AUTH__ = true;
+ * const sesionTest = await exigirRol('coach');
+ * // -> { usuarioId: "test-user", perfil: { role: "coach" } }
+ *
+ * @note Edge cases:
+ * - Sin sesión activa: redirige a `index.html?redirect_to=...` y retorna `null`.
+ * - Error al leer `profiles` con sesión válida: retorna `{ usuarioId, perfil: null }` sin expulsar al usuario.
  */
 export async function exigirRol(rol, campos = '') {
   if (typeof window !== 'undefined' && window.__TEST_BYPASS_AUTH__) {
@@ -55,6 +71,20 @@ export async function exigirRol(rol, campos = '') {
   return { usuarioId: session.user.id, perfil };
 }
 
+/**
+ * Cierra la sesión activa en Supabase Auth (o en el Mock Store offline)
+ * y redirige inmediatamente al usuario a la pantalla de inicio de sesión.
+ *
+ * @returns {Promise<void>}
+ *
+ * @example
+ * // Caso normal: cerrar sesión desde el botón de salida del perfil
+ * await cerrarSesion();
+ *
+ * @example
+ * // Caso especial: vincular directamente como manejador de evento click
+ * btnSalir.addEventListener('click', () => cerrarSesion());
+ */
 export async function cerrarSesion() {
   await supabase.auth.signOut();
   window.location.href = PANTALLAS.login;

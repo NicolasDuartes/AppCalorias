@@ -69,6 +69,22 @@ function normalizarTexto(txt) {
     .replace(/[\u0300-\u036f]/g, '');
 }
 
+/**
+ * Determina si el cliente debe operar en modo desconectado (Mock Store local),
+ * ya sea porque se forzó programáticamente (`globalThis.__FORCE_OFFLINE__ === true`)
+ * o porque el navegador reporta `navigator.onLine === false`.
+ *
+ * @returns {boolean} `true` si el entorno está sin conexión o en modo offline forzado.
+ *
+ * @example
+ * // Caso normal: consultar estado de red del navegador
+ * const offline = isOfflineMode(); // -> false (si hay conexión activa)
+ *
+ * @example
+ * // Caso especial: modo offline forzado durante suites de prueba
+ * setForceOffline(true);
+ * isOfflineMode(); // -> true
+ */
 export function isOfflineMode() {
   if (typeof globalThis !== 'undefined' && globalThis.__FORCE_OFFLINE__ === true) {
     return true;
@@ -79,6 +95,21 @@ export function isOfflineMode() {
   return false;
 }
 
+/**
+ * Activa o desactiva manualmente el modo offline forzado en `globalThis.__FORCE_OFFLINE__`,
+ * redirigiendo todas las consultas de Supabase hacia el `MockStore` local sin realizar peticiones HTTP.
+ *
+ * @param {boolean} force - `true` para forzar el uso del Mock Store local; `false` para restaurar la detección normal.
+ * @returns {void}
+ *
+ * @example
+ * // Caso normal: forzar modo offline para pruebas de resiliencia
+ * setForceOffline(true);
+ *
+ * @example
+ * // Caso especial: restaurar conexión normal convirtiendo valores truthy/falsy a booleano
+ * setForceOffline(false);
+ */
 export function setForceOffline(force) {
   if (typeof globalThis !== 'undefined') {
     globalThis.__FORCE_OFFLINE__ = Boolean(force);
@@ -1647,12 +1678,55 @@ function createResilientClient() {
   };
 }
 
+/**
+ * Instancia Singleton del cliente resiliente de Supabase.
+ * Conecta con `@supabase/supabase-js` vía CDN cuando hay red disponible y conmuta
+ * automáticamente al `MockStore` local ante desconexión, bloqueo de CDN o errores de red.
+ *
+ * @type {{ from: Function, rpc: Function, auth: Object }}
+ *
+ * @example
+ * // Caso normal: consulta encadenada con fallback transparente
+ * const { data, error } = await supabase.from('profiles').select('*').eq('id', uid).maybeSingle();
+ *
+ * @example
+ * // Caso especial: invocación de procedimiento almacenado (RPC) offline/online
+ * const { data } = await supabase.rpc('buscar_alimentos', { p_texto: 'avena', p_limite: 10 });
+ */
 export const supabase = createResilientClient();
 
+/**
+ * Devuelve la instancia activa del almacén reactivo local (`MockStore`) utilizado como respaldo offline.
+ *
+ * @returns {MockStore} Instancia del almacén en memoria sincronizado con Web Storage.
+ *
+ * @example
+ * // Caso normal: inspeccionar tablas cargadas en el MockStore
+ * const store = getMockStore();
+ *
+ * @example
+ * // Caso especial: ejecutar un RPC directamente sobre el almacén local
+ * const res = await getMockStore().rpc('usuario_disponible', { p_usuario: 'nuevo.user' });
+ */
 export function getMockStore() {
   return mockStore;
 }
 
+/**
+ * Restaura el `MockStore` local a su estado semilla original con los datos de demostración
+ * por defecto y persiste el estado limpio en `localStorage`/`sessionStorage`.
+ *
+ * @returns {Object} Estado semilla recién restaurado.
+ *
+ * @example
+ * // Caso normal: limpiar datos modificados tras una suite de pruebas
+ * resetMockStore();
+ *
+ * @example
+ * // Caso especial: verificar cantidad de perfiles semilla tras reiniciar
+ * const estadoInicial = resetMockStore();
+ * // -> { profiles: [...], meal_plans: [...], ... }
+ */
 export function resetMockStore() {
   return mockStore.reset();
 }

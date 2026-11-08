@@ -16,9 +16,24 @@ import { normalizarDecimal } from '../calc/formato-calc.js';
 let temporizadorToast = null;
 
 /**
- * Muestra un aviso flotante accesible estilo toast.
- * @param {string} mensaje Texto a comunicar al usuario.
- * @param {number} duracion Milisegundos visibles antes de ocultarse.
+ * Muestra una notificación efímera accesible (`.aviso-flotante--toast`) en la parte inferior
+ * de la pantalla con atributos WAI-ARIA `role="status"` y `aria-live="polite"`.
+ *
+ * @param {string} mensaje - Texto informativo a presentar al usuario.
+ * @param {number} [duracion=3000] - Tiempo en milisegundos antes de ocultar automáticamente el aviso.
+ * @returns {void}
+ *
+ * @example
+ * // Caso normal: mostrar confirmación con duración estándar de 3 segundos
+ * mostrarAvisoFlotante('Cambios guardados correctamente');
+ *
+ * @example
+ * // Caso especial: mostrar aviso prolongado de 5 segundos
+ * mostrarAvisoFlotante('Conexión restablecida', 5000);
+ *
+ * @note Edge cases:
+ * - Si no existe un nodo `.aviso-flotante--toast` en el DOM, lo crea dinámicamente con `createElement` (cero `innerHTML`) dentro de `.pantalla` o `document.body`.
+ * - Si se invoca mientras otro aviso está visible, cancela el temporizador previo y actualiza el mensaje inmediatamente.
  */
 export function mostrarAvisoFlotante(mensaje, duracion = 3000) {
   let toast = document.querySelector('.aviso-flotante--toast');
@@ -41,8 +56,20 @@ export function mostrarAvisoFlotante(mensaje, duracion = 3000) {
 }
 
 /**
- * Guarda un aviso flotante en sessionStorage para mostrarlo al cargar la siguiente pantalla.
- * @param {string} mensaje Texto a comunicar al usuario.
+ * Almacena un mensaje de notificación en `sessionStorage` (`'aviso-toast'`) para que sea
+ * desplegado automáticamente tras completar una redirección entre páginas MPA.
+ *
+ * @param {string} mensaje - Texto del aviso a mostrar en la página de destino.
+ * @returns {void}
+ *
+ * @example
+ * // Caso normal: encolar toast antes de redirigir al dashboard
+ * guardarAvisoToast('Alimento agregado al desayuno');
+ * window.location.href = 'dashboard.html';
+ *
+ * @example
+ * // Caso especial: si sessionStorage está bloqueado (modo privado estricto), falla silenciosamente
+ * guardarAvisoToast('Plan activado');
  */
 export function guardarAvisoToast(mensaje) {
   try {
@@ -53,7 +80,19 @@ export function guardarAvisoToast(mensaje) {
 }
 
 /**
- * Muestra y consume cualquier aviso toast pendiente en sessionStorage.
+ * Verifica si existe un aviso pendiente en `sessionStorage` (`'aviso-toast'`),
+ * lo elimina del almacenamiento para evitar repeticiones al recargar y lo muestra en pantalla.
+ *
+ * @returns {void}
+ *
+ * @example
+ * // Caso normal: procesar toasts al inicializar una vista
+ * procesarAvisoToastPendiente();
+ *
+ * @example
+ * // Caso especial: invocación cuando no hay avisos encolados (no realiza cambios en el DOM)
+ * sessionStorage.removeItem('aviso-toast');
+ * procesarAvisoToastPendiente();
  */
 export function procesarAvisoToastPendiente() {
   try {
@@ -92,8 +131,18 @@ const SIMBOLOS_SPRITE_BASE = {
 };
 
 /**
- * Asegura que el cascarón compartido de la página (<svg class="sprite"> y <nav class="barra-inferior">)
- * cuente con todos los símbolos base registrados y los atributos de accesibilidad requeridos.
+ * Garantiza que el documento HTML actual disponga de los 19 símbolos base en `<svg class="sprite">`
+ * y que toda barra de navegación `.barra-inferior` posea sus atributos WAI-ARIA (`aria-label` e íconos `aria-hidden="true"`).
+ *
+ * @returns {void}
+ *
+ * @example
+ * // Caso normal: completar símbolos faltantes en el sprite SVG de la vista actual
+ * asegurarCascaronCompartido();
+ *
+ * @example
+ * // Caso especial: ejecución en entorno sin DOM (Node/SSR) — retorna inmediatamente sin error
+ * asegurarCascaronCompartido();
  */
 export function asegurarCascaronCompartido() {
   if (typeof document === 'undefined') return;
@@ -128,7 +177,19 @@ export function asegurarCascaronCompartido() {
 }
 
 /**
- * Inicializa los controladores globales de retorno inteligente, accesibilidad y retroalimentación.
+ * Inicializa de forma idempotente los manejadores globales de navegación:
+ * retorno inteligente (`history.back` con guarda anti-bucle ping-pong), cierre de modales `:target`
+ * con `Escape`, micro-interacciones ARIA y sanitización automática de entradas decimales.
+ *
+ * @returns {void}
+ *
+ * @example
+ * // Caso normal: inicialización automática al cargar el DOM
+ * iniciarNavegacion();
+ *
+ * @example
+ * // Caso especial: llamadas subsecuentes re-hidratan el cascarón y toasts sin duplicar event listeners
+ * iniciarNavegacion();
  */
 export function iniciarNavegacion() {
   // 0. Cascarón común y aviso toast inter-páginas pendiente en sessionStorage

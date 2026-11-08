@@ -88,7 +88,7 @@ if (document.readyState === 'loading') {
 
 ## 🎨 Convenciones de Estilo (CSS)
 
-- **Solo Tokens:** Todo color, margen, espaciado, sombra o radio debe provenir de las variables definidas en `:root` ([`frontend/css/base.css`](file:///C:/Users/gian9/OneDrive/Desktop/AppCalorias/frontend/css/base.css)).
+- **Solo Tokens:** Todo color, margen, espaciado, sombra o radio debe provenir de las variables definidas en `:root` ([`frontend/css/base.css`](frontend/css/base.css)).
 - **Prohibido `style=""` en HTML:** Solo se admite para valores puramente dinámicos generados por datos (por ejemplo, el ancho porcentual de una barra de macronutrientes: `style="width: 45%"`).
 - **Zona Táctil Mínima de 44 px:** Todo botón, enlace o área interactiva debe medir al menos 44 × 44 px (`--alto-tactil`).
 - **Estados por Atributos ARIA:** Los cambios de estado deben regirse por atributos semánticos (`aria-pressed`, `aria-expanded`, `aria-selected`, `hidden`), nunca por clases inventadas.

@@ -16,7 +16,7 @@ Este documento centraliza el estado del proyecto, las decisiones técnicas adopt
 - **Resiliencia y Modo Desconectado (Offline Fallback):** Arquitectura dual en `supabase.js` con `MockStore` reactivo en memoria (`STORAGE_KEY_STORE = 'appcalorias_offline_store_v1'`) y Query Builder encadenado para garantizar que la app funcione sin conexión o cuando el CDN no esté disponible.
 - **Las 3 Reglas de Oro de Plantillas HTML (Cero `innerHTML`):**
   - **Regla 1:** Plantillas `<template id="tpl-...">` con `data-bind` y `data-ref` hidratadas con `cloneNode(true)` y `textContent` para erradicar cualquier vector de inyección DOM-XSS.
-  - **Regla 2:** Un solo `.html` por pantalla alternando estados vacíos y listas mediante `.vacio[hidden]`.
+  - **Regla 2:** Un solo `.html` por pantalla alternando estados vacíos y listas mediante `.vacio[hidden]` (manteniendo `plan-editor-vacio.html` e `historial-vacio.html` solo como alias de compatibilidad legada).
   - **Regla 3:** Cascarón compartido en `navegacion.js`, persistencia de borradores en `sessionStorage` en flujos MPA e invariantes conceptuales por rol.
 - **Accesibilidad WAI-ARIA Universal (Regla 4):** Ciclo estricto de foco (*Focus Trap*) con `accesibilidad.js` (`activarTrampaFoco`, `liberarTrampaFoco`, `configurarModalAccesible`) en los 6 modales de la aplicación, con soporte para teclado (`Escape`, `Tab`, `Shift+Tab`) y restauración al elemento disparador (WCAG 2.1 AA).
 
@@ -25,9 +25,9 @@ Este documento centraliza el estado del proyecto, las decisiones técnicas adopt
 ## 2. Historial de Hitos Implementados
 
 - **Inicio de sesión y registro corto:** Login como pantalla de bienvenida y redirección inteligente por rol.
-- **Dashboard del alumno:** Selector de fecha con rueda de días, calendario táctil, tarjeta compacta de calorías y 1-Tap Check en 4 comidas.
+- **Dashboard del alumno:** Selector de fecha con rueda de días, calendario táctil, tarjeta compacta de calorías y 1-Tap Check en comidas principales y colaciones.
 - **Perfil del coach y gestión de clientes:** Listado de alumnos, vinculación por ID único (`NF-XXXX-YY`) con `vincular_alumno`, y ficha técnica.
-- **Sistema de diseño y responsive:** Tokens de color canónicos (`--verde: #1E6847`, `--fondo: #F7F6F2`), escala de espacios, zona táctil de 44 px (`--alto-tactil`), layout adaptable sin marcos rígidos de teléfono.
+- **Sistema de diseño y responsive:** Tokens de color canónicos (`--verde: #1E6847`, `--fondo: #F3F5F1`), escala de espacios, zona táctil de 44 px (`--alto-tactil`), layout adaptable sin marcos rígidos de teléfono.
 - **Navegación y feedback visual (v0.4.0 - v0.4.2):** Módulo `navegacion.js` con historial inteligente, toasts inter-páginas persistidos en `sessionStorage`, sanitización decimal transparente y validación Atwater reactiva ($4P + 4C + 9G$).
 - **Motor de equivalencias analítico (v0.4.3 - v0.4.4):** Cálculo analítico exacto de porciones equitativas en $O(1)$ por mediana ponderada en norma $L_1$ (`equivalencia-calc.js`) con semáforo de similitud y adherencia.
 - **Arquitectura 100% modular y conexión Supabase (v0.5.0):** Controladores UI en `frontend/js/ui/` con mapas `SELECTORES` centralizados; capa de datos en `frontend/js/data/` (`alimentos-api.js`, `planes-api.js`, `registro-api.js`, `contexto-api.js`); ciclo de vida de planes para el coach (`plan-activo-ui.js`, `plan-editor-ui.js`, `plan-nuevo-ui.js`, `historial-ui.js`, `plan-archivado-ui.js`); y motor metabólico interactivo en `contexto.html` (Mifflin-St Jeor, NEAT, METs, TEF y TDEE).
@@ -51,10 +51,10 @@ Este documento centraliza el estado del proyecto, las decisiones técnicas adopt
 6. **Protección contra enumeración en `usuario_disponible`:**
    - Implementar rate limiting por IP mediante Supabase Edge Functions.
 
-### Prioridad 2: Infraestructura y Empaquetado Offline
+### Prioridad 2: Infraestructura y Empaquetado Local
 1. **Versionar las suites de prueba:**
    - Mover las suites estandarizadas de `scratch/` a una carpeta `tests/` versionada en Git.
 2. **Integración Continua (CI):**
    - Configurar GitHub Actions (`.github/workflows/ci.yml`) para ejecutar validación sintáctica, integridad de enlaces y suites de modularización en cada PR.
-3. **Resiliencia offline del SDK de Supabase:**
-   - Empaquetar copia estática local (`vendor/supabase-js.js`) para evitar dependencia de red exclusiva de CDN jsdelivr.
+3. **Copia local estática del SDK `@supabase/supabase-js`:**
+   - Aunque el modo offline ya está cubierto por el `MockStore` en `supabase.js`, empaquetar una copia estática (`vendor/supabase-js.js`) permitirá conectar con el backend de Supabase en redes corporativas que bloqueen el CDN `jsdelivr`.

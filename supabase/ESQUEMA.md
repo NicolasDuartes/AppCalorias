@@ -141,7 +141,7 @@ Un perfil por cuenta de Supabase Auth. Lo crea un trigger al registrarse.
 | Otro coach / sin sesión | Nada | Nada |
 
 - **`permisos_alumno`:** una fila por sección habilitada (`contexto`,
-  `antropometria`, `plan`). Solo el coach del alumno da o quita permisos.
+  `plan`; el valor `antropometria` permanece aceptado por el `CHECK` SQL pero fue descartado en la interfaz). Solo el coach del alumno da o quita permisos.
 - **Al vincular o desvincular:** los permisos del alumno se borran. Al
   desvincular, el coach deja de ver los datos, pero los registros quedan y el
   alumno vuelve a poder cargar todo.
