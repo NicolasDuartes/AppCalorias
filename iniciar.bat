@@ -4,7 +4,7 @@ echo   Iniciando servidor local de AppCalorias
 echo ========================================================
 echo.
 echo Sirviendo frontend en: http://localhost:8080/
-echo Portal de documentacion: http://localhost:8080/docs-dashboard.html
+echo Documentacion tecnica: Consulta README.md y DESIGN.md
 echo.
 echo Presiona Ctrl+C para detener el servidor.
 echo.

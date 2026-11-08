@@ -26,14 +26,39 @@ erDiagram
 | Tabla | Qué guarda | Estado |
 |---|---|---|
 | `profiles` | Cuenta: rol, @usuario, ID de cliente, coach, sexo, fecha de nacimiento. | En uso |
-| `permisos_alumno` | Secciones que el coach le habilita al alumno. | En esquema (pendiente interfaz UI) |
-| `contextos_energeticos` | Gasto energético y calorías objetivo (historial). | En esquema (pendiente conectar contexto-ui) |
+| `permisos_alumno` | Secciones que el coach le habilita al alumno (`contexto`, `plan`). | En uso (conectada vía contexto-api.js) |
+| `contextos_energeticos` | Gasto energético y calorías objetivo (historial). | En uso (conectada vía contexto-api.js) |
 | `antropometrias` | Mediciones corporales y composición (historial). | Descartada por diseño (pendiente DROP TABLE) |
 | `meal_plans`, `plan_meals`, `plan_items` | Planes alimenticios y sus comidas. | En uso (conectadas vía planes-api.js) |
 | `daily_logs`, `logged_items` | Registro diario del alumno y agua consumida. | En uso (conectadas vía registro-api.js) |
-| `coach_alumno_summary` | Vista de resumen para el coach. | En esquema (vista SQL auxiliar) |
+| `coach_alumno_summary` | Vista de resumen y semáforo de adherencia para el coach. | En uso (vista SQL auxiliar para clientes-ui.js) |
 | `categorias_alimento`, `alimentos`, `correcciones_alimento` | Base propia de alimentos (cada 100 g), USDA y correcciones. | En uso (conectadas vía alimentos-api.js) |
 | `alumnos` | Tabla vieja pre-migraciones sin uso. Bloqueada. | Deprecada (pendiente DROP TABLE) |
+
+## Ciclo de Trabajo Coach–Alumno y Semáforo Clínico
+
+La arquitectura de datos está diseñada para maximizar la adherencia del alumno mediante la reducción drástica de la fricción de registro:
+
+```mermaid
+flowchart TD
+    Coach([👨‍🏫 Coach]) -->|1. Crea Plan con Macros y Comidas| MealPlans[meal_plans + plan_meals + plan_items]
+    MealPlans -->|2. Se precarga en el celular del alumno| Alumno([📱 Alumno])
+    Alumno -->|3. Confirma con 1-Tap lo que comió| DailyLogs[daily_logs + logged_items]
+    DailyLogs -->|4. Se calcula adherencia automáticamente| Summary[coach_alumno_summary]
+    Summary -->|5. Semáforo de alerta y control rápido| Coach
+```
+
+### Mecánica del 1-Tap Check
+- **`plan_items` (Alimentos Sugeridos):** El coach planifica las comidas con gramajes exactos. El alumno no necesita idear recetas ni buscar ingredientes desde cero en cada ingesta.
+- **`logged_items` (Confirmación Táctil Inmediata):** Cada alimento sugerido se precarga en el día. El alumno solo pulsa el botón de confirmación (`checked = true`) al consumir lo planeado, reduciendo el 90% del tiempo de registro frente a diarios convencionales. Si varía la porción o reemplaza el alimento, edita únicamente la diferencia.
+- **`daily_logs`:** Acumula totales calóricos, macronutrientes reales, consumo de agua y notas de feedback entre coach y alumno.
+
+### Criterios Clínicos del Semáforo (`coach_alumno_summary`)
+La vista procesa en tiempo real la adherencia acumulada de los últimos 7 días y categoriza el estado de cada cliente para intervención del coach:
+- 🟢 **Excelente:** Adherencia $\ge 85\%$. El alumno sigue el plan con consistencia calórica y de macronutrientes.
+- 🟡 **Aceptable:** Adherencia entre $70\%$ y $84\%$. Desviaciones moderadas que ameritan revisión en la próxima consulta.
+- 🔴 **Bajo:** Adherencia $< 70\%$. Desconexión frecuente del plan con riesgo de abandono.
+- ⚫ **Inactivo:** Más de 3 días consecutivos sin registrar ingestas ni hidratación. Dispara alerta prioritaria en la bandeja del coach.
 
 ## Cuentas y vínculo (`profiles`)
 
